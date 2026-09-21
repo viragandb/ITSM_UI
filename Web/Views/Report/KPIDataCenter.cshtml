@@ -1,0 +1,947 @@
+﻿@using Service
+@model Web.Models.DataCenterKPIVM
+@{
+    /**/
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@using (Html.BeginForm("KPIDataCenter", "Report", FormMethod.Get, new { @class = "form-horizontal" }))
+{
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card box-danger">
+                <div class="card-header with-border">
+                    <h3 class="card-title">Data Center KPI</h3>
+                    <div class="card-tools pull-right">
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <div class="form-group row">
+
+                        <label class="control-label col-md-2">
+                            Date :
+                        </label>
+                        <div class="col-md-2">
+                            <div class="input-group date">
+                                <div class="input-group-addon">
+                                    <i class="fa fa-calendar"></i>
+                                </div>
+                                <input type="text" name="StartDate" id="StartDate" value="@ViewBag.StartDate" class="form-control datepicker" />
+                            </div>
+                        </div>
+
+
+                        <label class="control-label col-md-1">
+                            To
+                        </label>
+                        <div class="col-md-2">
+                            <div class="input-group date">
+                                <div class="input-group-addon">
+                                    <i class="fa fa-calendar"></i>
+                                </div>
+                                <input type="text" name="EndDate" id="EndDate" value="@ViewBag.EndDate" class="form-control datepicker" />
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="text-right">
+                        <button type="submit" class="btn btn-social">
+                            <i class="fa fa-search"></i>Search
+                        </button>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card box-warning">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <h4 class="card-title">
+                                <a data-bs-toggle="collapse" data-parent="#accordion" href="#KPI1">
+                                    Maintain 99.99% uptime for Critical production servers - ( W @Model.KPI1Weightage% )
+
+                                </a>
+
+                            </h4>
+                        </div>
+                        <div class="col-lg-2 text-right">
+                            KPI : @Model.KPI1Value
+                        </div>
+                        <div class="col-lg-1 text-right">
+                            W : @Model.KPI1WeightValue
+                        </div>
+                        <div class="col-lg-1 text-right">
+                            <span class="label label-warning">
+                                <b>
+                                    <lable>@Model.KPI1ValueRatio %</lable>
+                                </b>
+                            </span>
+                        </div>
+                    </div>
+
+                </div>
+                <div id="KPI1" class="panel-collapse collapse">
+                    <div class="card-body">
+
+                        <ul>
+                            <li>Uptime >= 99.99 => <b>100%</b></li>
+                            <li>Uptime < 99.99  & > 95% => <b>75%</b></li>
+                            <li>Uptime < 95% => <b> 0</b></li>
+                        </ul>
+
+                        <table id="dataTable" class="table table-bordered table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Asset Code</th>
+                                    <th>Name</th>
+                                    <th>Description</th>
+                                    <th>Serial #</th>
+                                    <th>Model</th>
+                                    <th>Location</th>
+                                    <th>Company</th>
+                                    <th>Uptime</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+                                    foreach (var item in Model.Assets)
+                                    {
+                                        <tr>
+                                            <td>
+
+                                                <a href="#AC_@item.AssetCode" data-bs-toggle="collapse" data-parent="#accordion">
+                                                    @item.AssetCode
+                                                </a>
+                                            </td>
+                                            <td>@item.AssetName</td>
+                                            <td>@item.Description</td>
+                                            <td>@item.SerialNo</td>
+                                            <td>@item.ModelName</td>
+                                            <td>@item.Location</td>
+                                            <td>@item.Company</td>
+                                            <td>@item.UpTime</td>
+
+                                        </tr>
+
+                                        <tr class="panel-collapse collapse" id="AC_@item.AssetCode">
+                                            <td colspan="8">
+
+                                                <div style="overflow-x:auto ">
+                                                    <table class="table table-bordered table-striped table-hover" style="background-color:#F8C471">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Ticket</th>
+                                                                <th>Type</th>
+                                                                <th>Date/Time</th>
+                                                                <th>Comment</th>
+                                                                <th>Downtime Hrs</th>
+
+                                                                <th>Updated By</th>
+                                                                <th>Updated Date</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @{
+                                                                foreach (var log in item.DowntimeLogs)
+                                                                {
+                                                                    <tr>
+
+                                                                        <td>
+                                                                            @if (log.TicketId != 0)
+                                                                            {
+                                                                                <a href="@Html.EncodedActionLink("", "TicketInfo", "Ticket", "", new { id = log.TicketId }, null)" target="_blank">
+                                                                                    Ticket
+                                                                                </a>
+                                                                            }
+                                                                        </td>
+
+                                                                        <td>@log.DowntimeType.EnumDisplayName()</td>
+                                                                        <td>@log.ApplicableDate</td>
+                                                                        <td>@log.Comment</td>
+                                                                        <td>@log.DowntimeHrs</td>
+                                                                        <td>@log.UpdatedBy</td>
+                                                                        <td>@log.UpdatedDate</td>
+                                                                    </tr>
+                                                                }
+                                                            }
+                                                        </tbody>
+                                                    </table>
+
+                                                </div>
+                                            </td>
+                                        </tr>
+
+
+
+                                    }
+                                }
+                            </tbody>
+
+                        </table>
+
+                     
+                    </div>
+
+
+                </div>
+                <div class="card-footer">
+                    <div class="progress-group">
+                        <div class="progress sm" style="margin-bottom:3px">
+                            <div class="progress-bar progress-bar-warning" id="finalProgressBar" style="width:@Model.KPI1ValueRatio%"></div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card box-danger">
+                <div class="card-header">
+                    <div class="row">
+
+                        <div class="col-lg-9">
+                            <h4 class="card-title">
+                                <a data-bs-toggle="collapse" data-parent="#accordion" href="#KPI2">
+                                    Change Incidents - ( W @Model.KPI2Weightage% )
+                                </a>
+                            </h4>
+                        </div>
+                        <div class="col-lg-1 text-right">
+                            KPI : @Model.KPI2Value
+                        </div>
+                        <div class="col-lg-1 text-right">
+                            W : @Model.KPI2WeightValue
+                        </div>
+                        <div class="col-lg-1 text-right">
+                            <span class="label label-danger">
+                                <b>
+                                    <lable>@Model.KPI2ValueRatio %</lable>
+                                </b>
+                            </span>
+                        </div>
+                    </div>
+
+                </div>
+                <div id="KPI2" class="panel-collapse collapse">
+                    <div class="card-body">
+                        <ul>
+                            <li>No Incident reported => <b>100%</b></li>
+                            <li>1 Incident Reported => <b>80%</b></li>
+                            <li>2-10 Incident Reported => <b>50%</b></li>
+                            <li>More than 10 Incident Reported => <b> 0</b></li>
+                        </ul>
+
+
+                        <table id="dataTable" class="table table-bordered table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>Asset Category</th>
+                                    <th>Asset Type</th>
+                                    <th>Request Type</th>
+                                    <th>Subject</th>
+                                    <th>Change Type</th>
+                                    <th>Priority</th>
+                                    <th>Risk</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+                                    foreach (var item in Model.Changes)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <a href="@Html.EncodedActionLink("", "Info", "Change", "", new { id = item.ChangeId }, null)" target="_blank" class="">
+                                                    Change @item.ChangeId
+                                                </a>
+                                            </td>
+
+                                            <td>@item.AssetType.AssetCategory.EnumDisplayName()</td>
+                                            <td>@item.AssetType.AssetTypeName</td>
+                                            <td>@item.ChangeRequestType.ChangeRequestTypeName</td>
+                                            <td>@item.Subject</td>
+                                            <td>@item.ChangeType.EnumDisplayName()</td>
+                                            <td>@item.Priority.EnumDisplayName()</td>
+                                            <td>@item.Risk.EnumDisplayName()</td>
+                                            <td>
+                                                <span class="label text- label-@ChangeService.GetStatusColor(item.Status)">
+                                                    @item.Status.EnumDisplayName()
+                                                </span>
+                                            </td>
+
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+                <div class="card-footer">
+                    <div class="progress-group">
+                        <div class="progress sm" style="margin-bottom:3px">
+                            <div class="progress-bar progress-bar-danger" id="finalProgressBar" style="width:@Model.KPI2ValueRatio%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card box-success">
+                <div class="card-header">
+                    <div class="row">
+
+                        <div class="col-lg-9">
+                            <h4 class="card-title">
+                                <a data-bs-toggle="collapse" data-parent="#accordion" href="#KPI3">
+                                    Data Backup Failure - ( W @Model.KPI3Weightage% )
+                                </a>
+                            </h4>
+                        </div>
+                        <div class="col-lg-1 text-right">
+                            KPI : @Model.KPI3Value
+                        </div>
+                        <div class="col-lg-1 text-right">
+                            W : @Model.KPI3WeightValue
+                        </div>
+                        <div class="col-lg-1 text-right">
+                            <span class="label label-success">
+                                <b>
+                                    <lable>@Model.KPI3ValueRatio %</lable>
+                                </b>
+                            </span>
+                        </div>
+                    </div>
+
+                </div>
+                <div id="KPI3" class="panel-collapse collapse">
+                    <div class="card-body">
+                        <ul>
+                            <li>No failure reported => <b>100%</b></li>
+                            <li>1 failure Reported => <b>80%</b></li>
+                            <li>2-10 failure Reported => <b>50%</b></li>
+                            <li>More than 10 failures Reported => <b> 0</b></li>
+                        </ul>
+
+                        @{
+                            foreach (var item in Model.BackupReviewLogs)
+                            {
+
+                                <div class="panel box box-@BackupReviewLogService.GetChecklistTypeColor(item.ChacklistType)">
+
+                                    <div class="card-header">
+                                        <h4 class="card-title">
+                                            <a data-bs-toggle="collapse" data-parent="#accordion" href="#BR_@item.BackupReviewLogId">
+                                                @item.ChacklistType.EnumDisplayName() Backup Review - @item.BackupDate.ToShortDateString()
+                                            </a>
+
+
+                                        </h4>
+                                        <div class="card-tools pull-right">
+                                            # Of Failures :
+                                            <span class="label label-@BackupReviewLogService.GetChecklistTypeColor(item.ChacklistType)">
+                                                <lable>@item.BackupChecklistItems.Sum(s => s.NoOfFailures)</lable>
+                                            </span>
+
+                                        </div>
+
+                                    </div>
+                                    <div id="BR_@item.BackupReviewLogId" class="panel-collapse collapse">
+                                        <div class="card-body">
+
+                                            <table id="dataTable" class="table table-bordered table-striped table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Checklist</th>
+                                                        <th>Comment</th>
+                                                        <th># of Failures</th>
+                                                        <th>Updated By</th>
+                                                        <th>Updated Date</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @{
+                                                        foreach (var list in item.BackupChecklistItems)
+                                                        {
+                                                            <tr>
+                                                                <td>@list.BackupChecklist.BackupChecklistName</td>
+                                                                <td>@list.Comment</td>
+                                                                <td>@list.NoOfFailures</td>
+                                                                <td>@list.UpdatedBy</td>
+                                                                <td>@list.UpdatedDate</td>
+                                                            </tr>
+                                                        }
+                                                    }
+
+                                                </tbody>
+
+                                            </table>
+                                        </div>
+
+
+
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+
+                </div>
+                <div class="card-footer">
+                    <div class="progress-group">
+                        <div class="progress sm" style="margin-bottom:3px">
+                            <div class="progress-bar progress-bar-success" id="finalProgressBar" style="width:@Model.KPI3ValueRatio%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card box-primary">
+                <div class="card-header">
+                    <div class="row">
+
+                        <div class="col-lg-9">
+                            <h4 class="card-title">
+                                <a data-bs-toggle="collapse" data-parent="#accordion" href="#KPI4">
+                                    DR Drill performed - ( W @Model.KPI4Weightage% )
+                                </a>
+                            </h4>
+                        </div>
+                        <div class="col-lg-1 text-right">
+                            KPI : @Model.KPI4Value
+                        </div>
+                        <div class="col-lg-1 text-right">
+                            W : @Model.KPI4WeightValue
+                        </div>
+                        <div class="col-lg-1 text-right">
+                            <span class="label label-primary">
+                                <b>
+                                    <lable>@Model.KPI4ValueRatio %</lable>
+                                </b>
+                            </span>
+                        </div>
+                    </div>
+
+                </div>
+                <div id="KPI4" class="panel-collapse collapse">
+                    <div class="card-body">
+                        <ul>
+                            <li>No pending DR Drill => <b>100%</b></li>
+                            <li>1 pending DR Drill => <b>75%</b></li>
+                            <li>2 pending DR Drills => <b>50%</b></li>
+                            <li>4 pending DR Drills => <b> 0</b></li>
+                        </ul>
+
+                        @{
+                            foreach (var item in Model.DRDrills)
+                            {
+
+                                <div class="panel box box-primary">
+
+                                    <div class="card-header">
+                                        <h4 class="card-title">
+                                            <a data-bs-toggle="collapse" data-parent="#accordion" href="#DR_@item.DRDrillId">
+                                                DR Drill - @item.ScheduleDate.ToShortDateString()
+                                            </a>
+
+
+                                        </h4>
+                                        <div class="card-tools pull-right">
+                                            <i class="fa fa-user"></i> &nbsp;&nbsp; @item.UpdatedBy
+                                            &nbsp;&nbsp;&nbsp;&nbsp;
+                                            <i class="fa fa-calendar"></i> &nbsp;&nbsp; @item.UpdatedDate
+                                            &nbsp;&nbsp;&nbsp;&nbsp;
+                                            <span class="label text- label-@DRDrillService.GetStatusColor(item.Status)">
+                                                @item.Status.EnumDisplayName()
+                                            </span>
+
+
+
+                                        </div>
+
+                                    </div>
+                                    <div id="DR_@item.DRDrillId" class="panel-collapse collapse">
+                                        <div class="card-body">
+                                            <div class="form-group row">
+                                                @Html.LabelFor(model => item.ScheduleDate, new { @class = "col-lg-2 text-right" })
+                                                <div class="col-lg-10">
+                                                    @item.ScheduleDate.ToShortDateString()
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                @Html.LabelFor(model => item.Description, new { @class = "col-lg-2 text-right" })
+                                                <div class="col-lg-10">
+                                                    @item.Description
+                                                </div>
+                                            </div>
+                                            @if (item.Comment != null)
+                                            {
+                                                <div class="form-group row">
+                                                    @Html.LabelFor(model => item.DrillDate, new { @class = "col-lg-2 text-right" })
+                                                    <div class="col-lg-10">
+                                                        @item.DrillDate.ToShortDateString()
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row">
+                                                    @Html.LabelFor(model => item.Comment, new { @class = "col-lg-2 text-right" })
+                                                    <div class="col-lg-10">
+                                                        @item.Comment
+                                                    </div>
+                                                </div>
+                                            }
+                                            @if (item.ReviewerComment != null)
+                                            {
+                                                <div class="form-group row">
+                                                    @Html.LabelFor(model => item.ReviewerComment, new { @class = "col-lg-2 text-right" })
+                                                    <div class="col-lg-10">
+                                                        @item.ReviewerComment
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row">
+                                                    @Html.LabelFor(model => item.NoOfIncidents, new { @class = "col-lg-2 text-right" })
+                                                    <div class="col-lg-10">
+                                                        @item.NoOfIncidents
+                                                    </div>
+                                                </div>
+
+                                            }
+
+
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                            }
+                        }
+
+                    </div>
+
+                </div>
+                <div class="card-footer">
+                    <div class="progress-group">
+                        <div class="progress sm" style="margin-bottom:3px">
+                            <div class="progress-bar progress-bar-primary" id="finalProgressBar" style="width:@Model.KPI4ValueRatio%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card box-info">
+                <div class="card-header">
+                    <div class="row">
+
+                        <div class="col-lg-9">
+                            <h4 class="card-title">
+                                <a data-bs-toggle="collapse" data-parent="#accordion" href="#KPI5">
+                                    DR Drill Incident - ( W @Model.KPI5Weightage% )
+                                </a>
+                            </h4>
+                        </div>
+                        <div class="col-lg-1 text-right">
+                            KPI : @Model.KPI5Value
+                        </div>
+                        <div class="col-lg-1 text-right">
+                            W : @Model.KPI5WeightValue
+                        </div>
+                        <div class="col-lg-1 text-right">
+                            <span class="label label-info">
+                                <b>
+                                    <lable>@Model.KPI5ValueRatio %</lable>
+                                </b>
+                            </span>
+                        </div>
+                    </div>
+
+                </div>
+                <div id="KPI5" class="panel-collapse collapse">
+                    <div class="card-body">
+                        <ul>
+                            <li>No incident reported => <b>100%</b></li>
+                            <li>1 incident Reported => <b>80%</b></li>
+                            <li>2-10 incidents Reported => <b>50%</b></li>
+                            <li>More than 10 incidents Reported => <b> 0</b></li>
+                        </ul>
+                        @{
+                            foreach (var item in Model.DRDrillIIncidents)
+                            {
+
+                                <div class="panel box box-info">
+
+                                    <div class="card-header">
+                                        <h4 class="card-title">
+                                            <a data-bs-toggle="collapse" data-parent="#accordion" href="#DRIn_@item.DRDrillId">
+                                                DR Drill - @item.ScheduleDate.ToShortDateString()
+                                            </a>
+
+
+                                        </h4>
+                                        <div class="card-tools pull-right">
+                                            <i class="fa fa-user"></i> &nbsp;&nbsp; @item.UpdatedBy
+                                            &nbsp;&nbsp;&nbsp;&nbsp;
+                                            <i class="fa fa-calendar"></i> &nbsp;&nbsp; @item.UpdatedDate
+                                            &nbsp;&nbsp;&nbsp;&nbsp;
+                                            <span class="label text- label-@DRDrillService.GetStatusColor(item.Status)">
+                                                @item.Status.EnumDisplayName()
+                                            </span>
+
+
+
+                                        </div>
+
+                                    </div>
+                                    <div id="DRIn_@item.DRDrillId" class="panel-collapse collapse">
+                                        <div class="card-body">
+                                            <div class="form-group row">
+                                                @Html.LabelFor(model => item.ScheduleDate, new { @class = "col-lg-2 text-right" })
+                                                <div class="col-lg-10">
+                                                    @item.ScheduleDate.ToShortDateString()
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                @Html.LabelFor(model => item.Description, new { @class = "col-lg-2 text-right" })
+                                                <div class="col-lg-10">
+                                                    @item.Description
+                                                </div>
+                                            </div>
+                                            @if (item.Comment != null)
+                                            {
+                                                <div class="form-group row">
+                                                    @Html.LabelFor(model => item.DrillDate, new { @class = "col-lg-2 text-right" })
+                                                    <div class="col-lg-10">
+                                                        @item.DrillDate.ToShortDateString()
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row">
+                                                    @Html.LabelFor(model => item.Comment, new { @class = "col-lg-2 text-right" })
+                                                    <div class="col-lg-10">
+                                                        @item.Comment
+                                                    </div>
+                                                </div>
+                                            }
+                                            @if (item.ReviewerComment != null)
+                                            {
+                                                <div class="form-group row">
+                                                    @Html.LabelFor(model => item.ReviewerComment, new { @class = "col-lg-2 text-right" })
+                                                    <div class="col-lg-10">
+                                                        @item.ReviewerComment
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row">
+                                                    @Html.LabelFor(model => item.NoOfIncidents, new { @class = "col-lg-2 text-right" })
+                                                    <div class="col-lg-10">
+                                                        @item.NoOfIncidents
+                                                    </div>
+                                                </div>
+
+                                            }
+
+
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+
+                </div>
+                <div class="card-footer">
+                    <div class="progress-group">
+                        <div class="progress sm" style="margin-bottom:3px">
+                            <div class="progress-bar progress-bar-info" id="finalProgressBar" style="width:@Model.KPI5ValueRatio%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="row">
+
+        <div class="col-md-12">
+            <div class="panel box box-default" style="margin-bottom:10px">
+                <div class="card-header with-border">
+                    <div class="row">
+
+                        <div class="col-lg-10">
+                            <h4 class="card-title">
+                                Team KPI 
+                            </h4>
+                        </div>
+                        <div class="col-lg-2 text-right">
+                            <span class="label label-danger">
+                                <b>
+                                    <lable>@Model.FinalTeamKPIValue %</lable>
+                                </b>
+                            </span>
+                        </div>
+                    </div>
+
+                </div>
+                @*<div id="KPI1" class="panel-collapse collapse">
+                        <div class="card-body">
+
+                        </div>
+
+
+                    </div>*@
+                <div class="card-footer">
+                    <div class="progress-group ">
+                        <div class="progress sm" style="margin-bottom:3px; ">
+                            <div class="progress-bar progress-bar-striped progress-bar-danger" id="finalProgressBar" style="width:@Model.FinalTeamKPIValue%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+
+    foreach (var item in Model.KPITaskUsers)
+    {
+
+        <div class="panel box box-default" style="margin-bottom:10px">
+            <div class="card-header with-border">
+                <div class="row">
+
+                    <div class="col-md-4">
+                        <h4 class="card-title">
+                            <a data-bs-toggle="collapse" data-parent="#accordion" href="#U_@item.User.EmpNo">
+
+                                @item.User.EmpNo - @item.User.FullName
+                            </a>
+                        </h4>
+                    </div>
+                    <div class="col-md-2">
+                        Team ( 60% ) :
+
+                        <span class="label label-danger">
+                            <lable>@Model.FinalTeamKPIWeightageValue %</lable>
+                        </span>
+
+                    </div>
+                    <div class="col-md-2">
+                        Task ( 40% ) :
+                        <span class="label label-primary">
+
+                            <lable>@item.KPIValueWeightage %</lable>
+                        </span>
+
+
+                    </div>
+                    <div class="col-md-2 text-right pull-right">
+                        <span class="progress-number">
+                            Final KPI :
+
+                            <span class="label label-success">
+                                <b>
+                                    <lable id="finalValCellTot">@item.KPIValue %</lable>
+                                </b>
+                            </span>
+                        </span>
+                    </div>
+                </div>
+
+                </div>
+            <div id="U_@item.User.EmpNo" class="panel-collapse collapse">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card box-primary">
+                                @*<div class="card-header with-border">
+                                        <div class="col-md-8">
+
+                                            <h3 class="card-title">
+                                                Task Categories
+                                            </h3>
+                                        </div>
+                                    </div>*@
+
+                                <div class="card-body">
+
+                                    <table id="dataTable" class="table table-bordered table-striped table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Task Category</th>
+                                                <th width="100px" class="text-right">Weightage</th>
+                                                <th width="100px" class="text-right">Total</th>
+                                                <th width="100px" class="text-right">Earned</th>
+                                                <th width="100px" class="text-right"><a href="#" data-bs-toggle="tooltip" title="Earned / Total %">%</a></th>
+                                                <th width="100px" class="text-right"><a href="#" data-bs-toggle="tooltip" title="Earned / Total * Weightage">KPI</a></th>
+
+
+
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @{
+                                                foreach (var cat in item.TaskCategories)
+                                                {
+
+                                                    <tr>
+                                                        <td>
+                                                            <a href="#@cat.CategoryIndex" data-bs-toggle="collapse" data-parent="#accordion">
+                                                                <label> @cat.TaskCategory.TaskCategoryName </label>
+
+                                                            </a>
+                                                        </td>
+
+                                                        <td class="text-right">@cat.TaskCategory.Weightage</td>
+                                                        <td class="text-right">@cat.AllocatedScore</td>
+                                                        <td class="text-right">@cat.Score</td>
+                                                        <td class="text-right">@cat.ScoreValue</td>
+                                                        <td class="text-right">@cat.WeightedValue</td>
+
+                                                    </tr>
+                                                    <tr id="@cat.CategoryIndex" class="panel-collapse collapse" style="background-color:#CCE4FA;">
+                                                        <td colspan="12">
+
+                                                            @if (cat.Tasks.Count > 0)
+                                                            {
+                                                                <table id="dataTable" class="table table-bordered table-striped table-hover tdGray" style="margin-bottom:0px;padding-bottom:0px">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th>Task </th>
+                                                                            <th width="100px" class="text-right">Repeat Type </th>
+                                                                            <th width="100px" class="text-right">Score </th>
+                                                                            <th width="100px" class="text-right">No Of Tasks </th>
+                                                                            <th width="100px" class="text-right">Total</th>
+                                                                            <th width="100px" class="text-right">Earned</th>
+                                                                            <th width="100px" class="text-right"><a href="#" data-bs-toggle="tooltip" title="Earned / Total %">%</a></th>
+
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        @{
+                                                                            foreach (var task in cat.Tasks)
+                                                                            {
+
+                                                                                var styleTr = "";
+                                                                                if (task.AllocatedScore != task.Score)
+                                                                                { styleTr = "#F5B7B1"; }
+                                                                                <tr style="background-color:@styleTr">
+
+                                                                                    <td>
+
+
+                                                                                        <a href="@Html.EncodedActionLink("", "TaskUpdatesDR", "ScheduledTask", "", new { id = task.TaskId, startDate=@ViewBag.StartDate, endDate=@ViewBag.EndDate }, null)" target="_blank">
+                                                                                            @task.TaskName
+                                                                                        </a>
+
+                                                                                    </td>
+
+                                                                                    <td>@task.Task.RepeatType.EnumDisplayName()</td>
+                                                                                    <td class="text-right">@task.Task.Score</td>
+                                                                                    <td class="text-right">@task.NoOfTasks</td>
+                                                                                    <td class="text-right">@task.AllocatedScore</td>
+                                                                                    <td class="text-right">@task.Score</td>
+                                                                                    <td class="text-right">@task.ScoreValue</td>
+
+                                                                                </tr>
+                                                                              
+                                                                            }
+                                                                        }
+                                                                    </tbody>
+                                                                </table>
+
+                                                            }
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            }
+                                        </tbody>
+
+                                    </table>
+
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+            <div class="card-footer">
+                <div class="progress-group">
+
+
+                    <div class="progress sm" style="margin-bottom:3px">
+                        <div class="progress-bar progress-bar-striped progress-bar-success" id="finalProgressBar" style="width:@item.KPIValue%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+
+
+
+}
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            $('[data-bs-toggle="tooltip"]').tooltip();
+
+        });
+
+
+
+
+
+
+
+
+    </script>
+}
+
+
+
+
+
+

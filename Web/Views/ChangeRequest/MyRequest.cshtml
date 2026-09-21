@@ -1,0 +1,566 @@
+﻿@model ICollection<Domain.CM.ChangeRequest>
+@using Service.AR
+@using Service
+@using Service.CM
+@using Domain.CM
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="card">
+
+            <div class="card-header p-2">
+
+                <ul class="nav nav-pills"
+                    id="changeRequestTabs"
+                    role="tablist">
+
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active"
+                                id="pending-tab"
+                                data-bs-toggle="tab"
+                                data-bs-target="#tab_Pending"
+                                type="button"
+                                role="tab">
+                            Pending
+                        </button>
+                    </li>
+
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link"
+                                id="approved-tab"
+                                data-bs-toggle="tab"
+                                data-bs-target="#tab_Approved"
+                                type="button"
+                                role="tab">
+                            On Going
+                        </button>
+                    </li>
+
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link"
+                                id="closed-tab"
+                                data-bs-toggle="tab"
+                                data-bs-target="#tab_Closed"
+                                type="button"
+                                role="tab">
+                            Closed
+                        </button>
+                    </li>
+
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link"
+                                id="rejected-tab"
+                                data-bs-toggle="tab"
+                                data-bs-target="#tab_Rejected"
+                                type="button"
+                                role="tab">
+                            Rejected
+                        </button>
+                    </li>
+
+                </ul>
+
+            </div>
+
+            <div class="card-body">
+
+                <div class="tab-content">
+
+                    <div class="tab-pane fade show active"
+                         id="tab_Pending"
+                         role="tabpanel">
+
+                        <div class="table-responsive">
+
+                            <table id="pendingDataTable"
+                                   class="table table-striped table-hover align-middle w-100 dataTable">
+
+                                <thead>
+                                    <tr>
+                                        <th>Request #</th>
+                                        <th>Category</th>
+                                        <th>Subject</th>
+                                        <th>Description</th>
+                                        <th>Duration Type</th>
+                                        <th>Requested Date</th>
+                                        <th class="text-end">Action</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+
+                                    @foreach (var item in Model.Where(w => w.Status == ChangeRequestStatusEnum.Initiated))
+                                    {
+                                        <tr>
+
+                                            <td>
+                                                <a href="@Html.EncodedActionLink("", "Info", "ChangeRequest", "", new { id = item.ChangeRequestId }, null)"
+                                                   target="_blank">
+                                                    #@item.ChangeRequestId
+                                                </a>
+                                            </td>
+
+                                            <td>
+                                                @item.ChangeRequestCategory.Name
+                                            </td>
+
+                                            <td>
+                                                @item.Subject
+                                            </td>
+
+                                            <td>
+                                                @item.Description
+                                            </td>
+
+                                            <td>
+                                                @item.DurationType.EnumDisplayName()
+                                            </td>
+
+                                            <td>
+                                                @item.RequestedDate
+                                            </td>
+
+                                            <td class="text-end">
+
+                                                <button type="button"
+                                                        data-id="@item.ChangeRequestId"
+                                                        class="openModalUpdateReject btn btn-sm btn-danger"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#modalUpdateReject">
+
+                                                    <i class="align-middle me-1"
+                                                       data-lucide="thumbs-down">
+                                                    </i>
+                                                    Reject
+
+                                                </button>
+
+                                            </td>
+
+                                        </tr>
+                                    }
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="tab-pane fade"
+                         id="tab_Approved"
+                         role="tabpanel">
+
+                        <div class="table-responsive">
+
+                            <table id="ongoingDataTable"
+                                   class="table table-striped table-hover align-middle w-100 dataTable">
+
+                                <thead>
+                                    <tr>
+                                        <th>Request #</th>
+                                        <th>Category</th>
+                                        <th>Subject</th>
+                                        <th>Description</th>
+                                        <th>Duration Type</th>
+                                        <th>Requested Date</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+
+                                    @foreach (var item in Model.Where(w =>
+                                        w.Status > ChangeRequestStatusEnum.Initiated &&
+                                        w.Status < ChangeRequestStatusEnum.Closed))
+                                    {
+                                        <tr>
+
+                                            <td>
+                                                <a href="@Html.EncodedActionLink("", "Info", "ChangeRequest", "", new { id = item.ChangeRequestId }, null)"
+                                                   target="_blank">
+                                                    #@item.ChangeRequestId
+                                                </a>
+                                            </td>
+
+                                            <td>
+                                                @item.ChangeRequestCategory.Name
+                                            </td>
+
+                                            <td>
+                                                @item.Subject
+                                            </td>
+
+                                            <td>
+                                                @item.Description
+                                            </td>
+
+                                            <td>
+                                                @item.DurationType.EnumDisplayName()
+                                            </td>
+
+                                            <td>
+                                                @item.RequestedDate
+                                            </td>
+
+                                            <td>
+                                                <span class="badge bg-@ChangeRequestService.GetStatusColor(item.Status)">
+                                                    @item.Status.EnumDisplayName()
+                                                </span>
+                                            </td>
+
+                                        </tr>
+                                    }
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="tab-pane fade"
+                         id="tab_Closed"
+                         role="tabpanel">
+
+                        <div class="table-responsive">
+
+                            <table id="closedDataTable"
+                                   class="table table-striped table-hover align-middle w-100 dataTable">
+
+                                <thead>
+                                    <tr>
+                                        <th>Request #</th>
+                                        <th>Category</th>
+                                        <th>Subject</th>
+                                        <th>Description</th>
+                                        <th>Duration Type</th>
+                                        <th>Requested Date</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+
+                                    @foreach (var item in Model.Where(w => w.Status == ChangeRequestStatusEnum.Closed))
+                                    {
+                                        <tr>
+
+                                            <td>
+                                                <a href="@Html.EncodedActionLink("", "Info", "ChangeRequest", "", new { id = item.ChangeRequestId }, null)"
+                                                   target="_blank">
+                                                    #@item.ChangeRequestId
+                                                </a>
+                                            </td>
+
+                                            <td>
+                                                @item.ChangeRequestCategory.Name
+                                            </td>
+
+                                            <td>
+                                                @item.Subject
+                                            </td>
+
+                                            <td>
+                                                @item.Description
+                                            </td>
+
+                                            <td>
+                                                @item.DurationType.EnumDisplayName()
+                                            </td>
+
+                                            <td>
+                                                @item.RequestedDate
+                                            </td>
+
+                                        </tr>
+                                    }
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="tab-pane fade"
+                         id="tab_Rejected"
+                         role="tabpanel">
+
+                        <div class="table-responsive">
+
+                            <table id="rejectedDataTable"
+                                   class="table table-striped table-hover align-middle w-100 dataTable">
+
+                                <thead>
+                                    <tr>
+                                        <th>Request #</th>
+                                        <th>Category</th>
+                                        <th>Subject</th>
+                                        <th>Description</th>
+                                        <th>Duration Type</th>
+                                        <th>Requested Date</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+
+                                    @foreach (var item in Model.Where(w => w.Status == ChangeRequestStatusEnum.Rejected))
+                                    {
+                                        <tr>
+
+                                            <td>
+                                                <a href="@Html.EncodedActionLink("", "Info", "ChangeRequest", "", new { id = item.ChangeRequestId }, null)"
+                                                   target="_blank">
+                                                    #@item.ChangeRequestId
+                                                </a>
+                                            </td>
+
+                                            <td>
+                                                @item.ChangeRequestCategory.Name
+                                            </td>
+
+                                            <td>
+                                                @item.Subject
+                                            </td>
+
+                                            <td>
+                                                @item.Description
+                                            </td>
+
+                                            <td>
+                                                @item.DurationType.EnumDisplayName()
+                                            </td>
+
+                                            <td>
+                                                @item.RequestedDate
+                                            </td>
+
+                                        </tr>
+                                    }
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+<div class="modal fade"
+     id="modalUpdateReject"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title">
+                    Request #
+                    <span id="rejectRequestLabel"></span>
+                    Reject
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <input type="hidden"
+                       id="rejectRequestId"
+                       value="" />
+
+                <div class="mb-3">
+
+                    <label for="rejectComment"
+                           class="form-label">
+                        Comment
+                    </label>
+
+                    <input type="text"
+                           id="rejectComment"
+                           placeholder="Enter Comment"
+                           class="form-control" />
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn btn-sm btn-light"
+                        data-bs-dismiss="modal">
+
+                    <i class="align-middle me-1" data-lucide="x"></i>
+                    Cancel
+
+                </button>
+
+                <button type="button"
+                        id="btnReject"
+                        class="btn btn-sm btn-danger"
+                        onclick="reject()">
+
+                    <i class="align-middle me-1" data-lucide="thumbs-down"></i>
+                    Reject
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $(".dataTable").DataTable({
+                paging: true,
+                lengthChange: true,
+                searching: true,
+                ordering: true,
+                info: true,
+                responsive: true,
+                autoWidth: false
+            });
+
+        });
+
+
+        $(document).on("click", ".openModalUpdateReject", function () {
+
+            var requestId =
+                $(this).data("id");
+
+            $("#rejectRequestId").val(requestId);
+            $("#rejectRequestLabel").text(requestId);
+            $("#rejectComment").val("");
+            $("#btnReject").prop("disabled", false);
+
+        });
+
+
+        function reject() {
+
+            var requestId =
+                $("#rejectRequestId").val();
+
+            var comment =
+                $("#rejectComment").val();
+
+
+            if (!comment || !comment.trim()) {
+
+                Swal.fire(
+                    "Error!",
+                    "Please enter a comment",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            $("#btnReject")
+                .prop("disabled", true);
+
+
+            $.ajax({
+
+                url: '@Url.Action("MyRequestReject", "ChangeRequest")',
+
+                type: "GET",
+
+                dataType: "json",
+
+                data: {
+                    requestId: requestId,
+                    comment: comment
+                },
+
+                success: function (data) {
+
+                    if (data == "1" || data == 1) {
+
+                        Swal.fire(
+                            "Completed",
+                            "Request has been rejected",
+                            "success"
+                        );
+
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 100);
+
+                    }
+                    else {
+
+                        $("#btnReject")
+                            .prop("disabled", false);
+
+                        Swal.fire(
+                            "Something went wrong!",
+                            "Please try again",
+                            "error"
+                        );
+
+                    }
+
+                },
+
+                error: function () {
+
+                    $("#btnReject")
+                        .prop("disabled", false);
+
+                    Swal.fire(
+                        "Something went wrong!",
+                        "Please try again",
+                        "error"
+                    );
+
+                }
+
+            });
+
+        }
+
+    </script>
+}

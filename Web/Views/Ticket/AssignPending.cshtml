@@ -1,0 +1,1070 @@
+﻿@model ICollection<Domain.Ticket>
+@using Service
+@using Domain
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="card">
+
+            <div class="card-header p-0">
+
+                <ul class="nav nav-tabs"
+                    id="ticketTabs"
+                    role="tablist">
+
+                    <li class="nav-item" role="presentation">
+
+                        <button class="nav-link active"
+                                id="pending-tab"
+                                data-bs-toggle="tab"
+                                data-bs-target="#pending"
+                                type="button"
+                                role="tab"
+                                aria-controls="pending"
+                                aria-selected="true">
+
+                            <i class="align-middle me-1"
+                               data-lucide="clock"></i>
+
+                            Pending Assign
+
+                        </button>
+
+                    </li>
+
+                    <li class="nav-item" role="presentation">
+
+                        <button class="nav-link"
+                                id="ongoing-tab"
+                                data-bs-toggle="tab"
+                                data-bs-target="#ongoing"
+                                type="button"
+                                role="tab"
+                                aria-controls="ongoing"
+                                aria-selected="false">
+
+                            <i class="align-middle me-1"
+                               data-lucide="clipboard-check"></i>
+
+                            On-going
+
+                        </button>
+
+                    </li>
+
+                    <li class="nav-item" role="presentation">
+
+                        <button class="nav-link"
+                                id="completed-tab"
+                                data-bs-toggle="tab"
+                                data-bs-target="#completed"
+                                type="button"
+                                role="tab"
+                                aria-controls="completed"
+                                aria-selected="false">
+
+                            <i class="align-middle me-1"
+                               data-lucide="check-circle"></i>
+
+                            To be Closed
+
+                        </button>
+
+                    </li>
+
+                </ul>
+
+            </div>
+
+            <div class="card-body">
+
+                <div class="tab-content" id="ticketTabsContent">
+
+                    <!-- Pending -->
+                    <div class="tab-pane fade show active"
+                         id="pending"
+                         role="tabpanel"
+                         aria-labelledby="pending-tab">
+
+                        <div class="accordion"
+                             id="pendingAccordion">
+
+                            @foreach (var item in Model.Where(w => w.Status == TicketStatusEnum.Waiting))
+                            {
+                                var collapseId = "pendingTicket_" + item.TicketId;
+
+                                <div class="accordion-item">
+
+                                    <h2 class="accordion-header"
+                                        id="pendingHeading_@item.TicketId">
+
+                                        <button class="accordion-button collapsed"
+                                                type="button"
+                                                data-bs-toggle="collapse"
+                                                data-bs-target="#@collapseId"
+                                                aria-expanded="false"
+                                                aria-controls="@collapseId">
+
+                                            <div class="w-100 d-flex justify-content-between align-items-center me-3 flex-wrap gap-2">
+
+                                                <div>
+
+                                                    <strong>
+                                                        @item.Code
+                                                    </strong>
+
+                                                    <span class="mx-2 text-muted">|</span>
+
+                                                    @(item.RequestType != null && item.RequestType.Category != null
+                                                        ? item.RequestType.Category.CategoryName
+                                                        : "N/A")
+
+                                                    <i class="align-middle mx-2"
+                                                       data-lucide="chevrons-right"></i>
+
+                                                    @(item.RequestType != null && item.RequestType.AssetType != null
+                                                        ? item.RequestType.AssetType.AssetTypeName
+                                                        : "N/A")
+
+                                                    <i class="align-middle mx-2"
+                                                       data-lucide="chevrons-right"></i>
+
+                                                    <strong>
+                                                        @(item.RequestType != null && item.RequestType.SubCategory != null
+                                                            ? item.RequestType.SubCategory.SubCategoryName
+                                                            : "N/A")
+                                                    </strong>
+
+                                                    <span class="mx-2">-</span>
+
+                                                    @(item.Branch != null
+                                                        ? item.Branch.Name
+                                                        : "N/A")
+
+                                                </div>
+
+                                                <div class="text-muted small">
+
+                                                    @(item.PendingTeam != null
+                                                        ? item.PendingTeam.TeamName
+                                                        : "N/A")
+
+                                                    <span class="mx-2">|</span>
+
+                                                    @item.RequestedDate.ToShortDateString()
+
+                                                </div>
+
+                                            </div>
+
+                                        </button>
+
+                                    </h2>
+
+                                    <div id="@collapseId"
+                                         class="accordion-collapse collapse"
+                                         aria-labelledby="pendingHeading_@item.TicketId"
+                                         data-bs-parent="#pendingAccordion">
+
+                                        <div class="accordion-body">
+
+                                            @Html.Partial("_Ticket", item)
+
+                                        </div>
+
+                                        <div class="card-footer">
+
+                                            <div class="d-flex justify-content-end flex-wrap gap-2">
+
+                                                <a href="@Html.EncodedActionLink("", "Info", "Ticket", "", new { id = item.TicketId }, null)"
+                                                   target="_blank"
+                                                   class="btn btn-sm btn-light">
+
+                                                    <i class="align-middle me-1"
+                                                       data-lucide="info"></i>
+
+                                                    More
+
+                                                </a>
+
+                                                <button type="button"
+                                                        class="openModalUpdate btn btn-sm btn-primary"
+                                                        data-id="@item.TicketId"
+                                                        data-code="@item.Code"
+                                                        data-teamid="@item.PendingTeamId"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#modalUpdate">
+
+                                                    <i class="align-middle me-1"
+                                                       data-lucide="user-plus"></i>
+
+                                                    Assign
+
+                                                </button>
+
+                                                <button type="button"
+                                                        class="btn btn-sm btn-success"
+                                                        onclick="assignedToMe('@item.TicketId')">
+
+                                                    <i class="align-middle me-1"
+                                                       data-lucide="user-check"></i>
+
+                                                    Assign To Me
+
+                                                </button>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            }
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- On-going -->
+                    <div class="tab-pane fade"
+                         id="ongoing"
+                         role="tabpanel"
+                         aria-labelledby="ongoing-tab">
+
+                        <div class="accordion"
+                             id="ongoingAccordion">
+
+                            @foreach (var item in Model.Where(w => w.Status > TicketStatusEnum.Waiting &&
+                                                                   w.Status < TicketStatusEnum.Completed))
+                            {
+                                var collapseId = "ongoingTicket_" + item.TicketId;
+
+                                <div class="accordion-item">
+
+                                    <h2 class="accordion-header"
+                                        id="ongoingHeading_@item.TicketId">
+
+                                        <button class="accordion-button collapsed"
+                                                type="button"
+                                                data-bs-toggle="collapse"
+                                                data-bs-target="#@collapseId"
+                                                aria-expanded="false"
+                                                aria-controls="@collapseId">
+
+                                            <div class="w-100 d-flex justify-content-between align-items-center me-3 flex-wrap gap-2">
+
+                                                <div>
+
+                                                    <strong>
+                                                        @item.Code
+                                                    </strong>
+
+                                                    <span class="mx-2 text-muted">|</span>
+
+                                                    @(item.RequestType != null && item.RequestType.Category != null
+                                                        ? item.RequestType.Category.CategoryName
+                                                        : "N/A")
+
+                                                    <i class="align-middle mx-2"
+                                                       data-lucide="chevrons-right"></i>
+
+                                                    @(item.RequestType != null && item.RequestType.AssetType != null
+                                                        ? item.RequestType.AssetType.AssetTypeName
+                                                        : "N/A")
+
+                                                    <i class="align-middle mx-2"
+                                                       data-lucide="chevrons-right"></i>
+
+                                                    <strong>
+                                                        @(item.RequestType != null && item.RequestType.SubCategory != null
+                                                            ? item.RequestType.SubCategory.SubCategoryName
+                                                            : "N/A")
+                                                    </strong>
+
+                                                    <span class="mx-2">-</span>
+
+                                                    @(item.Branch != null
+                                                        ? item.Branch.Name
+                                                        : "N/A")
+
+                                                </div>
+
+                                                <div class="text-muted small">
+
+                                                    <i class="align-middle me-1"
+                                                       data-lucide="user"></i>
+
+                                                    @item.AssignedTo
+
+                                                    <span class="mx-2">|</span>
+
+                                                    @item.RequestedDate.ToShortDateString()
+
+                                                </div>
+
+                                            </div>
+
+                                        </button>
+
+                                    </h2>
+
+                                    <div id="@collapseId"
+                                         class="accordion-collapse collapse"
+                                         aria-labelledby="ongoingHeading_@item.TicketId"
+                                         data-bs-parent="#ongoingAccordion">
+
+                                        <div class="accordion-body">
+
+                                            @Html.Partial("_Ticket", item)
+
+                                        </div>
+
+                                        <div class="card-footer">
+
+                                            <div class="d-flex justify-content-end flex-wrap gap-2">
+
+                                                <a href="@Html.EncodedActionLink("", "Info", "Ticket", "", new { id = item.TicketId }, null)"
+                                                   target="_blank"
+                                                   class="btn btn-sm btn-light">
+
+                                                    <i class="align-middle me-1"
+                                                       data-lucide="info"></i>
+
+                                                    More
+
+                                                </a>
+
+                                                <button type="button"
+                                                        class="openModalUpdate btn btn-sm btn-primary"
+                                                        data-id="@item.TicketId"
+                                                        data-code="@item.Code"
+                                                        data-teamid="@item.PendingTeamId"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#modalUpdate">
+
+                                                    <i class="align-middle me-1"
+                                                       data-lucide="user-plus"></i>
+
+                                                    Assign
+
+                                                </button>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            }
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Completed -->
+                    <div class="tab-pane fade"
+                         id="completed"
+                         role="tabpanel"
+                         aria-labelledby="completed-tab">
+
+                        <div class="accordion"
+                             id="completedAccordion">
+
+                            @foreach (var item in Model.Where(w => w.Status == TicketStatusEnum.Completed))
+                            {
+                                var collapseId = "completedTicket_" + item.TicketId;
+
+                                <div class="accordion-item">
+
+                                    <h2 class="accordion-header"
+                                        id="completedHeading_@item.TicketId">
+
+                                        <button class="accordion-button collapsed"
+                                                type="button"
+                                                data-bs-toggle="collapse"
+                                                data-bs-target="#@collapseId"
+                                                aria-expanded="false"
+                                                aria-controls="@collapseId">
+
+                                            <div class="w-100 d-flex justify-content-between align-items-center me-3 flex-wrap gap-2">
+
+                                                <div>
+
+                                                    <strong>
+                                                        @item.Code
+                                                    </strong>
+
+                                                    <span class="mx-2 text-muted">|</span>
+
+                                                    @(item.RequestType != null && item.RequestType.Category != null
+                                                        ? item.RequestType.Category.CategoryName
+                                                        : "N/A")
+
+                                                    <i class="align-middle mx-2"
+                                                       data-lucide="chevrons-right"></i>
+
+                                                    @(item.RequestType != null && item.RequestType.AssetType != null
+                                                        ? item.RequestType.AssetType.AssetTypeName
+                                                        : "N/A")
+
+                                                    <i class="align-middle mx-2"
+                                                       data-lucide="chevrons-right"></i>
+
+                                                    <strong>
+                                                        @(item.RequestType != null && item.RequestType.SubCategory != null
+                                                            ? item.RequestType.SubCategory.SubCategoryName
+                                                            : "N/A")
+                                                    </strong>
+
+                                                    <span class="mx-2">-</span>
+
+                                                    @(item.Branch != null
+                                                        ? item.Branch.Name
+                                                        : "N/A")
+
+                                                </div>
+
+                                                <div class="text-muted small">
+
+                                                    <i class="align-middle me-1"
+                                                       data-lucide="user"></i>
+
+                                                    @item.AssignedTo
+
+                                                    <span class="mx-2">|</span>
+
+                                                    @item.RequestedDate.ToShortDateString()
+
+                                                </div>
+
+                                            </div>
+
+                                        </button>
+
+                                    </h2>
+
+                                    <div id="@collapseId"
+                                         class="accordion-collapse collapse"
+                                         aria-labelledby="completedHeading_@item.TicketId"
+                                         data-bs-parent="#completedAccordion">
+
+                                        <div class="accordion-body">
+
+                                            @Html.Partial("_Ticket", item)
+
+                                        </div>
+
+                                        <div class="card-footer">
+
+                                            <div class="d-flex justify-content-end">
+
+                                                <a href="@Html.EncodedActionLink("", "Info", "Ticket", "", new { id = item.TicketId }, null)"
+                                                   target="_blank"
+                                                   class="btn btn-sm btn-light">
+
+                                                    <i class="align-middle me-1"
+                                                       data-lucide="info"></i>
+
+                                                    More
+
+                                                </a>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            }
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+<!-- Assign User Modal -->
+<div class="modal fade"
+     id="modalUpdate"
+     tabindex="-1"
+     aria-labelledby="modalUpdateLabel"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title"
+                    id="modalUpdateLabel">
+
+                    <i class="align-middle me-2"
+                       data-lucide="user-plus"></i>
+
+                    Ticket #
+                    <span id="modelLableId"></span>
+                    - Assign User
+
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <input type="hidden"
+                       name="modalTicketId"
+                       id="modalTicketId" />
+
+                <input type="hidden"
+                       name="modalTeamId"
+                       id="modalTeamId" />
+
+                <div class="mb-3">
+
+                    <label for="modalTeamMemberId"
+                           class="form-label">
+                        Team Member
+                    </label>
+
+                    <select id="modalTeamMemberId"
+                            name="modalTeamMemberId"
+                            class="form-select">
+
+                        <option value="0">
+                            -- Select --
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <div class="mb-3">
+
+                    <label for="textComment"
+                           class="form-label">
+                        Comment
+                    </label>
+
+                    <textarea id="textComment"
+                              name="textComment"
+                              class="form-control"
+                              rows="4"
+                              placeholder="Comment"></textarea>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn btn-sm btn-danger"
+                        data-bs-dismiss="modal">
+
+                    <i class="align-middle me-1"
+                       data-lucide="x"></i>
+
+                    Cancel
+
+                </button>
+
+                <button type="button"
+                        class="btn btn-sm btn-primary btnClickDisable"
+                        onclick="update()">
+
+                    <i class="align-middle me-1"
+                       data-lucide="save"></i>
+
+                    Update
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- Assign To Me Modal -->
+<div class="modal fade"
+     id="modalUpdateAssignMe"
+     tabindex="-1"
+     aria-labelledby="modalUpdateAssignMeLabel"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title"
+                    id="modalUpdateAssignMeLabel">
+
+                    <i class="align-middle me-2"
+                       data-lucide="user-check"></i>
+
+                    Ticket #
+                    <span id="assignMeModelLabelId"></span>
+                    - Assign To Me
+
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <input type="hidden"
+                       name="modalAssignMeTicketId"
+                       id="modalAssignMeTicketId" />
+
+                <div class="mb-3">
+
+                    <label for="assignMeComment"
+                           class="form-label">
+                        Comment
+                    </label>
+
+                    <textarea id="assignMeComment"
+                              name="assignMeComment"
+                              class="form-control"
+                              rows="4"
+                              placeholder="Comment"></textarea>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn btn-sm btn-danger"
+                        data-bs-dismiss="modal">
+
+                    <i class="align-middle me-1"
+                       data-lucide="x"></i>
+
+                    Cancel
+
+                </button>
+
+                <button type="button"
+                        class="btn btn-sm btn-primary btnClickDisable"
+                        onclick="updateAssignMe()">
+
+                    <i class="align-middle me-1"
+                       data-lucide="save"></i>
+
+                    Update
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $("#modalTeamMemberId").select2({
+                width: "100%",
+                dropdownParent: $("#modalUpdate")
+            });
+
+        });
+
+
+        function parseJsonResult(data) {
+
+            if (typeof data === "string") {
+
+                try {
+                    return JSON.parse(data);
+                }
+                catch (e) {
+                    return [];
+                }
+
+            }
+
+            return data || [];
+        }
+
+
+        $(document).on("click", ".openModalUpdate", function () {
+
+            var ticketId = $(this).data("id");
+            var code = $(this).data("code");
+            var teamId = $(this).data("teamid");
+
+            $("#modalUpdate #modalTicketId").val(ticketId);
+            $("#modalUpdate #modalTeamId").val(teamId);
+            $("#modalUpdate #modelLableId").text(code);
+
+            $("#modalUpdate #textComment").val("");
+
+            $("#modalUpdate .btnClickDisable")
+                .prop("disabled", false);
+
+            loadTeamUsers();
+
+        });
+
+
+        $(document).on("click", ".openModalUpdateAssignMe", function () {
+
+            var ticketId = $(this).data("id");
+            var code = $(this).data("code");
+
+            $("#modalUpdateAssignMe #modalAssignMeTicketId")
+                .val(ticketId);
+
+            $("#modalUpdateAssignMe #assignMeModelLabelId")
+                .text(code);
+
+            $("#modalUpdateAssignMe #assignMeComment")
+                .val("");
+
+            $("#modalUpdateAssignMe .btnClickDisable")
+                .prop("disabled", false);
+
+        });
+
+
+        function loadTeamUsers() {
+
+            var teamId =
+                $("#modalUpdate #modalTeamId").val();
+
+            var dropDown =
+                $("#modalTeamMemberId");
+
+            dropDown.empty();
+
+            dropDown.append(
+                "<option value='0'>-- Select --</option>"
+            );
+
+            $.getJSON(
+                '@Url.Action("GetUsersByTeamIdJsonResult", "User")',
+                {
+                    teamId: teamId
+                },
+                function (data) {
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.EmpNo,
+                                    text: item.FullName
+                                })
+                            );
+
+                        }
+                    );
+
+                    dropDown.val("0").trigger("change");
+
+                }
+            );
+
+        }
+
+
+        function update() {
+
+            var ticketId =
+                $("#modalUpdate #modalTicketId").val();
+
+            var teamUserId =
+                $("#modalUpdate #modalTeamMemberId").val();
+
+            var comment =
+                $("#modalUpdate #textComment").val().trim();
+
+            var button =
+                $("#modalUpdate .btnClickDisable");
+
+
+            if (!comment ||
+                !teamUserId ||
+                teamUserId == "0") {
+
+                Swal.fire(
+                    "Error!",
+                    "Please enter the required data",
+                    "error"
+                );
+
+                return;
+            }
+
+
+            button.prop("disabled", true);
+
+
+            $.ajax({
+
+                url: '@Url.Action("Assign", "Ticket")',
+
+                type: "GET",
+
+                dataType: "json",
+
+                data: {
+                    ticketId: ticketId,
+                    comment: comment,
+                    userId: teamUserId
+                },
+
+                success: function (data) {
+
+                    if (data == "1" || data == 1) {
+
+                        Swal.fire(
+                            "Completed",
+                            "Ticket has been assigned",
+                            "success"
+                        );
+
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 500);
+
+                    }
+                    else {
+
+                        button.prop("disabled", false);
+
+                        Swal.fire(
+                            "Something went wrong!",
+                            "Please try again",
+                            "error"
+                        );
+
+                    }
+
+                },
+
+                error: function () {
+
+                    button.prop("disabled", false);
+
+                    Swal.fire(
+                        "Something went wrong!",
+                        "Please try again",
+                        "error"
+                    );
+
+                }
+
+            });
+
+        }
+
+
+        function updateAssignMe() {
+
+            var ticketId =
+                $("#modalUpdateAssignMe #modalAssignMeTicketId").val();
+
+            var comment =
+                $("#modalUpdateAssignMe #assignMeComment").val().trim();
+
+            var button =
+                $("#modalUpdateAssignMe .btnClickDisable");
+
+
+            if (!comment) {
+
+                Swal.fire(
+                    "Error!",
+                    "Please enter the required data",
+                    "error"
+                );
+
+                return;
+            }
+
+
+            button.prop("disabled", true);
+
+
+            $.ajax({
+
+                url: '@Url.Action("AssignMe", "Ticket")',
+
+                type: "GET",
+
+                dataType: "json",
+
+                data: {
+                    ticketId: ticketId,
+                    comment: comment
+                },
+
+                success: function (data) {
+
+                    if (data == "1" || data == 1) {
+
+                        Swal.fire(
+                            "Completed",
+                            "Ticket has been assigned",
+                            "success"
+                        );
+
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 500);
+
+                    }
+                    else {
+
+                        button.prop("disabled", false);
+
+                        Swal.fire(
+                            "Something went wrong!",
+                            "Please try again",
+                            "error"
+                        );
+
+                    }
+
+                },
+
+                error: function () {
+
+                    button.prop("disabled", false);
+
+                    Swal.fire(
+                        "Something went wrong!",
+                        "Please try again",
+                        "error"
+                    );
+
+                }
+
+            });
+
+        }
+
+
+        function assignedToMe(itemId) {
+
+            Swal.fire({
+                title: "Are you sure?",
+                text: "Please confirm",
+                icon: "warning",
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                showCancelButton: true,
+                reverseButtons: true
+            }).then(function (result) {
+
+                if (result.isConfirmed || result.value) {
+
+                    $.ajax({
+
+                        url: '@Url.Action("AssignMe", "Ticket")',
+
+                        type: "GET",
+
+                        dataType: "json",
+
+                        data: {
+                            ticketId: itemId,
+                            comment: "Assigned by myself"
+                        },
+
+                        success: function (data) {
+
+                            if (data == "1" || data == 1) {
+
+                                Swal.fire(
+                                    "Updated!",
+                                    "Ticket has been updated",
+                                    "success"
+                                );
+
+                                setTimeout(function () {
+                                    window.location.reload();
+                                }, 1000);
+
+                            }
+                            else {
+
+                                Swal.fire(
+                                    "Something went wrong!",
+                                    "Please try again",
+                                    "error"
+                                );
+
+                            }
+
+                        },
+
+                        error: function () {
+
+                            Swal.fire(
+                                "Something went wrong!",
+                                "Please try again",
+                                "error"
+                            );
+
+                        }
+
+                    });
+
+                }
+
+            });
+
+        }
+
+    </script>
+}

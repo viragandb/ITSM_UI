@@ -1,0 +1,345 @@
+﻿@model ICollection<Domain.Ticket>
+@using Service
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="card">
+
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="align-middle me-2" data-lucide="ticket"></i>
+                    Tickets
+                </h5>
+            </div>
+
+            <div class="card-body">
+
+                <div class="accordion" id="ticketAccordion">
+
+                    @foreach (var item in Model)
+                    {
+                        var collapseId = "ticket_" + item.TicketId;
+
+                        <div class="accordion-item">
+
+                            <h2 class="accordion-header"
+                                id="heading_@item.TicketId">
+
+                                <button class="accordion-button collapsed"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#@collapseId"
+                                        aria-expanded="false"
+                                        aria-controls="@collapseId">
+
+                                    <div class="w-100 d-flex justify-content-between align-items-center me-3 flex-wrap gap-2">
+
+                                        <div>
+
+                                            <strong>@item.Code</strong>
+
+                                            <span class="mx-2 text-muted">|</span>
+
+                                            @(item.RequestType != null && item.RequestType.Category != null
+                                                ? item.RequestType.Category.CategoryName
+                                                : "N/A")
+
+                                            <i class="align-middle mx-1"
+                                               data-lucide="chevrons-right"></i>
+
+                                            @(item.RequestType != null && item.RequestType.AssetType != null
+                                                ? item.RequestType.AssetType.AssetTypeName
+                                                : "N/A")
+
+                                            <i class="align-middle mx-1"
+                                               data-lucide="chevrons-right"></i>
+
+                                            <strong>
+                                                @(item.RequestType != null && item.RequestType.SubCategory != null
+                                                    ? item.RequestType.SubCategory.SubCategoryName
+                                                    : "N/A")
+                                            </strong>
+
+                                        </div>
+
+                                        <div class="text-muted small">
+
+                                            @(item.PendingTeam != null
+                                                ? item.PendingTeam.TeamName
+                                                : "N/A")
+
+                                            <span class="mx-2">|</span>
+
+                                            @item.RequestedDate.ToShortDateString()
+
+                                        </div>
+
+                                    </div>
+
+                                </button>
+
+                            </h2>
+
+                            <div id="@collapseId"
+                                 class="accordion-collapse collapse"
+                                 aria-labelledby="heading_@item.TicketId"
+                                 data-bs-parent="#ticketAccordion">
+
+                                <div class="accordion-body">
+
+                                    @Html.Partial("_Ticket", item)
+
+                                </div>
+
+                                <div class="card-footer">
+
+                                    <div class="d-flex justify-content-end flex-wrap gap-2">
+
+                                        <a href="@Html.EncodedActionLink("", "Info", "Ticket", "", new { id = item.TicketId }, null)"
+                                           target="_blank"
+                                           class="btn btn-sm btn-light">
+
+                                            <i class="align-middle me-1"
+                                               data-lucide="info"></i>
+
+                                            More
+
+                                        </a>
+
+                                        <button type="button"
+                                                class="openModalUpdate btn btn-sm btn-primary"
+                                                data-id="@item.TicketId"
+                                                data-code="@item.Code"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#modalUpdate">
+
+                                            <i class="align-middle me-1"
+                                               data-lucide="check-check"></i>
+
+                                            Review
+
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+<div class="modal fade"
+     id="modalUpdate"
+     tabindex="-1"
+     aria-labelledby="modalUpdateLabel"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title"
+                    id="modalUpdateLabel">
+
+                    <i class="align-middle me-2"
+                       data-lucide="check-check"></i>
+
+                    Ticket #
+                    <span id="modelLableId"></span>
+                    - Review
+
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <input type="hidden"
+                       name="modalTicketId"
+                       id="modalTicketId" />
+
+                <div class="mb-0">
+
+                    <label for="textComment"
+                           class="form-label">
+                        Comment
+                    </label>
+
+                    <textarea id="textComment"
+                              name="textComment"
+                              placeholder="Comment"
+                              rows="4"
+                              class="form-control"></textarea>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn btn-sm btn-danger"
+                        data-bs-dismiss="modal">
+
+                    <i class="align-middle me-1"
+                       data-lucide="x"></i>
+
+                    Cancel
+
+                </button>
+
+                <button type="button"
+                        class="btn btn-sm btn-primary btnClickDisable"
+                        onclick="update()">
+
+                    <i class="align-middle me-1"
+                       data-lucide="save"></i>
+
+                    Update
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).on("click", ".openModalUpdate", function () {
+
+            var ticketId = $(this).data("id");
+            var code = $(this).data("code");
+
+            $("#modalUpdate #modalTicketId")
+                .val(ticketId);
+
+            $("#modalUpdate #modelLableId")
+                .text(code);
+
+            $("#modalUpdate #textComment")
+                .val("");
+
+            $("#modalUpdate .btnClickDisable")
+                .prop("disabled", false);
+
+        });
+
+
+        function update() {
+
+            var ticketId =
+                $("#modalUpdate #modalTicketId").val();
+
+            var comment =
+                $("#modalUpdate #textComment").val().trim();
+
+            var button =
+                $("#modalUpdate .btnClickDisable");
+
+
+            if (!comment) {
+
+                Swal.fire(
+                    "Error!",
+                    "Please enter the required data",
+                    "error"
+                );
+
+                return;
+            }
+
+
+            button.prop("disabled", true);
+
+
+            $.ajax({
+
+                url: '@Url.Action("Review", "Ticket")',
+
+                type: "GET",
+
+                dataType: "json",
+
+                data: {
+                    ticketId: ticketId,
+                    comment: comment
+                },
+
+                success: function (data) {
+
+                    if (data == "1" || data == 1) {
+
+                        Swal.fire(
+                            "Completed",
+                            "Ticket has been reviewed",
+                            "success"
+                        );
+
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 200);
+
+                    }
+                    else {
+
+                        button.prop("disabled", false);
+
+                        Swal.fire(
+                            "Something went wrong!",
+                            "Please try again",
+                            "error"
+                        );
+
+                    }
+
+                },
+
+                error: function () {
+
+                    button.prop("disabled", false);
+
+                    Swal.fire(
+                        "Something went wrong!",
+                        "Please try again",
+                        "error"
+                    );
+
+                }
+
+            });
+
+        }
+
+    </script>
+}

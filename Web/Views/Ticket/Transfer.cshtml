@@ -1,0 +1,426 @@
+﻿@model ICollection<Domain.Ticket>
+@using Service
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("Transfer", "Ticket", FormMethod.Get))
+{
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card">
+
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="align-middle me-2" data-lucide="arrow-right-left"></i>
+                        Tickets
+                    </h5>
+                </div>
+
+                <div class="card-body">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+
+                            <label for="CompanyId" class="form-label">
+                                Company
+                            </label>
+
+                            <select id="CompanyId"
+                                    name="CompanyId"
+                                    class="form-select">
+                                <option value=""></option>
+                            </select>
+
+                            <span class="text-danger"
+                                  data-valmsg-for="CompanyId"
+                                  data-valmsg-replace="true">
+                            </span>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <label for="CategoryId" class="form-label">
+                                Category
+                            </label>
+
+                            <select id="CategoryId"
+                                    name="CategoryId"
+                                    class="form-select">
+                                <option value=""></option>
+                            </select>
+
+                            <span class="text-danger"
+                                  data-valmsg-for="CategoryId"
+                                  data-valmsg-replace="true">
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="card-footer">
+
+                    <div class="d-flex justify-content-end">
+
+                        <button type="submit"
+                                class="btn btn-sm btn-primary">
+
+                            <i class="align-middle me-1" data-lucide="search"></i>
+                            Search
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card">
+
+                <div class="card-body">
+
+                    <div class="accordion" id="transferAccordion">
+
+                        @foreach (var item in Model)
+                        {
+                            var collapseId = "ticket_" + item.TicketId;
+
+                            <div class="accordion-item">
+
+                                <h2 class="accordion-header"
+                                    id="heading_@item.TicketId">
+
+                                    <button class="accordion-button collapsed"
+                                            type="button"
+                                            data-bs-toggle="collapse"
+                                            data-bs-target="#@collapseId"
+                                            aria-expanded="false"
+                                            aria-controls="@collapseId">
+
+                                        <div class="w-100 d-flex justify-content-between align-items-center flex-wrap gap-2 me-3">
+
+                                            <div>
+
+                                                <strong>
+                                                    @item.Code
+                                                </strong>
+
+                                                <span class="mx-2 text-muted">|</span>
+
+                                                @(item.RequestType != null &&
+                                                  item.RequestType.Category != null
+                                                    ? item.RequestType.Category.CategoryName
+                                                    : "N/A")
+
+                                                <i class="align-middle mx-1"
+                                                   data-lucide="chevrons-right"></i>
+
+                                                @(item.RequestType != null &&
+                                                  item.RequestType.AssetType != null
+                                                    ? item.RequestType.AssetType.AssetTypeName
+                                                    : "N/A")
+
+                                                <i class="align-middle mx-1"
+                                                   data-lucide="chevrons-right"></i>
+
+                                                <strong>
+                                                    @(item.RequestType != null &&
+                                                      item.RequestType.SubCategory != null
+                                                        ? item.RequestType.SubCategory.SubCategoryName
+                                                        : "N/A")
+                                                </strong>
+
+                                                <span class="mx-2 text-muted">|</span>
+
+                                                <span>
+                                                    Assigned To:
+                                                </span>
+
+                                                <strong>
+                                                    @(item.AssignedToUser != null
+                                                        ? item.AssignedToUser.FullName
+                                                        : "N/A")
+                                                </strong>
+
+                                            </div>
+
+                                            <div class="text-muted small">
+
+                                                @item.Company
+
+                                                <span class="mx-2">|</span>
+
+                                                @item.LocationName
+
+                                                <span class="mx-2">|</span>
+
+                                                @item.RequestedDate.ToShortDateString()
+
+                                            </div>
+
+                                        </div>
+
+                                    </button>
+
+                                </h2>
+
+                                <div id="@collapseId"
+                                     class="accordion-collapse collapse"
+                                     aria-labelledby="heading_@item.TicketId"
+                                     data-bs-parent="#transferAccordion">
+
+                                    <div class="accordion-body">
+
+                                        @Html.Partial("_Ticket", item)
+
+                                    </div>
+
+                                    <div class="card-footer">
+
+                                        <div class="d-flex justify-content-end flex-wrap gap-2">
+
+                                            <a href="@Html.EncodedActionLink("", "TicketInfo", "Ticket", "", new { id = item.TicketId }, null)"
+                                               target="_blank"
+                                               class="btn btn-sm btn-light">
+
+                                                <i class="align-middle me-1"
+                                                   data-lucide="info"></i>
+
+                                                More
+
+                                            </a>
+
+                                            <button type="button"
+                                                    class="btn btn-sm btn-warning"
+                                                    onclick="assignToMe('@item.TicketId', '@HttpUtility.JavaScriptStringEncode(item.Code)')">
+
+                                                <i class="align-middle me-1"
+                                                   data-lucide="user-check"></i>
+
+                                                Assign To Me
+
+                                            </button>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        }
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+}
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            loadCategory();
+            loadCompanies();
+
+        });
+
+
+        function parseJsonResult(data) {
+
+            if (typeof data === "string") {
+
+                try {
+                    return JSON.parse(data);
+                }
+                catch (e) {
+                    return [];
+                }
+
+            }
+
+            return data || [];
+        }
+
+
+        function loadCategory() {
+
+            var dropDown = $("#CategoryId");
+
+            dropDown.empty();
+
+            dropDown.append(
+                "<option value='0'>-- All --</option>"
+            );
+
+
+            $.getJSON(
+                '@Url.Action("GetCategoryListJsonResult", "Category")',
+                function (data) {
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.CategoryId,
+                                    text: item.CategoryName
+                                })
+                            );
+
+                        }
+                    );
+
+
+                    var selectedId = '@ViewBag.CategoryId';
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+                }
+            );
+
+        }
+
+
+        function loadCompanies() {
+
+            var dropDown = $("#CompanyId");
+
+            dropDown.empty();
+
+            dropDown.append(
+                "<option value='0'>-- All --</option>"
+            );
+
+
+            $.getJSON(
+                '@Url.Action("GetCompanyListJsonResult", "Company")',
+                function (data) {
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.CompanyId,
+                                    text: item.CompanyName
+                                })
+                            );
+
+                        }
+                    );
+
+
+                    var selectedId = '@ViewBag.CompanyId';
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+                }
+            );
+
+        }
+
+
+        function assignToMe(itemId, itemName) {
+
+            Swal.fire({
+
+                title: "Are you sure?",
+                text: "Do you want to assign ticket " + itemName + " to yourself?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                reverseButtons: true
+
+            }).then(function (result) {
+
+                if (result.isConfirmed || result.value) {
+
+                    $.ajax({
+
+                        url: '@Url.Action("AssignToMe", "Ticket")',
+
+                        type: "GET",
+
+                        dataType: "json",
+
+                        data: {
+                            ticketId: itemId
+                        },
+
+                        success: function (data) {
+
+                            if (data == "1" || data == 1) {
+
+                                Swal.fire(
+                                    "Completed",
+                                    "Ticket has been assigned",
+                                    "success"
+                                );
+
+                                setTimeout(function () {
+                                    window.location.href = '@Url.Action("Pending", "Ticket")';
+                                }, 500);
+
+                            }
+                            else {
+
+                                Swal.fire(
+                                    "Something went wrong!",
+                                    "Ticket could not be assigned. Please try again",
+                                    "error"
+                                );
+
+                            }
+
+                        },
+
+                        error: function () {
+
+                            Swal.fire(
+                                "Something went wrong!",
+                                "Ticket could not be assigned. Please try again",
+                                "error"
+                            );
+
+                        }
+
+                    });
+
+                }
+
+            });
+
+        }
+
+    </script>
+}

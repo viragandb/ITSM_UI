@@ -1,0 +1,376 @@
+﻿@model IEnumerable<Web.Models.KPITaskUserVM>
+@using Service
+
+@{
+    /**/
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+
+
+}
+@*.tdGray
+
+
+*@
+
+<style>
+    .tdGray.table-striped > tr:nth-of-type(odd)   {
+        background-color: #ABB2B9;
+    }
+
+    .table tr td  {
+        background-color: #ABB2B9;
+    }
+</style>
+
+@using (Html.BeginForm("KPITask", "Report", FormMethod.Get, new { @class = "form-horizontal" }))
+{
+
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card box-danger">
+                <div class="card-header with-border">
+                    <h3 class="card-title">Scheduled Task KPI</h3>
+                    <div class="card-tools pull-right">
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <div class="form-group">
+
+                        <label class="control-label col-md-2">
+                            Team :
+                        </label>
+                        <div class="col-md-4">
+                            <select id="TeamId" name="TeamId" class="form-control">
+                                <option value=""></option>
+                            </select>
+                        </div>
+
+
+                    </div>
+                    <div class="form-group row">
+
+                        <label class="control-label col-md-2">
+                            Date :
+                        </label>
+                        <div class="col-md-2">
+                            <div class="input-group date">
+                                <div class="input-group-addon">
+                                    <i class="fa fa-calendar"></i>
+                                </div>
+                                <input type="text" name="StartDate" id="StartDate" value="@ViewBag.StartDate" class="form-control datepicker" />
+                            </div>
+                        </div>
+
+
+                        <label class="control-label col-md-1">
+                            To
+                        </label>
+                        <div class="col-md-2">
+                            <div class="input-group date">
+                                <div class="input-group-addon">
+                                    <i class="fa fa-calendar"></i>
+                                </div>
+                                <input type="text" name="EndDate" id="EndDate" value="@ViewBag.EndDate" class="form-control datepicker" />
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="text-right">
+                        <button type="submit" class="btn btn-social">
+                            <i class="fa fa-search"></i>Search
+                        </button>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+    {
+        foreach (var item in Model)
+        {
+
+            <div class="panel box box-primary" style="margin-bottom:10px">
+                <div class="card-header with-border">
+                    <div class="row">
+
+                        <div class="col-md-10">
+                            <h4 class="card-title">
+                                <a data-bs-toggle="collapse" data-parent="#accordion" href="#U_@item.User.EmpNo">
+
+                                    @item.User.EmpNo - @item.User.FullName
+                                </a>
+                                | @item.User.DesignationName
+                            </h4>
+                        </div>
+                        <div class="col-md-2 text-right">
+                            <span class="progress-number">
+                                <span class="label label-primary">
+                                    <b>
+                                        KPI : <lable id="finalValCellTot">@item.KPIValue %</lable>
+                                    </b>
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+
+                </div>
+                <div id="U_@item.User.EmpNo" class="panel-collapse collapse">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="card box-primary">
+                                    @*<div class="card-header with-border">
+                                            <div class="col-md-8">
+
+                                                <h3 class="card-title">
+                                                    Task Categories
+                                                </h3>
+                                            </div>
+                                        </div>*@
+
+                                    <div class="card-body">
+
+                                        <table id="dataTable" class="table table-bordered table-striped table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Task Category</th>
+                                                    <th width="100px" class="text-right">Weightage</th>
+                                                    <th width="100px" class="text-right">Total</th>
+                                                    <th width="100px" class="text-right">Earned</th>
+                                                    <th width="100px" class="text-right"><a href="#" data-bs-toggle="tooltip" title="Earned / Total %">%</a></th>
+                                                    <th width="100px" class="text-right"><a href="#" data-bs-toggle="tooltip" title="Earned / Total * Weightage">KPI</a></th>
+
+
+
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @{
+                                                    foreach (var cat in item.TaskCategories)
+                                                    {
+
+                                                        <tr>
+                                                            <td>
+                                                                <a href="#@cat.CategoryIndex" data-bs-toggle="collapse" data-parent="#accordion">
+                                                                    <label> @cat.TaskCategory.TaskCategoryName </label>
+                                                                    @*( W @cat.TaskCategory.Weightage % )*@
+
+                                                                </a>
+                                                            </td>
+
+                                                            <td class="text-right">@cat.TaskCategory.Weightage</td>
+                                                            <td class="text-right">@cat.AllocatedScore</td>
+                                                            <td class="text-right">@cat.Score</td>
+                                                            <td class="text-right">@cat.ScoreValue</td>
+                                                            <td class="text-right">@cat.WeightedValue</td>
+
+                                                        </tr>
+                                                        <tr id="@cat.CategoryIndex" class="panel-collapse collapse" style="background-color:#CCE4FA;">
+                                                            <td colspan="12">
+
+                                                                @if (cat.Tasks.Count > 0)
+                                                                {
+                                                                    <table id="dataTable" class="table table-bordered table-striped table-hover tdGray" style="margin-bottom:0px;padding-bottom:0px">
+                                                                        <thead>
+                                                                            <tr>
+                                                                                <th>Task </th>
+                                                                                <th width="100px" class="text-right">Repeat Type </th>
+                                                                                <th width="100px" class="text-right">Score </th>
+                                                                                <th width="100px" class="text-right">No Of Tasks </th>
+                                                                                <th width="100px" class="text-right">Total</th>
+                                                                                <th width="100px" class="text-right">Earned</th>
+                                                                                <th width="100px" class="text-right"><a href="#" data-bs-toggle="tooltip" title="Earned / Total %">%</a></th>
+
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            @{
+                                                                                foreach (var task in cat.Tasks)
+                                                                                {
+
+                                                                                    var styleTr = "";
+                                                                                    if (task.AllocatedScore != task.Score)
+                                                                                    { styleTr = "#F5B7B1"; }
+                                                                                    <tr style="background-color:@styleTr">
+
+                                                                                        <td>
+
+
+                                                                                            <a href="@Html.EncodedActionLink("", "TaskUpdatesDR", "ScheduledTask", "", new { id = task.TaskId, startDate=@ViewBag.StartDate, endDate=@ViewBag.EndDate }, null)" target="_blank">
+                                                                                                @task.TaskName
+                                                                                            </a>
+
+                                                                                        </td>
+
+                                                                                        <td >@task.Task.RepeatType.EnumDisplayName()</td>
+                                                                                        <td class="text-right">@task.Task.Score</td>
+                                                                                        <td class="text-right">@task.NoOfTasks</td>
+                                                                                        <td class="text-right">@task.AllocatedScore</td>
+                                                                                        <td class="text-right">@task.Score</td>
+                                                                                        <td class="text-right">@task.ScoreValue</td>
+
+                                                                                    </tr>
+                                                                                    @*<tr id="@task.TaskId" class="panel-collapse collapse">
+                                                                                            <td colspan="12" align="left">
+                                                                                                <div class="row">
+                                                                                                    <div class="col-md-12">
+
+
+
+
+                                                                                                    </div>
+                                                                                                </div>
+
+                                                                                            </td>
+                                                                                        </tr>*@
+                                                                                }
+                                                                            }
+                                                                        </tbody>
+                                                                    </table>
+
+                                                                }
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                }
+                                            </tbody>
+
+                                        </table>
+
+
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+                <div class="card-footer">
+                    <div class="progress-group">
+
+
+                        <div class="progress sm" style="margin-bottom:3px">
+                            <div class="progress-bar progress-bar-primary" id="finalProgressBar" style="width:@item.KPIValue%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+    }
+
+    <div class="row">
+
+        <div class="col-md-12">
+            <div class="panel box box-default" style="margin-bottom:10px">
+                <div class="card-header with-border">
+                    <div class="row">
+
+                        <div class="col-lg-10">
+                            <h4 class="card-title">
+                                Team KPI
+                            </h4>
+                        </div>
+                        <div class="col-lg-2 text-right">
+                            <span class="label label-danger">
+                                <b>
+                                    KPI <lable>@ViewBag.TeamKPI %</lable>
+                                </b>
+                            </span>
+                        </div>
+                    </div>
+
+                </div>
+                @*<div id="KPI1" class="panel-collapse collapse">
+                        <div class="card-body">
+
+                        </div>
+
+
+                    </div>*@
+                <div class="card-footer">
+                    <div class="progress-group ">
+                        <div class="progress sm" style="margin-bottom:3px; ">
+                            <div class="progress-bar progress-bar-striped progress-bar-danger" id="finalProgressBar" style="width:@ViewBag.TeamKPI%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+}
+
+
+@section scripts {
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('[data-bs-toggle="tooltip"]').tooltip();
+
+        });
+
+        $(document).ready(function () {
+
+            //$('#dataTable').DataTable({
+            //    "paging": false,
+            //    "lengthChange": true,
+            //    "searching": true,
+            //    "ordering": true,
+            //    "info": true,
+            //    "autoWidth": true
+            //});
+
+            loadTeams();
+        });
+
+
+
+
+        function loadTeams() {
+
+            $.getJSON("@Url.Action("GetTeamUserListJsonResult", "Team")", function (data) {
+                var dropDown = $("#TeamId");
+
+                dropDown.empty();
+                dropDown.append("<option value='0'>-- Select --</option>");
+
+                $.each(JSON.parse(data), function (index, optionaldata) {
+                    dropDown.append($('<option />', { value: optionaldata.TeamId }).html(optionaldata.TeamName));
+                });
+
+                if ('@ViewBag.TeamId') {
+                      $('#TeamId').val(@ViewBag.TeamId).attr("selected", "selected");
+                 }
+
+                loadUsers();
+                loadCategory();
+            });
+
+        }
+
+
+
+
+    </script>
+
+}
+
+
+
+
+
+

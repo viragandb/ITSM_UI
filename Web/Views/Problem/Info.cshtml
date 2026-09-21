@@ -1,0 +1,162 @@
+﻿@model Domain.Problem
+@using Service
+@{
+    /**/
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@Html.HiddenFor(model => model.ProblemId)
+
+@Html.Partial("_Problem", Model)
+
+
+<div class="row">
+    <div class="col-md-4">
+
+        <div class="card box-widget widget-user-2">
+            <div class="widget-user-header bg-primary">
+                <div class="widget-user-image">
+                    <img class="img-circle" src="@Model.RequestedUser.ProImageName" alt="User Avatar">
+                </div>
+                <h5 class="widget-user-desc">@Model.RequestedUser.FullName</h5>
+                <h5 class="widget-user-desc">@Model.RequestedBy</h5>
+                <h5 class="widget-user-desc">Requested By</h5>
+            </div>
+            <div class="card-footer no-padding">
+                <ul class="nav nav-stacked">
+
+                    <li>
+                        <a href="#">
+                            @Model.RequestedUser.DesignationName<br />
+                            @Model.RequestedUser.DepartmentName
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            &nbsp;<span class="pull-left badge bg-green">@Model.RequestedUser.Email</span>
+                            <span class="pull-right badge bg-red">@Model.RequestedUser.ContactNo</span>
+                        </a>
+                    </li>
+                    <li><a href="#"></a></li>
+                </ul>
+            </div>
+
+        </div>
+
+        <div class="card box-info">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fa fa-ticket"></i>&nbsp;&nbsp;Tickets</h3>
+            </div>
+            <div class="card-body">
+                <div class="form-group row">
+
+                    @{
+                        foreach (var ticket in Model.Tickets)
+                        {
+                            <div class="col-sm-6">
+
+                                <a href="@Html.EncodedActionLink("","Info", "Ticket","", new { id = ticket.TicketId },null)" target="_blank" class="">
+                                    @ticket.Code
+                                </a><br />
+                            </div>
+
+                        }
+                    }
+
+                </div>
+
+            </div>
+        </div>
+
+        <div class="card box-success">
+            <div class="card-header">
+                <h3 class="card-title"> <i class="fa fa-plug"></i>&nbsp;&nbsp;Assets</h3>
+            </div>
+            <div class="card-body">
+                <ul>
+                    @{
+                        foreach (var item in Model.ItemAssets)
+                        {
+                            <li>
+                                <a href="@Html.EncodedActionLink("","Info", "Asset","", new { id = item.AssetId },null)" target="_blank" class="">
+                                   @item.Asset.AssetName - @item.Asset.Description
+                                </a>
+                            </li>
+                        }
+                    }
+                </ul>
+
+            </div>
+        </div>
+        <div class="card box-warning">
+            <div class="card-header">
+                <h3 class="card-title">Documents</h3>
+            </div>
+            <div class="card-body">
+                <ul>
+                    @{
+                        foreach (var doc in Model.ItemsDocs)
+                        {
+                            <li><a href="@doc.FileUrl" target="_blank">@doc.FileName</a> </li>
+                        }
+                    }
+                </ul>
+            </div>
+        </div>
+
+    </div>
+    <div class="col-md-8">
+        <div class="card box-default">
+
+            <div class="card-header with-border">
+                <h3 class="card-title">History</h3>
+                <div class="card-tools pull-right">
+
+                </div>
+            </div>
+
+            <div class="card-body">
+
+                <table id="dataTable" class="table table-bordered table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Comment</th>
+                            <th>Updated By</th>
+                            <th>Updated Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            foreach (var item in Model.ItemLogs)
+                            {
+                                <tr>
+
+                                    <td>@item.Comment</td>
+                                    <td>@item.UpdatedUser.EmpNo | @item.UpdatedUser.FullName</td>
+                                    <td class="text-right">@item.UpdatedDate</td>
+
+                                </tr>
+                            }
+                        }
+                    </tbody>
+
+                </table>
+
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+@section scripts {
+    <script type="text/javascript">
+
+
+
+    </script>
+
+}

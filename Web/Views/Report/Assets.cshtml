@@ -1,0 +1,524 @@
+﻿@using Service
+@model IEnumerable<Domain.Asset>
+@{
+    /**/
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@using (Html.BeginForm("Assets", "Report", FormMethod.Get, new { @class = "form-horizontal" }))
+{
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card card-primary card-outline">
+                <div class="card-header with-border">
+                    <h3 class="card-title">Assets</h3>
+
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <div class="form-group ">
+                                        <label class="control-label"> Asset Category </label>
+                                        <select id="AssetCategoryId" name="AssetCategoryId" class="form-control form-control-sm"></select>
+
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div class="form-group ">
+                                        <label class="control-label"> Asset Type </label>
+                                        <select id="AssetTypeId" name="AssetTypeId" class="form-control form-control-sm"></select>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div class="form-group ">
+                                        <label class="control-label">
+                                            Status :
+                                        </label>
+
+                                        <select id="StatusId" name="StatusId" class="select2 select2-hidden-accessible"
+                                                multiple="" data-placeholder="All" style="width: 100%;" aria-hidden="true">
+                                        </select>
+                                    </div>
+
+
+                                </div>
+                                <div class="col-sm-3">
+                                    <div class="form-group ">
+                                        <label class="control-label">
+                                            Owned By :
+                                        </label>
+                                        <select id="AllocatedTypeId" name="AllocatedTypeId" class="form-control form-control-sm select2">
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="row">
+
+                                <div class="col-sm-3">
+                                    <div class="form-group ">
+                                        <label class="control-label">
+                                            Location :
+                                        </label>
+                                        <select id="BranchId" name="BranchId" class="form-control form-control-sm select2">
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div class="form-group ">
+                                        <label class="control-label">
+                                            Department :
+                                        </label>
+                                        <select id="DepartmentId" name="DepartmentId" class="form-control form-control-sm select2">
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                </div>
+
+                                <div class="col-sm-3">
+                                    <div class="form-group ">
+                                        <div class="icheck-primary d-inline">
+                                            <input type="checkbox" id="checkboxWarranty" name="checkboxWarranty" @ViewBag.Warranty>
+                                            <label for="checkboxWarranty">
+                                                Warranty Expired
+                                            </label>
+                                        </div> <br />
+                                        <div class="icheck-primary d-inline">
+                                            <input type="checkbox" id="checkboxMaintenance" name="checkboxMaintenance" @ViewBag.Maintenance>
+                                            <label for="checkboxMaintenance">
+                                                Maintenance Expired
+                                            </label>
+                                        </div><br />
+                                        <div class="icheck-primary d-inline">
+                                            <input type="checkbox" id="checkboxToBeReturned" name="checkboxToBeReturned" @ViewBag.ToBeReturned>
+                                            <label for="checkboxToBeReturned">
+                                                To Be Returned
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+
+
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <div class="form-group ">
+                                        <label class="control-label"> Asset # </label>
+                                        <input type="text" id="AssetNo" name="AssetNo" value="@ViewBag.AssetNo" class="form-control form-control-sm" />
+
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div class="form-group ">
+                                        <label class="control-label"> Serial # </label>
+                                        <input type="text" id="SerialNo" name="SerialNo" value="@ViewBag.SerialNo" class="form-control form-control-sm" />
+
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div class="form-group ">
+                                        <label class="control-label"> Barcode # </label>
+                                        <input type="text" id="BarcodeNo" name="BarcodeNo" value="@ViewBag.BarcodeNo" class="form-control form-control-sm" />
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group ">
+                                <label class="control-label"> Assigned User</label>
+                                <input type="text" id="AssignTo" name="AssignTo" value="@ViewBag.AssignTo" placeholder="Type LAN Id here to search" class="form-control form-control-sm" />
+
+                                @*@Html.LabelFor(model => model.AssignTo, new { @class = "control-label" })
+                                    @Html.TextBoxFor(model => model.AssignTo, new { placeholder = "Type LAN Id here to search", @class = "form-control form-control-sm" })*@
+                            </div>
+                        </div>
+                        @*<div class="col-lg-4">
+                                <div class="form-group ">
+                                    <label class="control-label"> Assigned User Name</label>
+                                    <input type="text" id="AssignUserName" name="AssignUserName" value="@ViewBag.AssignUserName" readonly  class="form-control form-control-sm" />
+
+                                </div>
+                            </div>*@
+
+                    </div>
+
+
+                </div>
+                <div class="card-footer">
+                    <div class="text-right">
+                        <button type="submit" class="btn btn-sm btn-default">
+                            <i class="fa fa-search mr-2"></i>Search
+                        </button>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card box-default">
+                <div class="card-body">
+
+                    <table id="dataTable" class="table table-bordered table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>AssetNo</th>
+                                <th>Asset Category</th>
+                                <th>Asset Type</th>
+                                <th>Make</th>
+                                <th>Model</th>
+                                <th>Serial No</th>
+                                <th>Barcode</th>
+                                <th>Branch</th>
+                                <th>Department</th>
+                                <th>DAO Code</th>
+                                <th>Status</th>
+                                <th>Description</th>
+                                <th>Owned By</th>
+                                <th>Assigned To</th>
+                                <th>Vendor</th>
+                                <th>Purchase Price</th>
+                                <th>Warranty Period</th>
+                                <th>Warranty Expire</th>
+                                <th>To Be Returned Date</th>
+                                <th>Classification</th>
+                                <th>Responsible Team</th>
+                                <th>Updated By</th>
+                                <th>Updated Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                foreach (var item in Model)
+                                {
+                                    <tr>
+
+                                        <td>
+                                            <a href="@Html.EncodedActionLink("","Info", "Asset","", new { id = item.AssetId },null)" target="_blank">
+                                                @item.AssetNo
+                                            </a>
+                                        </td>
+                                        <td>@item.AssetCategory.EnumDisplayName()</td>
+                                        <td>@item.AssetType.AssetTypeName</td>
+                                        <td>@item.AssetMake.Name</td>
+                                        <td>@item.ModelName</td>
+                                        <td>@item.SerialNo</td>
+                                        <td>@item.Barcode</td>
+                                        <td>@item.Branch.Name</td>
+                                        <td>@item.Department.DepartmentName</td>
+                                        <td>
+
+                                            @if (item.DepartmentId == DepartmentService.GetDeptIdBranch())
+                                            {
+                                                @item.Branch.DAOCode
+                                            }
+                                            else
+                                            {
+                                                @item.Department.DAOCode
+                                            }
+
+                                        </td>
+                                        <td>@item.Status.EnumDisplayName()</td>
+                                        <td>@item.Description</td>
+                                        <td>@item.AllocatedType.EnumDisplayName()</td>
+                                        <td>
+                                            @if (item.AssignedTo != null)
+                                            {
+                                                @item.AssignedToUser.FullName
+                                            }
+                                            else
+                                            {
+                                                <span>N/A</span>
+                                            }
+                                        </td>
+                                        <td>@item.Vendor.VendorName</td>
+                                        <td>@item.PurchasePrice</td>
+                                        <td>@item.WarrantyPeriod</td>
+                                        <td>
+                                            @if (item.WarrantyPeriod > 0)
+                                            {
+                                                @item.WarrantyExpire.ToShortDateString()
+                                            }
+                                            else
+                                            {
+                                                <span>N/A</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (item.AllocatedType == Domain.AllocatedTypeEnum.External)
+                                            {
+                                                @item.ToBeReturnedDate.ToShortDateString()
+                                            }
+                                            else
+                                            {
+                                                <span>N/A</span>
+                                            }
+                                        </td>
+                                        <td>@item.Priority.EnumDisplayName()</td>
+                                        <td>
+                                            @if (item.ResponsibleTeam != null)
+                                            {
+                                                @item.ResponsibleTeam.TeamName
+                                            }
+                                            else
+                                            {
+                                                <span>N/A</span>
+                                            }
+                                        </td>
+
+
+                                        <td>@item.UpdatedBy</td>
+                                        <td>@item.UpdatedDate</td>
+
+
+                                    </tr>
+
+
+                                }
+                            }
+                        </tbody>
+
+                    </table>
+
+                </div>
+                <!-- /.box-body -->
+
+            </div>
+
+        </div>
+    </div>
+
+
+}
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            $("#dataTable").DataTable({
+                "responsive": true, "lengthChange": true, "autoWidth": true, "paging": true,
+                /* "buttons": ["excel", "pdf", "print", "colvis"]*/
+                "buttons": [
+                    {
+                        extend: 'excelHtml5',
+                        text: 'Excel',
+                        title: 'ITSM - Assets',
+                        exportOptions: {
+                            modifier: {
+                                page: 'all'
+                            }
+                        }
+                    }
+                    , {
+                        extend: 'pdfHtml5',
+                        text: ' PDF',
+                        title: 'ITSM - Assets',
+                        orientation: 'landscape',
+                        exportOptions: {
+                            modifier: {
+                                page: 'all'
+                            }
+                        }
+                    }
+                    , {
+                        extend: 'print',
+                        text: '<i class="fa fa-print"></i>',
+                        title: 'ITSM - Assets',
+                        autoPrint: true
+                    }
+                    ,
+                    "colvis"
+                ]
+            }).buttons().container().appendTo('#dataTable_wrapper .col-md-6:eq(0)');
+        });
+
+        $(document).ready(function () {
+            loadAssetStatus();
+            loadAssetCategory();
+            loadAssetOwnershipType();
+            loadLocations();
+
+            SearchADUser();
+        });
+
+        function SearchADUser() {
+
+            $("#AssignTo").autocomplete({
+                source: function (request, response) {
+                   /* $("#AssignUserName").val('');*/
+                $.ajax({
+                    url: '@Url.Action("GetSearchUserByLanIdJsonResult", "User")',
+                    datatype: "json",
+                    data: {
+                        term: request.term
+                    },
+                    success: function (data) {
+                        response($.map(data, function (val, item) {
+                            return {
+                                label: val.EmpNo + " - " + val.FullName + " | " + val.DepartmentName,
+                                value: val.EmpNo ,
+                                itemId: val.EmpNo,
+                                itemName: val.FullName
+
+                            }
+                        }))
+                    }
+                })
+                 },
+                 minLength: 1,
+            select: function (event, ui) {
+                /*$("#AssignUserName").val(ui.item.itemName);*/
+
+                }
+            });
+        }
+
+
+        function loadLocations() {
+            $.getJSON("@Url.Action("GetItemListJsonResult", "Branch")", function (data) {
+                var dropDown = $("#BranchId");
+                dropDown.empty();
+                dropDown.append("<option value='0'>-- All --</option>");
+                $.each(JSON.parse(data), function (index, optionaldata) {
+                    dropDown.append($('<option />', { value: optionaldata.BranchId }).html(optionaldata.Name));
+                });
+
+                 if ('@ViewBag.BranchId') {
+                     $('#BranchId').val('@ViewBag.BranchId').attr("selected", "selected");
+                }
+                loadDepartments();
+            });
+        }
+
+        $("select#BranchId").change(function (evt) {
+            loadDepartments();
+        });
+
+        function loadDepartments() {
+           var _branchId = $('#BranchId').val();
+
+            $.getJSON("@Url.Action("GetDepartmentListBtBranchIdJsonResult", "Department")",
+                {
+                    branchId: _branchId
+                }, function (data) {
+                var dropDown = $("#DepartmentId");
+                dropDown.empty();
+                dropDown.append("<option value='0'>-- All --</option>");
+                $.each(JSON.parse(data), function (index, optionaldata) {
+                    dropDown.append($('<option />', { value: optionaldata.DepartmentId }).html(optionaldata.DepartmentName));
+                });
+
+                if ('@ViewBag.DepartmentId') {
+                     $('#DepartmentId').val('@ViewBag.DepartmentId').attr("selected", "selected");
+                }
+
+            });
+         }
+
+        function loadAssetStatus() {
+            $.getJSON("@Url.Action("GetAssetStatusJsonResult", "Asset")", function (data) {
+                var dropDown = $("#StatusId");
+                dropDown.empty();
+                //dropDown.append("<option value='0'>-- All --</option>");
+                $.each(JSON.parse(data), function (index, optionaldata) {
+                    dropDown.append($('<option />', { value: optionaldata.Id }).html(optionaldata.Name));
+                });
+                 if ('@ViewBag.StatusId') {
+                      $('#StatusId').val('@ViewBag.StatusId').attr("selected", "selected");
+                }
+            });
+        }
+
+        function loadAssetCategory() {
+            $.getJSON("@Url.Action("GetAssetCategoryJsonResult", "AssetType")", function (data) {
+                var dropDown = $("#AssetCategoryId");
+                dropDown.empty();
+                dropDown.append("<option value='0'>-- Select --</option>");
+                $.each(JSON.parse(data), function (index, optionaldata) {
+                    dropDown.append($('<option />', { value: optionaldata.Id }).html(optionaldata.Name));
+                });
+                if ('@ViewBag.AssetCategoryId') {
+                    $('#AssetCategoryId').val('@ViewBag.AssetCategoryId').attr("selected", "selected");
+                }
+                loadAssetType();
+            });
+        }
+
+        $("select#AssetCategoryId").change(function (evt) {
+            loadAssetType();
+
+        });
+
+        function loadAssetType() {
+            var catId = $('#AssetCategoryId').val();
+
+            $.getJSON("@Url.Action("GetAssetTypeByAssetCategoryListJsonResult", "AssetType")",
+                {
+                    assetCategory: catId
+                }, function (data) {
+                var dropDown = $("#AssetTypeId");
+                dropDown.empty();
+                dropDown.append("<option value='0'>-- All --</option>");
+                $.each(JSON.parse(data), function (index, optionaldata) {
+                    dropDown.append($('<option />', { value: optionaldata.AssetTypeId }).html(optionaldata.AssetTypeName));
+                });
+
+                 if ('@ViewBag.AssetTypeId') {
+                     $('#AssetTypeId').val('@ViewBag.AssetTypeId').attr("selected", "selected");
+                }
+
+                });
+
+         }
+
+        function loadAssetOwnershipType() {
+            $.getJSON("@Url.Action("GetAssetOwnershipTypeJsonResult", "AssetType")", function (data) {
+                var dropDown = $("#AllocatedTypeId");
+                dropDown.empty();
+                dropDown.append("<option value='0'>-- All --</option>");
+                $.each(JSON.parse(data), function (index, optionaldata) {
+                    dropDown.append($('<option />', { value: optionaldata.Id }).html(optionaldata.Name));
+                });
+
+                if ('@ViewBag.AllocatedTypeId') {
+                    $('#AllocatedTypeId').val('@ViewBag.AllocatedTypeId').attr("selected", "selected");
+                }
+
+            });
+        }
+
+    </script>
+
+
+
+}
+
+
+
+
+

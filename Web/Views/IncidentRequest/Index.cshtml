@@ -1,0 +1,415 @@
+﻿@using Service
+@using Service.IM
+@model IEnumerable<Domain.IM.IncidentRequest>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("Index", "IncidentRequest", FormMethod.Get))
+{
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card">
+
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="align-middle me-2" data-lucide="triangle-alert"></i>
+                        Incidents
+                    </h5>
+                </div>
+
+                <div class="card-body">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-4">
+
+                            <label for="TeamId" class="form-label">
+                                Level 01 Team
+                            </label>
+
+                            <select id="TeamId"
+                                    name="TeamId"
+                                    class="form-select">
+                                <option value=""></option>
+                            </select>
+
+                        </div>
+
+                        <div class="col-md-4">
+
+                            <label for="StatusId" class="form-label">
+                                Status
+                            </label>
+
+                            <select id="StatusId"
+                                    name="StatusId"
+                                    class="form-select">
+                                <option value=""></option>
+                            </select>
+
+                            <span class="text-danger"
+                                  data-valmsg-for="StatusId"
+                                  data-valmsg-replace="true">
+                            </span>
+
+                        </div>
+
+                        <div class="col-md-2">
+
+                            <label for="StartDate" class="form-label">
+                                Occurred Date
+                            </label>
+
+                            <input type="date"
+                                   name="StartDate"
+                                   id="StartDate"
+                                   value="@ViewBag.StartDate"
+                                   class="form-control" />
+
+                        </div>
+
+                        <div class="col-md-2">
+
+                            <label for="EndDate" class="form-label">
+                                To
+                            </label>
+
+                            <input type="date"
+                                   name="EndDate"
+                                   id="EndDate"
+                                   value="@ViewBag.EndDate"
+                                   class="form-control" />
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="card-footer">
+
+                    <div class="d-flex justify-content-end">
+
+                        <button type="submit"
+                                class="btn btn-sm btn-primary">
+
+                            <i class="align-middle me-1" data-lucide="search"></i>
+                            Search
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card">
+
+                <div class="card-body">
+
+                    <div class="table-responsive">
+
+                        <table id="dataTable"
+                               class="table table-striped table-hover align-middle w-100">
+
+                            <thead>
+                                <tr>
+                                    <th>Request #</th>
+                                    <th>Impact</th>
+                                    <th>Requester</th>
+                                    <th>Occurred Date</th>
+                                    <th>Requested Date</th>
+                                    <th>Status</th>
+                                    <th>Level 01 Team</th>
+                                    <th>Pending Team</th>
+                                    <th>Subject</th>
+                                    <th>Description</th>
+                                    <th>Business Impact</th>
+                                    <th>Root Cause</th>
+                                    <th>Corrective Action</th>
+                                    <th>Preventive Action</th>
+                                    <th>Lessons Learnt</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+
+                                        <td>
+
+                                            <a href="@Html.EncodedActionLink("", "Info", "IncidentRequest", "", new { id = item.IncidentRequestId }, null)"
+                                               target="_blank">
+
+                                                #@item.IncidentRequestId
+
+                                            </a>
+
+                                        </td>
+
+                                        <td>
+
+                                            <span class="badge bg-@IncidentRequestService.GetImpactColor(item.Impact)">
+                                                @item.Impact.EnumDisplayName()
+                                            </span>
+
+                                        </td>
+
+                                        <td>
+                                            @(item.RequestedUser != null ? item.RequestedUser.FullName : "N/A")
+                                        </td>
+
+                                        <td>
+                                            @item.OccurredDate
+                                        </td>
+
+                                        <td>
+                                            @item.RequestedDate
+                                        </td>
+
+                                        <td>
+
+                                            <span class="badge bg-@IncidentRequestService.GetStatusColor(item.Status)">
+                                                @item.Status.EnumDisplayName()
+                                            </span>
+
+                                        </td>
+
+                                        <td>
+                                            @(item.Level01Team != null ? item.Level01Team.TeamName : "N/A")
+                                        </td>
+
+                                        <td>
+                                            @(item.PendingTeam != null ? item.PendingTeam.TeamName : "N/A")
+                                        </td>
+
+                                        <td>
+                                            @item.Subject
+                                        </td>
+
+                                        <td style="white-space: pre-wrap;">
+                                            @item.Description
+                                        </td>
+
+                                        <td style="white-space: pre-wrap;">
+                                            @item.BusinessImpact
+                                        </td>
+
+                                        @if (item.Status >= Domain.IM.IncidentStatusEnum.Completed)
+                                        {
+                                            <td style="white-space: pre-wrap;">
+                                                @item.RootCause
+                                            </td>
+
+                                            <td style="white-space: pre-wrap;">
+                                                @item.CorrectiveAction
+                                            </td>
+
+                                            <td style="white-space: pre-wrap;">
+                                                @item.PreventiveAction
+                                            </td>
+
+                                            <td style="white-space: pre-wrap;">
+                                                @item.LessonsLearnt
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                            <td>N/A</td>
+                                            <td>N/A</td>
+                                            <td>N/A</td>
+                                            <td>N/A</td>
+                                        }
+
+                                    </tr>
+                                }
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+}
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $("#dataTable").DataTable({
+
+                responsive: true,
+                lengthChange: false,
+                autoWidth: false,
+                paging: false,
+
+                buttons: [
+
+                    {
+                        extend: "excelHtml5",
+                        text: "Excel",
+                        title: "Incidents",
+                        exportOptions: {
+                            modifier: {
+                                page: "current"
+                            }
+                        }
+                    },
+
+                    {
+                        extend: "pdfHtml5",
+                        text: "PDF",
+                        title: "Incidents",
+                        orientation: "landscape",
+                        exportOptions: {
+                            modifier: {
+                                page: "current"
+                            }
+                        }
+                    },
+
+                    {
+                        extend: "print",
+                        text: "Print",
+                        title: "Incidents",
+                        autoPrint: true
+                    },
+
+                    "colvis"
+                ]
+
+            }).buttons().container().appendTo(
+                "#dataTable_wrapper .col-md-6:eq(0)"
+            );
+
+
+            loadTeams();
+            loadStatus();
+
+        });
+
+
+        function parseJsonResult(data) {
+
+            if (typeof data === "string") {
+
+                try {
+                    return JSON.parse(data);
+                }
+                catch (e) {
+                    return [];
+                }
+
+            }
+
+            return data || [];
+        }
+
+
+        function loadTeams() {
+
+            $.getJSON(
+                '@Url.Action("GetTeamListJsonResult", "Team")',
+                function (data) {
+
+                    var dropDown = $("#TeamId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- All --</option>"
+                    );
+
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.TeamId,
+                                    text: item.TeamName
+                                })
+                            );
+
+                        }
+                    );
+
+
+                    var selectedId = '@ViewBag.TeamId';
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+                }
+            );
+
+        }
+
+
+        function loadStatus() {
+
+            $.getJSON(
+                '@Url.Action("GetStatusJsonResult", "IncidentRequest")',
+                function (data) {
+
+                    var dropDown = $("#StatusId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- All --</option>"
+                    );
+
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.Id,
+                                    text: item.Name
+                                })
+                            );
+
+                        }
+                    );
+
+
+                    var selectedId = '@ViewBag.StatusId';
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+                }
+            );
+
+        }
+
+    </script>
+}

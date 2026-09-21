@@ -1,0 +1,422 @@
+﻿@model Web.Models.ChangeVM
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("Create", "Change", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card">
+
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="align-middle me-2" data-lucide="plus"></i>
+                        New Change
+                    </h5>
+                </div>
+
+                <div class="card-body">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-3">
+
+                            <label for="AssetCategoryId" class="form-label">
+                                Asset Category
+                            </label>
+
+                            <select id="AssetCategoryId"
+                                    name="AssetCategoryId"
+                                    class="form-select">
+                                <option value="0">-- Select --</option>
+                            </select>
+
+                            <span class="text-danger"
+                                  data-valmsg-for="AssetCategoryId"
+                                  data-valmsg-replace="true">
+                            </span>
+
+                        </div>
+
+                        <div class="col-md-5">
+
+                            @Html.LabelFor(
+                                model => model.AssetTypeId,
+                                new { @class = "form-label" }
+                            )
+
+                            <select id="AssetTypeId"
+                                    name="AssetTypeId"
+                                    class="form-select">
+                            </select>
+
+                            <span class="text-danger"
+                                  data-valmsg-for="AssetTypeId"
+                                  data-valmsg-replace="true">
+                            </span>
+
+                        </div>
+
+                        <div class="col-md-4">
+
+                            @Html.LabelFor(
+                                model => model.ChangeRequestTypeId,
+                                new { @class = "form-label" }
+                            )
+
+                            <select id="ChangeRequestTypeId"
+                                    name="ChangeRequestTypeId"
+                                    class="form-select">
+                            </select>
+
+                            <span class="text-danger"
+                                  data-valmsg-for="ChangeRequestTypeId"
+                                  data-valmsg-replace="true">
+                            </span>
+
+                        </div>
+
+                        <div class="col-12">
+
+                            @Html.LabelFor(
+                                model => model.Subject,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.TextBoxFor(
+                                model => model.Subject,
+                                new { @class = "form-control" }
+                            )
+
+                            @Html.ValidationMessageFor(
+                                model => model.Subject,
+                                "",
+                                new { @class = "text-danger" }
+                            )
+
+                        </div>
+
+                        <div class="col-12">
+
+                            @Html.LabelFor(
+                                model => model.Description,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.TextAreaFor(
+                                model => model.Description,
+                                new
+                                {
+                                    @class = "form-control",
+                                    rows = "4"
+                                }
+                            )
+
+                            @Html.ValidationMessageFor(
+                                model => model.Description,
+                                "",
+                                new { @class = "text-danger" }
+                            )
+
+                        </div>
+
+                        <div class="col-md-4">
+
+                            @Html.LabelFor(
+                                model => model.ChangeType,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.EnumDropDownListFor(
+                                model => model.ChangeType,
+                                "-- Select --",
+                                new { @class = "form-select" }
+                            )
+
+                        </div>
+
+                        <div class="col-md-4">
+
+                            @Html.LabelFor(
+                                model => model.Priority,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.EnumDropDownListFor(
+                                model => model.Priority,
+                                "-- Select --",
+                                new { @class = "form-select" }
+                            )
+
+                        </div>
+
+                        <div class="col-md-4">
+
+                            @Html.LabelFor(
+                                model => model.Risk,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.EnumDropDownListFor(
+                                model => model.Risk,
+                                "-- Select --",
+                                new { @class = "form-select" }
+                            )
+
+                        </div>
+
+                        <div class="col-md-3">
+
+                            @Html.LabelFor(
+                                model => model.StartDate,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.TextBoxFor(
+                                model => model.StartDate,
+                                "{0:yyyy-MM-dd}",
+                                new
+                                {
+                                    @class = "form-control",
+                                    type = "date"
+                                }
+                            )
+
+                            @Html.ValidationMessageFor(
+                                model => model.StartDate,
+                                "",
+                                new { @class = "text-danger" }
+                            )
+
+                        </div>
+
+                        <div class="col-md-3">
+
+                            @Html.LabelFor(
+                                model => model.EndDate,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.TextBoxFor(
+                                model => model.EndDate,
+                                "{0:yyyy-MM-dd}",
+                                new
+                                {
+                                    @class = "form-control",
+                                    type = "date"
+                                }
+                            )
+
+                            @Html.ValidationMessageFor(
+                                model => model.EndDate,
+                                "",
+                                new { @class = "text-danger" }
+                            )
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="card-footer">
+
+                    <div class="d-flex justify-content-end">
+
+                        <button type="submit"
+                                name="action:Save"
+                                class="btn btn-primary btn-sm">
+
+                            <i class="align-middle me-1" data-lucide="save"></i>
+                            Save
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+}
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            loadAssetCategory();
+            loadChangeRequestType();
+
+        });
+
+
+        function parseJsonResult(data) {
+
+            if (typeof data === "string") {
+
+                try {
+                    return JSON.parse(data);
+                }
+                catch (e) {
+                    return [];
+                }
+
+            }
+
+            return data || [];
+
+        }
+
+
+        function loadAssetCategory() {
+
+            $.getJSON(
+                '@Url.Action("GetAssetCategoryJsonResult", "AssetType")',
+                function (data) {
+
+                    var dropDown =
+                        $("#AssetCategoryId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- Select --</option>"
+                    );
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.Id,
+                                    text: item.Name
+                                })
+                            );
+
+                        }
+                    );
+
+                    var selectedId =
+                        '@ViewBag.AssetCategoryId';
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+                    loadAssetType();
+
+                }
+            );
+
+        }
+
+
+        $("#AssetCategoryId").on("change", function () {
+
+            loadAssetType();
+
+        });
+
+
+        function loadAssetType() {
+
+            var categoryId =
+                $("#AssetCategoryId").val();
+
+            $.getJSON(
+                '@Url.Action("GetAssetTypeByAssetCategoryListJsonResult", "AssetType")',
+                {
+                    assetCategory: categoryId
+                },
+                function (data) {
+
+                    var dropDown =
+                        $("#AssetTypeId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- Select --</option>"
+                    );
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.AssetTypeId,
+                                    text: item.AssetTypeName
+                                })
+                            );
+
+                        }
+                    );
+
+                    var selectedId =
+                        '@ViewBag.AssetTypeId';
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+                }
+            );
+
+        }
+
+
+        function loadChangeRequestType() {
+
+            $.getJSON(
+                '@Url.Action("GetChangeRequestTypeListJsonResult", "ChangeRequestType")',
+                function (data) {
+
+                    var dropDown =
+                        $("#ChangeRequestTypeId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- Select --</option>"
+                    );
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.ChangeRequestTypeId,
+                                    text: item.ChangeRequestTypeName
+                                })
+                            );
+
+                        }
+                    );
+
+                    var selectedId =
+                        '@ViewBag.ChangeRequestTypeId';
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+                }
+            );
+
+        }
+
+    </script>
+}

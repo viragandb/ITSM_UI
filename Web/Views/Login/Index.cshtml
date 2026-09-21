@@ -1,0 +1,350 @@
+﻿@model Domain.UserLogin
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html lang="en"
+      data-bs-theme="light"
+      data-layout="fluid"
+      data-sidebar-theme="dark"
+      data-sidebar-position="left"
+      data-sidebar-behavior="sticky">
+
+<head>
+
+    <meta charset="utf-8" />
+
+    <meta http-equiv="X-UA-Compatible"
+          content="IE=edge" />
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+    <meta name="description"
+          content="IT Service Management" />
+
+    <title>ITSM - Login</title>
+
+
+    <!-- AppStack -->
+    <link href="@Url.Content("~/theme/css/app.css")"
+          rel="stylesheet" />
+
+
+    <!-- Font Awesome -->
+    <link href="@Url.Content("~/Plugins/fontawesome-free/css/all.min.css")"
+          rel="stylesheet" />
+
+
+    <style>
+
+        .auth-brand-title {
+            font-weight: 500;
+        }
+
+        .validation-summary-errors {
+            color: var(--bs-danger);
+            margin-bottom: 1rem;
+        }
+
+        .field-validation-error {
+            color: var(--bs-danger);
+            font-size: .875rem;
+        }
+
+        .input-validation-error {
+            border-color: var(--bs-danger);
+        }
+    </style>
+
+</head>
+
+
+<body>
+
+    <div class="container-fluid p-0">
+
+        <div class="row g-0">
+
+
+            <!-- ============================================== -->
+            <!-- LEFT IMAGE -->
+            <!-- ============================================== -->
+
+            <div class="col-lg-6 d-none d-xl-flex  bg-white" style="background-image: url(/Images/bg--2.png); background-size: 500px; background-position: left center; background-repeat: no-repeat;">
+
+                <div class="auth-full-page position-relative w-100">
+
+                    @*<img src="@Url.Content("~/Images/bg--2.jpg")"
+                         class="auth-bg"
+                         alt="IT Service Management" />*@
+
+                    <div class="auth-quote">
+
+                        <i data-lucide="quote"></i>
+
+                        <figure>
+
+                            <blockquote>
+
+                                <p>
+                                    IT Service Management
+                                </p>
+
+                            </blockquote>
+
+                            <figcaption>
+                                ITSM
+                            </figcaption>
+
+                        </figure>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ============================================== -->
+            <!-- LOGIN -->
+            <!-- ============================================== -->
+
+            <div class="col-lg-6 bg-white">
+
+                <div class="auth-full-page d-flex p-4 p-xl-5">
+
+                    <div class="d-flex flex-column w-100 h-100">
+
+
+                        <div class="auth-form">
+
+
+                            <!-- ================================== -->
+                            <!-- HEADER -->
+                            <!-- ================================== -->
+
+                            <div class="text-center mb-4">
+
+                                <h1 class="h2 auth-brand-title">
+                                    IT Service Management
+                                </h1>
+
+                                <p class="lead">
+                                    Sign in to start your session
+                                </p>
+
+                            </div>
+
+
+                            <!-- ================================== -->
+                            <!-- LOGIN FORM -->
+                            <!-- ================================== -->
+
+                            @using (Html.BeginForm(
+                                "Index",
+                                "Login",
+                                FormMethod.Post,
+                                new { @class = "needs-validation" }))
+                            {
+                                @Html.AntiForgeryToken()
+
+
+                                <!-- Validation Summary -->
+
+                                @Html.ValidationSummary(
+                                    true,
+                                    "",
+                                    new { @class = "alert alert-danger" }
+                                )
+
+
+                                <!-- LAN ID -->
+
+                                <div class="mb-3">
+
+                                    <label class="form-label"
+                                           for="UserName">
+
+                                        LAN ID
+
+                                    </label>
+
+                                    <div class="input-group input-group-lg">
+
+                                        @Html.TextBoxFor(
+                                            model => model.UserName,
+                                            new
+                                            {
+                                                @class = "form-control",
+                                                @placeholder = "Enter LAN ID",
+                                                @autocomplete = "username"
+                                            }
+                                        )
+
+                                        <span class="input-group-text">
+
+                                            <i class="fas fa-user"></i>
+
+                                        </span>
+
+                                    </div>
+
+                                    @Html.ValidationMessageFor(
+                                        model => model.UserName,
+                                        "",
+                                        new { @class = "field-validation-error" }
+                                    )
+
+                                </div>
+
+
+                                <!-- PASSWORD -->
+
+                                <div class="mb-3">
+
+                                    <label class="form-label"
+                                           for="Password">
+
+                                        Password
+
+                                    </label>
+
+                                    <div class="input-group input-group-lg">
+
+                                        @Html.PasswordFor(
+                                            model => model.Password,
+                                            new
+                                            {
+                                                @class = "form-control",
+                                                @placeholder = "Enter password",
+                                                @autocomplete = "current-password"
+                                            }
+                                        )
+
+                                        <span class="input-group-text">
+
+                                            <i class="fas fa-lock"></i>
+
+                                        </span>
+
+                                    </div>
+
+                                    @Html.ValidationMessageFor(
+                                        model => model.Password,
+                                        "",
+                                        new { @class = "field-validation-error" }
+                                    )
+
+                                </div>
+
+
+                                <!-- LOGIN BUTTON -->
+
+                                <div class="d-grid gap-2 mt-4">
+
+                                    <button type="submit"
+                                            class="btn btn-lg btn-primary">
+
+                                        <i class="fas fa-sign-in-alt me-2"></i>
+
+                                        Login
+
+                                    </button>
+
+                                </div>
+
+
+                                <!-- ================================== -->
+                                <!-- SEPARATOR -->
+                                <!-- ================================== -->
+
+                                <div class="row my-4">
+
+                                    <div class="col">
+                                        <hr />
+                                    </div>
+
+                                    <div class="col-auto text-uppercase d-flex align-items-center text-muted">
+
+                                        Or
+
+                                    </div>
+
+                                    <div class="col">
+                                        <hr />
+                                    </div>
+
+                                </div>
+
+
+                                <!-- ================================== -->
+                                <!-- WINDOWS AUTHENTICATION -->
+                                <!-- ================================== -->
+
+                                <div class="d-grid gap-2">
+
+                                    <a href="@Url.Action("ADLogin", "Login")"
+                                       class="btn btn-lg btn-success">
+
+                                        <i class="fab fa-windows me-2"></i>
+
+                                        Login using Windows Authentication
+
+                                    </a>
+
+                                </div>
+
+                            }
+
+
+                        </div>
+
+
+                        <!-- ====================================== -->
+                        <!-- FOOTER -->
+                        <!-- ====================================== -->
+
+                        <div class="text-center mt-auto pt-4">
+
+                            <p class="mb-0 text-muted">
+
+                                &copy; @DateTime.Today.Year
+                                IT Service Management
+
+                            </p>
+
+                        </div>
+
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- AppStack -->
+    <script src="@Url.Content("~/theme/js/app.js")"></script>
+
+
+    <!-- jQuery for MVC validation -->
+    <script src="@Url.Content("~/Plugins/jquery/jquery.min.js")"></script>
+
+
+    <!-- MVC Validation -->
+    <script src="@Url.Content("~/Scripts/jquery.validate.js")"></script>
+
+    <script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.js")"></script>
+
+
+</body>
+
+</html>

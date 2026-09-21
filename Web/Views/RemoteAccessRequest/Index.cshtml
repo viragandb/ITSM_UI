@@ -1,0 +1,358 @@
+﻿@using Service
+@using Service.AR
+@model IEnumerable<Domain.RA.RemoteAccessRequest>
+@{
+    /**/
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@using (Html.BeginForm("Index", "RemoteAccessRequest", FormMethod.Get, new { @class = "form-horizontal" }))
+{
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card card-primary card-outline">
+                <div class="card-header with-border">
+                    <h3 class="card-title">Access Request</h3>
+
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+
+                            <div class="form-group row">
+                                <label class="col-form-label col-md-2 text-right">
+                                    Team :
+                                </label>
+                                <div class="col-md-4">
+                                    <select id="TeamId" name="TeamId" class="form-control form-control-sm">
+                                        <option value=""></option>
+                                    </select>
+                                </div>
+
+                                <label class="col-form-label col-md-2 text-right">
+                                    Access Type :
+                                </label>
+                                <div class="col-md-4">
+                                    <select id="AccessTypeId" name="AccessTypeId" class="form-control form-control-sm">
+                                        <option value=""></option>
+                                    </select>
+                                </div>
+
+
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-form-label col-md-2 text-right">
+                                    Branch :
+                                </label>
+                                <div class="col-md-4">
+                                    <select id="BranchId" name="BranchId" class="form-control form-control-sm">
+                                        <option value=""></option>
+                                    </select>
+                                </div>
+
+                                <label class="col-form-label col-md-2 text-right">
+                                    Department :
+                                </label>
+                                <div class="col-md-4">
+                                    <select id="DepartmentId" name="DepartmentId" class="form-control form-control-sm">
+                                        <option value=""></option>
+                                    </select>
+                                </div>
+
+
+                            </div>
+                           
+                            <div class="form-group row">
+                                <label class="control-label col-md-2 text-right">
+                                    Requested Date :
+                                </label>
+                                <div class="col-md-2">
+
+                                    <div class="input-group date datePicker" id="start_date" data-bs-target-input="nearest">
+                                        <input type="text" name="StartDate" id="StartDate" value="@ViewBag.StartDate" class="form-control form-control-sm datetimepicker-input" />
+                                        <div class="input-group-append" data-bs-target="#start_date" data-bs-toggle="datetimepicker">
+                                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <label class="control-label col-md-1 text-right">
+                                    To
+                                </label>
+                                <div class="col-md-2">
+                                    <div class="input-group date datePicker" id="end_date" data-bs-target-input="nearest">
+                                        <input type="text" name="EndDate" id="EndDate" value="@ViewBag.EndDate" class="form-control form-control-sm datetimepicker-input" />
+                                        <div class="input-group-append" data-bs-target="#end_date" data-bs-toggle="datetimepicker">
+                                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                               
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-form-label col-md-2 text-right">
+                                    Request # :
+                                </label>
+
+                                <div class="col-md-2">
+                                    <input type="text" id="RequestId" name="RequestId" value="@ViewBag.RequestId" class="form-control form-control-sm" />
+                                </div>
+                                <div class="col-md-2">
+                                </div>
+
+                                <label class="col-form-label col-md-2 text-right">
+                                    Status :
+                                </label>
+                                <div class="col-md-4">
+                                    <select id="StatusId" name="StatusId" class="form-control form-control-sm">
+                                        <option value=""></option>
+                                    </select>
+                                    <span class="help-block" data-valmsg-for="StatusId" data-valmsg-replace="true"></span>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="card-footer">
+                    <div class="text-right">
+                        <button type="submit" class="btn btn-sm btn-default">
+                            <i class="fa fa-search mr-2"></i>Search
+                        </button>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card box-default">
+                <div class="card-body">
+
+                    <table id="dataTable" class="table table-bordered table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Request #</th>
+                                <th>Access Type</th>
+                                <th>Created By</th>
+                                <th>Requester</th>
+                                <th>Requested Date</th>
+                                <th>Status</th>
+                                <th>Team</th>
+                                <th>Branch</th>
+                                <th>Department</th>
+                                <th>Impact</th>
+                                <th>Justification</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>
+                                            <a href="@Html.EncodedActionLink("","Info", "RemoteAccessRequest","", new { id = item.RemoteAccessRequestId },null)"
+                                               target="_blank">
+                                                <span> # </span>
+                                                @item.RemoteAccessRequestId 
+                                            </a>
+                                        </td>
+                                       
+                                        <td>
+                                            <span class="badge bg-danger">
+                                                @item.RemoteAccessType.EnumDisplayName()
+                                            </span>
+                                        </td>
+                                        <td>@item.CreatedUser.FullName</td>
+                                        <td>@item.RequestedUser.FullName</td>
+          
+                                        <td>@item.RequestedDate.ToShortDateString()</td>
+                                        <td>
+                                            <span class="badge bg-@AccessRequestService.GetStatusColor(item.Status)">
+                                                @item.Status.EnumDisplayName()
+                                                @if (item.Status == Domain.AR.AccessRequestStatusEnum.Pending)
+                                                {
+                                                    <i class="fas fa-angle-double-right"></i>
+                                                    <span>@(item.TeamId !=null ? item.Team.TeamName : "N/A") </span>
+                                                }
+                                            </span>
+                                        </td>
+                                        <td>
+                                            @(item.TeamId !=null ? item.Team.TeamName : "N/A")
+                                        </td>
+                                        <td>@item.Branch.Name</td>
+                                        <td>@item.Department.DepartmentName</td>
+                                        <td>@item.BusinessImpact</td>
+                                        <td>@item.BusinessJustification</td>
+
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+
+                    </table>
+
+                </div>
+                <!-- /.box-body -->
+
+            </div>
+
+        </div>
+    </div>
+   
+}
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $("#dataTable").DataTable({
+                "responsive": true, "lengthChange": false, "autoWidth": false, "paging": false, "order": [[0, "desc"]],
+                /* "buttons": ["excel", "pdf", "print", "colvis"]*/
+                "buttons": [
+                    {
+                        extend: 'excelHtml5',
+                        text: 'Excel',
+                        title: 'Tickets',
+                        exportOptions: {
+                            modifier: {
+                                page: 'current'
+                            }
+                        }
+                    }
+                    , {
+                        extend: 'pdfHtml5',
+                        text: ' PDF',
+                        title: 'Tickets',
+                        orientation: 'landscape',
+                        exportOptions: {
+                            modifier: {
+                                page: 'current'
+                            }
+                        }
+                    }
+                    ,
+                    {
+                        extend: 'print',
+                        text: '<i class="fa fa-print"></i>',
+                        title: 'Access Request',
+                        autoPrint: true
+                    }
+                    ,
+                    "colvis"
+                ]
+            }).buttons().container().appendTo('#dataTable_wrapper .col-md-6:eq(0)');
+
+            loadTeams();
+            loadLocations();
+            loadStatus();
+            loadAccessTypes();
+        });
+
+        function loadTeams() {
+            $.getJSON("@Url.Action("GetTeamListJsonResult", "Team")", function (data) {
+                var dropDown = $("#TeamId");
+
+                dropDown.empty();
+                dropDown.append("<option value='0'>-- All --</option>");
+
+                $.each(JSON.parse(data), function (index, optionaldata) {
+                    dropDown.append($('<option />', { value: optionaldata.TeamId }).html(optionaldata.TeamName));
+                });
+
+                if ('@ViewBag.TeamId') {
+                      $('#TeamId').val(@ViewBag.TeamId).attr("selected", "selected");
+                 }
+
+            });
+
+        }
+
+
+        function loadLocations() {
+            $.getJSON("@Url.Action("GetItemListJsonResult", "Branch")", function (data) {
+                var dropDown = $("#BranchId");
+                dropDown.empty();
+                dropDown.append("<option value='0'>-- All --</option>");
+                $.each(JSON.parse(data), function (index, optionaldata) {
+                    dropDown.append($('<option />', { value: optionaldata.BranchId }).html(optionaldata.Name));
+                });
+
+                 if ('@ViewBag.BranchId') {
+                     $('#BranchId').val('@ViewBag.BranchId').attr("selected", "selected");
+                }
+                loadDepartments();
+            });
+         }
+        $("select#BranchId").change(function (evt) {
+            loadDepartments();
+        });
+
+
+        function loadDepartments(itemId) {
+            var _branchId = $('#BranchId').val();
+                $.getJSON("@Url.Action("GetDepartmentListBtBranchIdJsonResult", "Department")",
+                {
+                    branchId: _branchId
+                }, function (data) {
+                var dropDown = $("#DepartmentId");
+                dropDown.empty();
+                dropDown.append("<option value='0'>-- All --</option>");
+                $.each(JSON.parse(data), function (index, optionaldata) {
+                    dropDown.append($('<option />', { value: optionaldata.DepartmentId }).html(optionaldata.DepartmentName));
+                });
+
+                if ('@ViewBag.DepartmentId') {
+                    $('#DepartmentId').val('@ViewBag.DepartmentId').attr("selected", "selected");
+                }
+            });
+        }
+
+       
+
+        function loadAccessTypes() {
+            $.getJSON("@Url.Action("GetAccessTypesJsonResult", "RemoteAccessRequest")", function (data) {
+                var dropDown = $("#AccessTypeId");
+                dropDown.empty();
+                dropDown.append("<option value='0'>-- All --</option>");
+                $.each(JSON.parse(data), function (index, optionaldata) {
+                    dropDown.append($('<option />', { value: optionaldata.Id }).html(optionaldata.Name));
+                });
+                if ('@ViewBag.AccessTypeId') {
+                    $('#AccessTypeId').val(@ViewBag.AccessTypeId).attr("selected", "selected");
+                 }
+            });
+        }
+
+        function loadStatus() {
+            $.getJSON("@Url.Action("GetStatusJsonResult", "RemoteAccessRequest")", function (data) {
+                var dropDown = $("#StatusId");
+                dropDown.empty();
+                dropDown.append("<option value='0'>-- All --</option>");
+                $.each(JSON.parse(data), function (index, optionaldata) {
+                    dropDown.append($('<option />', { value: optionaldata.Id }).html(optionaldata.Name));
+                });
+                if ('@ViewBag.StatusId') {
+                    $('#StatusId').val(@ViewBag.StatusId).attr("selected", "selected");
+                 }
+            });
+        }
+
+
+    </script>
+}
+
+
+
+
+

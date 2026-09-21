@@ -1,0 +1,663 @@
+﻿@model ICollection<Domain.TicketTask>
+@using Service
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="card">
+
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="align-middle me-2" data-lucide="clipboard-check"></i>
+                    Pending Ticket Tasks
+                </h5>
+            </div>
+
+            <div class="card-body">
+
+                <div class="accordion" id="taskAccordion">
+
+                    @foreach (var item in Model)
+                    {
+                        var collapseId = "task_" + item.TicketTaskId;
+
+                        <div class="accordion-item">
+
+                            <h2 class="accordion-header"
+                                id="heading_@item.TicketTaskId">
+
+                                <button class="accordion-button collapsed"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#@collapseId"
+                                        aria-expanded="false"
+                                        aria-controls="@collapseId">
+
+                                    <div class="w-100 d-flex justify-content-between align-items-center flex-wrap gap-2 me-3">
+
+                                        <div>
+
+                                            <strong>
+                                                Ticket # @(item.Ticket != null ? item.Ticket.Code : "N/A")
+                                            </strong>
+
+                                            <span class="mx-2 text-muted">|</span>
+
+                                            @item.Subject
+
+                                        </div>
+
+                                        <span class="badge bg-@TicketTaskService.GetTicketStatusColor(item.Status)">
+                                            @item.Status.EnumDisplayName()
+                                        </span>
+
+                                    </div>
+
+                                </button>
+
+                            </h2>
+
+                            <div id="@collapseId"
+                                 class="accordion-collapse collapse"
+                                 aria-labelledby="heading_@item.TicketTaskId"
+                                 data-bs-parent="#taskAccordion">
+
+                                <div class="accordion-body">
+
+                                    @Html.Partial("_TicketTask", item)
+
+                                </div>
+
+                                <div class="card-footer">
+
+                                    <div class="d-flex justify-content-end flex-wrap gap-2">
+
+                                        @if (item.Ticket != null)
+                                        {
+                                            <a href="@Html.EncodedActionLink("", "Info", "Ticket", "", new { id = item.Ticket.TicketId }, null)"
+                                               target="_blank"
+                                               class="btn btn-sm btn-light">
+
+                                                <i class="align-middle me-1" data-lucide="info"></i>
+                                                Ticket Info
+
+                                            </a>
+                                        }
+
+                                        <button type="button"
+                                                class="openModalUpdateReject btn btn-sm btn-danger"
+                                                data-id="@item.TicketTaskId"
+                                                data-taskname="@item.Subject"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#modalUpdateReject">
+
+                                            <i class="align-middle me-1" data-lucide="thumbs-down"></i>
+                                            Reject
+
+                                        </button>
+
+                                        <button type="button"
+                                                class="openModalUpdate btn btn-sm btn-primary"
+                                                data-id="@item.TicketTaskId"
+                                                data-teamid="@item.AllocatedTeamId"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#modalUpdate">
+
+                                            <i class="align-middle me-1" data-lucide="user-plus"></i>
+                                            Assign
+
+                                        </button>
+
+                                        <button type="button"
+                                                class="btn btn-sm btn-info btnAssignMe"
+                                                onclick="updateAssignMe('@item.TicketTaskId', this)">
+
+                                            <i class="align-middle me-1" data-lucide="user-check"></i>
+                                            Assign To Me
+
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+<div class="modal fade"
+     id="modalUpdate"
+     tabindex="-1"
+     aria-labelledby="modalUpdateLabel"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title"
+                    id="modalUpdateLabel">
+
+                    <i class="align-middle me-2" data-lucide="user-plus"></i>
+                    Assign User
+
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <input type="hidden"
+                       id="assignTicketTaskId"
+                       name="assignTicketTaskId" />
+
+                <input type="hidden"
+                       id="assignTeamId"
+                       name="assignTeamId" />
+
+                <div class="mb-0">
+
+                    <label for="modalTeamMemberId"
+                           class="form-label">
+                        Team Member
+                    </label>
+
+                    <select id="modalTeamMemberId"
+                            name="modalTeamMemberId"
+                            class="form-select">
+                        <option value="0">-- Select --</option>
+                    </select>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn btn-sm btn-light"
+                        data-bs-dismiss="modal">
+
+                    <i class="align-middle me-1" data-lucide="x"></i>
+                    Cancel
+
+                </button>
+
+                <button type="button"
+                        class="btn btn-sm btn-primary btnClickDisable"
+                        onclick="update()">
+
+                    <i class="align-middle me-1" data-lucide="save"></i>
+                    Update
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<div class="modal fade"
+     id="modalUpdateReject"
+     tabindex="-1"
+     aria-labelledby="modalUpdateRejectLabel"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title"
+                    id="modalUpdateRejectLabel">
+
+                    <i class="align-middle me-2" data-lucide="thumbs-down"></i>
+                    Task Reject
+
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <input type="hidden"
+                       id="rejectTicketTaskId"
+                       name="rejectTicketTaskId" />
+
+                <div class="mb-3">
+
+                    <label class="form-label fw-semibold">
+                        Task
+                    </label>
+
+                    <div id="rejectTaskName"
+                         class="text-muted">
+                    </div>
+
+                </div>
+
+                <div class="mb-0">
+
+                    <label for="rejectComment"
+                           class="form-label">
+                        Comment
+                    </label>
+
+                    <textarea id="rejectComment"
+                              name="rejectComment"
+                              rows="4"
+                              placeholder="Comment"
+                              class="form-control"></textarea>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn btn-sm btn-light"
+                        data-bs-dismiss="modal">
+
+                    <i class="align-middle me-1" data-lucide="x"></i>
+                    Cancel
+
+                </button>
+
+                <button type="button"
+                        class="btn btn-sm btn-danger btnClickDisable"
+                        onclick="updateReject()">
+
+                    <i class="align-middle me-1" data-lucide="thumbs-down"></i>
+                    Reject
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $("#modalTeamMemberId").select2({
+                width: "100%",
+                dropdownParent: $("#modalUpdate")
+            });
+
+        });
+
+
+        function parseJsonResult(data) {
+
+            if (typeof data === "string") {
+
+                try {
+                    return JSON.parse(data);
+                }
+                catch (e) {
+                    return [];
+                }
+
+            }
+
+            return data || [];
+        }
+
+
+        $(document).on("click", ".openModalUpdate", function () {
+
+            var taskId = $(this).data("id");
+            var teamId = $(this).data("teamid");
+
+            $("#assignTicketTaskId").val(taskId);
+            $("#assignTeamId").val(teamId);
+
+            $("#modalUpdate .btnClickDisable")
+                .prop("disabled", false);
+
+            loadTeamUsers();
+
+        });
+
+
+        $(document).on("click", ".openModalUpdateReject", function () {
+
+            var taskId = $(this).data("id");
+            var taskName = $(this).data("taskname");
+
+            $("#rejectTicketTaskId").val(taskId);
+            $("#rejectTaskName").text(taskName);
+            $("#rejectComment").val("");
+
+            $("#modalUpdateReject .btnClickDisable")
+                .prop("disabled", false);
+
+        });
+
+
+        function loadTeamUsers() {
+
+            var teamId =
+                $("#assignTeamId").val();
+
+            var dropDown =
+                $("#modalTeamMemberId");
+
+            dropDown.empty();
+
+            dropDown.append(
+                "<option value='0'>-- Select --</option>"
+            );
+
+
+            $.getJSON(
+                '@Url.Action("GetUsersByTeamIdJsonResult", "User")',
+                {
+                    teamId: teamId
+                },
+                function (data) {
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.EmpNo,
+                                    text: item.FullName
+                                })
+                            );
+
+                        }
+                    );
+
+                    dropDown.val("0").trigger("change");
+
+                }
+            );
+
+        }
+
+
+        function update() {
+
+            var taskId =
+                $("#assignTicketTaskId").val();
+
+            var userId =
+                $("#modalTeamMemberId").val();
+
+            var button =
+                $("#modalUpdate .btnClickDisable");
+
+
+            if (!userId || userId == "0") {
+
+                Swal.fire(
+                    "Error!",
+                    "Please select a team member",
+                    "error"
+                );
+
+                return;
+            }
+
+
+            button.prop("disabled", true);
+
+
+            $.ajax({
+
+                url: '@Url.Action("PendingAssign", "TicketTask")',
+
+                type: "GET",
+
+                dataType: "json",
+
+                data: {
+                    ticketTaskId: taskId,
+                    userId: userId
+                },
+
+                success: function (data) {
+
+                    if (data == "1" || data == 1) {
+
+                        Swal.fire(
+                            "Completed",
+                            "Task has been assigned",
+                            "success"
+                        );
+
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 200);
+
+                    }
+                    else {
+
+                        button.prop("disabled", false);
+
+                        Swal.fire(
+                            "Something went wrong!",
+                            "Please try again",
+                            "error"
+                        );
+
+                    }
+
+                },
+
+                error: function () {
+
+                    button.prop("disabled", false);
+
+                    Swal.fire(
+                        "Something went wrong!",
+                        "Please try again",
+                        "error"
+                    );
+
+                }
+
+            });
+
+        }
+
+
+        function updateAssignMe(itemId, buttonElement) {
+
+            var button =
+                $(buttonElement);
+
+            button.prop("disabled", true);
+
+
+            $.ajax({
+
+                url: '@Url.Action("AssignMe", "TicketTask")',
+
+                type: "GET",
+
+                dataType: "json",
+
+                data: {
+                    ticketTaskId: itemId
+                },
+
+                success: function (data) {
+
+                    if (data == "1" || data == 1) {
+
+                        Swal.fire(
+                            "Completed",
+                            "Task has been assigned",
+                            "success"
+                        );
+
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 100);
+
+                    }
+                    else {
+
+                        button.prop("disabled", false);
+
+                        Swal.fire(
+                            "Something went wrong!",
+                            "Please try again",
+                            "error"
+                        );
+
+                    }
+
+                },
+
+                error: function () {
+
+                    button.prop("disabled", false);
+
+                    Swal.fire(
+                        "Something went wrong!",
+                        "Please try again",
+                        "error"
+                    );
+
+                }
+
+            });
+
+        }
+
+
+        function updateReject() {
+
+            var taskId =
+                $("#rejectTicketTaskId").val();
+
+            var comment =
+                $("#rejectComment").val().trim();
+
+            var button =
+                $("#modalUpdateReject .btnClickDisable");
+
+
+            if (!comment) {
+
+                Swal.fire(
+                    "Error!",
+                    "Please enter the required data",
+                    "error"
+                );
+
+                return;
+            }
+
+
+            button.prop("disabled", true);
+
+
+            $.ajax({
+
+                url: '@Url.Action("Reject", "TicketTask")',
+
+                type: "GET",
+
+                dataType: "json",
+
+                data: {
+                    ticketTaskId: taskId,
+                    comment: comment
+                },
+
+                success: function (data) {
+
+                    if (data == "1" || data == 1) {
+
+                        Swal.fire(
+                            "Completed",
+                            "Task has been rejected",
+                            "success"
+                        );
+
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 200);
+
+                    }
+                    else {
+
+                        button.prop("disabled", false);
+
+                        Swal.fire(
+                            "Something went wrong!",
+                            "Please try again",
+                            "error"
+                        );
+
+                    }
+
+                },
+
+                error: function () {
+
+                    button.prop("disabled", false);
+
+                    Swal.fire(
+                        "Something went wrong!",
+                        "Please try again",
+                        "error"
+                    );
+
+                }
+
+            });
+
+        }
+
+    </script>
+}

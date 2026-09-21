@@ -1,0 +1,319 @@
+﻿@using Service
+@model IEnumerable<Domain.KPIRatio>
+@{
+    /**/
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@using (Html.BeginForm("KPIUser", "Report", FormMethod.Get, new { @class = "form-horizontal" }))
+{
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card box-danger">
+                <div class="card-header with-border">
+                    <h3 class="card-title">Tasks</h3>
+                    <div class="card-tools pull-right">
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <div class="form-group">
+
+
+                        <label class="control-label col-md-2">
+                            Team :
+                        </label>
+                        <div class="col-md-6">
+                            <select id="TeamId" name="TeamId" class="form-control">
+                                <option value=""></option>
+                            </select>
+                        </div>
+
+
+                    </div>
+                    <div class="form-group">
+
+                        <label class="control-label col-md-2">
+                            Task Owner :
+                        </label>
+                        <div class="col-md-6">
+                            <select id="UserEmpNo" name="UserEmpNo" class="form-control">
+                                <option value=""></option>
+                            </select>
+                            <span class="help-block" data-valmsg-for="UserEmpNo" data-valmsg-replace="true"></span>
+                        </div>
+
+                    </div>
+                    <div class="form-group row">
+
+                        <label class="control-label col-md-2">
+                            Task Date :
+                        </label>
+                        <div class="col-md-2">
+                            <div class="input-group date">
+                                <div class="input-group-addon">
+                                    <i class="fa fa-calendar"></i>
+                                </div>
+                                <input type="text" name="StartDate" id="StartDate" value="@ViewBag.StartDate" class="form-control datepicker" />
+                            </div>
+                        </div>
+
+
+                        <label class="control-label col-md-1">
+                            To
+                        </label>
+                        <div class="col-md-2">
+                            <div class="input-group date">
+                                <div class="input-group-addon">
+                                    <i class="fa fa-calendar"></i>
+                                </div>
+                                <input type="text" name="EndDate" id="EndDate" value="@ViewBag.EndDate" class="form-control datepicker" />
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="text-right">
+                        <button type="submit" class="btn btn-social">
+                            <i class="fa fa-search"></i>Search
+                        </button>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+
+        <div class="col-md-12">
+            <!-- Horizontal Form -->
+            <div class="card box-default" style="overflow-x: auto;">
+                <div class="card-body">
+
+                    <table id="dataTable" class="table table-bordered table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                @*<th>Date</th>*@
+                                <th>Online Hrs</th>
+                                <th>Task Hrs</th>
+                                <th>Missed Calls</th>
+                                <th>Rcvd Calls</th>
+                                <th>Total Abnd Calls</th>
+                                <th>Total Rcvd Calls</th>
+                                <th>Creat. Tickets</th>
+                                <th>SLA V. Tickets</th>
+                                <th>Updat. Tickets</th>
+                                <th>First Level R. Tickets</th>
+                                <th>Assg. Tickets</th>
+
+                                @*<th class="text-right"><a href="#" data-bs-toggle="tooltip" data-placement="bottom" title="(On-line Hrs on the Service Desk + Total Time Spend on Work Notes) / 8 * 100">Work Time % - A (W20)</a></th>
+                                <th class="text-right"><a href="#" data-bs-toggle="tooltip" data-placement="bottom" title="100 - (No.of Missed Calls / No.of Received Calls * 100)">Ans. Call % - B (W20)</a></th>
+                                <th class="text-right"> <a href="#" data-bs-toggle="tooltip" data-placement="bottom" title="Total Ticket Entered / Total Calls Received * 100">T. Entering. % - C (W20)</a></th>
+                                <th class="text-right"><a href="#" data-bs-toggle="tooltip" data-placement="bottom" title="No.of Abundant Calls / No.of Received Calls * 100">Abnd. Call % - D (W10)</a></th>
+                                <th class="text-right"><a href="#" data-bs-toggle="tooltip" data-placement="bottom" title="SLA violated Tickets / No.of Updated Tickets * 100">SLA V. % - E (W20)</a></th>
+                                <th class="text-right"><a href="#" data-bs-toggle="tooltip" data-placement="bottom" title="First Level Resolved Tickets / No.of Assigned Tickets * 100">First Level R. % - F (W10)</a></th>
+                                <th class="text-right" width="100px"><a href="#" data-bs-toggle="tooltip" data-placement="bottom" title="(A * 20 / 100) + (B * 20 / 100) + (C * 20 / 100) + ((100-D) * 10 / 100) + ((100-E) * 20 / 100) + (F * 10 / 100)">Final Value</a></th>*@
+
+                                <th class="text-right"><a href="#" data-bs-toggle="tooltip" data-placement="bottom" title="Working Time - ((On-line Hrs on the Service Desk + Total Time Spend on Work Notes) / 8 * 100) *(20%)"> A</a></th>
+                                <th class="text-right"><a href="#" data-bs-toggle="tooltip" data-placement="bottom" title="Answerd Call - (100 - (No.of Missed Calls / No.of Received Calls * 100)) *(20%)">B</a></th>
+                                <th class="text-right"> <a href="#" data-bs-toggle="tooltip" data-placement="bottom" title="Ticket Entering - (Total Ticket Entered / Total Calls Received * 100) *(10%)">C</a></th>
+                                <th class="text-right"><a href="#" data-bs-toggle="tooltip" data-placement="bottom" title="Abandoned Call - (100 - (No.of Abandoned Calls / No.of Received Calls * 100)) *(20%)">D</a></th>
+                                <th class="text-right"><a href="#" data-bs-toggle="tooltip" title="SLA Violations - (100 - (SLA violated Tickets / No.of Updated Tickets * 100)) *(25%)">E</a></th>
+                                <th class="text-right"><a href="#" data-bs-toggle="tooltip" data-placement="bottom" title="First Level Resolution - (First Level Resolved Tickets / No.of Assigned Tickets * 100) *(5%)">F</a></th>
+                                <th class="text-right" width="100px"><a href="#" data-bs-toggle="tooltip" data-placement="bottom" title="(A + B + C + D + E + F)">Final Value</a></th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                foreach (var item in Model)
+                                {
+                            <tr>
+                                <td>
+                                    <a href="#@item.EmpNo" data-bs-toggle="collapse" data-parent="#accordion">
+                                        @item.EmpNo - @item.User.FullName
+                                    </a>
+                                </td>
+                                <td class="text-right">@item.OnlineHrs</td>
+                                <td class="text-right">@item.TaskHrs</td>
+                                <td class="text-right">@item.MissedCalls</td>
+                                <td class="text-right">@item.ReceivedCalls</td>
+                                <td class="text-right">@item.TotalAbundantCalls</td>
+                                <td class="text-right">@item.TotalReceivedCalls</td>
+                                <td class="text-right">@item.TotalCreatedTickets</td>
+                                <td class="text-right">@item.SLAViolatedTickets</td>
+                                <td class="text-right">@item.TotalUpdatedTickets</td>
+                                <td class="text-right">@item.ResolveFLTickets</td>
+                                <td class="text-right">@item.TotalAssignedTickets</td>
+                                <td class="text-right">@item.RatioWorkingTime</td>
+                                <td class="text-right">@item.RatioAnswerdCall</td>
+                                <td class="text-right">@item.RatioTicketEntering</td>
+                                <td class="text-right">@item.RatioAbundantCall</td>
+                                <td class="text-right">@item.RatioSLA</td>
+                                <td class="text-right">@item.RatioFirstLResolve</td>
+                                <td class="text-right">@item.FinalValue</td>
+
+                               
+                            </tr>
+
+                                    
+                                   <tr class="panel-collapse collapse" id="@item.EmpNo"  >
+                                        <td colspan="19" style="background-color:#a8f7b7" >
+
+                                            <div style="overflow-x:auto " >
+                                                <table class="table table-bordered table-striped table-hover" style="background-color:#a8f7b7">
+                                                    <tr >
+                                                        <th>Date</th>
+                                                        <th>Online Hrs</th>
+                                                        <th>Task Hrs</th>
+                                                        <th>Missed Calls</th>
+                                                        <th>Rcvd Calls</th>
+                                                        <th>Total Abnd Calls</th>
+                                                        <th>Total Rcvd Calls</th>
+                                                        <th>Creat. Tickets</th>
+                                                        <th>SLA V. Tickets</th>
+                                                        <th>Updat. Tickets</th>
+                                                        <th>First Level R. Tickets</th>
+                                                        <th>Assg. Tickets</th>
+                                                        <th>A</th>
+                                                        <th>B</th>
+                                                        <th>C</th>
+                                                        <th>D</th>
+                                                        <th>E</th>
+                                                        <th>F</th>
+                                                        <th>Final Value</th>
+                                                    </tr>
+                                                    @foreach (var dDate in item.History)
+                                                    {
+                                                        <tr>
+
+                                                            <td>@dDate.Date.ToShortDateString()</td>
+                                                            <td align="right">@dDate.OnlineHrs</td>
+                                                            <td align="right">@dDate.TaskHrs</td>
+                                                            <td align="right">@dDate.MissedCalls</td>
+                                                            <td align="right">@dDate.ReceivedCalls</td>
+                                                            <td align="right">@dDate.TotalAbundantCalls</td>
+                                                            <td align="right">@dDate.TotalReceivedCalls</td>
+                                                            <td align="right">@dDate.TotalCreatedTickets</td>
+                                                            <td align="right">@dDate.SLAViolatedTickets</td>
+                                                            <td align="right">@dDate.TotalUpdatedTickets</td>
+                                                            <td align="right">@dDate.ResolveFLTickets</td>
+                                                            <td align="right">@dDate.TotalAssignedTickets</td>
+                                                            <td align="right">@dDate.RatioWorkingTime</td>
+                                                            <td align="right">@dDate.RatioAnswerdCall</td>
+                                                            <td align="right">@dDate.RatioTicketEntering</td>
+                                                            <td align="right">@dDate.RatioAbundantCall</td>
+                                                            <td align="right">@dDate.RatioSLA</td>
+                                                            <td align="right">@dDate.RatioFirstLResolve</td>
+                                                            <td align="right">@dDate.FinalValue</td>
+
+                                                        </tr>
+
+                                                    }
+                                                </table>
+
+                                            </div>
+                                        </td>
+                                    </tr>
+
+
+                                }
+                            }
+                        </tbody>
+
+                    </table>
+
+                </div>
+                <!-- /.box-body -->
+
+            </div>
+            <!-- /.box -->
+
+        </div>
+    </div>
+}
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            $('[data-bs-toggle="tooltip"]').tooltip();   
+
+            //$('#dataTable').DataTable({
+            //    "paging": false,
+            //    "lengthChange": true,
+            //    "searching": true,
+            //    "ordering": true,
+            //    "info": true,
+            //    "autoWidth": true
+            //});
+
+            loadTeams();
+
+        });
+
+         $("select#TeamId").change(function (evt) {
+            loadUsers();
+
+        });
+
+        function loadTeams() {
+
+            $.getJSON("@Url.Action("GetTeamUserListJsonResult", "Team")", function (data) {
+                var dropDown = $("#TeamId");
+
+                dropDown.empty();
+                dropDown.append("<option value='0'>-- All --</option>");
+
+                $.each(JSON.parse(data), function (index, optionaldata) {
+                    dropDown.append($('<option />', { value: optionaldata.TeamId }).html(optionaldata.TeamName));
+                });
+
+                if ('@ViewBag.TeamId') {
+                      $('#TeamId').val(@ViewBag.TeamId).attr("selected", "selected");
+                 }
+
+                loadUsers();
+            });
+
+        }
+
+         function loadUsers() {
+             var _teamId = $('#TeamId').val();
+
+            $.getJSON("@Url.Action("GetUsersByTeamIdJsonResult", "User")",
+              {
+                  teamId: _teamId
+              }, function (data) {
+                  var dropDown = $("#UserEmpNo");
+
+                  dropDown.empty();
+                  dropDown.append("<option value='0'>-- All --</option>");
+
+                  $.each(JSON.parse(data), function (index, optionaldata) {
+                      dropDown.append($('<option/>', { value: optionaldata.EmpNo }).html(optionaldata.EmpNo + ' - ' +optionaldata.FullName + ' (' + optionaldata.DesignationName + ')' ));
+                  });
+
+                   if ('@ViewBag.UserEmpNo') {
+                       $('#UserEmpNo').val(@ViewBag.UserEmpNo).attr("selected", "selected");
+                 }
+
+              });
+        }
+
+
+    </script>
+}
+
+
+
+
+

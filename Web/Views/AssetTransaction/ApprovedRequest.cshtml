@@ -1,0 +1,503 @@
+﻿@model ICollection<Domain.AssetTransferRequest>
+@using Service
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("PendingComplete", "AssetTransaction", FormMethod.Get))
+{
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card">
+
+                <div class="card-header">
+
+                    <h5 class="card-title mb-0">
+                        <i class="align-middle me-2" data-lucide="search"></i>
+                        Search
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-4">
+
+                            <label for="BranchId" class="form-label">
+                                Location
+                            </label>
+
+                            <select id="BranchId"
+                                    name="BranchId"
+                                    class="form-select select2">
+                            </select>
+
+                        </div>
+
+                        <div class="col-md-4">
+
+                            <label for="DepartmentId" class="form-label">
+                                Department
+                            </label>
+
+                            <select id="DepartmentId"
+                                    name="DepartmentId"
+                                    class="form-select select2">
+                            </select>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="card-footer">
+
+                    <div class="d-flex justify-content-end">
+
+                        <button type="submit"
+                                class="btn btn-primary">
+
+                            <i class="align-middle me-1" data-lucide="search"></i>
+                            Search
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card">
+
+                <div class="card-header">
+
+                    <h5 class="card-title mb-0">
+                        <i class="align-middle me-2" data-lucide="clock"></i>
+                        Pendings
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div id="accordion">
+
+                        @foreach (var item in Model)
+                        {
+                            var collapseId = "G_" + item.AssetTransferRequestId;
+
+                            <div class="card mb-3">
+
+                                <div class="card-header">
+
+                                    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-2">
+
+                                        <div>
+
+                                            <a href="#@collapseId"
+                                               class="text-body text-decoration-none fw-semibold collapsed"
+                                               data-bs-toggle="collapse"
+                                               aria-expanded="false"
+                                               aria-controls="@collapseId">
+
+                                                <i class="align-middle me-1" data-lucide="file-text"></i>
+                                                #@item.AssetTransferRequestId
+
+                                            </a>
+
+                                            <span class="ms-2 text-muted">
+
+                                                @item.BranchFrom.Name
+
+                                                <i class="align-middle mx-1" data-lucide="chevrons-right"></i>
+
+                                                @item.Branch.Name
+                                                -
+                                                @item.Department.DepartmentName
+
+                                            </span>
+
+                                        </div>
+
+                                        <span class="badge bg-@AssetTransferRequestService.GetTransTypeColor(item.TransactionType)">
+                                            @item.TransactionType.EnumDisplayName()
+                                        </span>
+
+                                    </div>
+
+                                </div>
+
+                                <div id="@collapseId"
+                                     class="collapse"
+                                     data-bs-parent="#accordion">
+
+                                    <div class="card-body">
+
+                                        @Html.Partial(
+                                            "~/Views/AssetTransaction/_Min.cshtml",
+                                            item
+                                        )
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        }
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+}
+
+
+<div class="modal fade"
+     id="modalUpdate"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title">
+                    #<span id="updateModalRequestId"></span> Complete
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <input type="hidden"
+                       id="updateRequestId"
+                       value="" />
+
+                <div class="mb-3">
+
+                    <label for="updateComment"
+                           class="form-label">
+                        Comment
+                    </label>
+
+                    <textarea id="updateComment"
+                              class="form-control"
+                              rows="3"
+                              placeholder="Enter comment"></textarea>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn btn-light btn-sm"
+                        data-bs-dismiss="modal">
+
+                    <i class="align-middle me-1" data-lucide="x"></i>
+                    Cancel
+
+                </button>
+
+                <button type="button"
+                        class="btn btn-success btn-sm btnClickDisable"
+                        onclick="updateRequest()">
+
+                    <i class="align-middle me-1" data-lucide="check-circle"></i>
+                    Complete
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            if ($.fn.select2) {
+
+                $(".select2").select2({
+                    width: "100%"
+                });
+
+            }
+
+            loadLocations();
+
+        });
+
+
+        $(document).on("click", ".openModalUpdate", function () {
+
+            var requestId =
+                $(this).data("id");
+
+            var code =
+                $(this).data("code");
+
+
+            $("#updateRequestId")
+                .val(requestId);
+
+            $("#updateModalRequestId")
+                .text(code);
+
+            $("#updateComment")
+                .val("");
+
+            $("#modalUpdate .btnClickDisable")
+                .prop("disabled", false);
+
+        });
+
+
+        function updateRequest() {
+
+            var requestId =
+                $("#updateRequestId").val();
+
+            var comment =
+                $("#updateComment").val();
+
+
+            if (!comment || comment.trim() === "") {
+
+                Swal.fire(
+                    "Error!",
+                    "Please enter the comment",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            $("#modalUpdate .btnClickDisable")
+                .prop("disabled", true);
+
+
+            $.ajax({
+
+                url: '@Url.Action("Complete", "AssetTransaction")',
+
+                type: "GET",
+
+                dataType: "json",
+
+                data: {
+                    requestId: requestId,
+                    comment: comment.trim()
+                },
+
+                success: function (data) {
+
+                    if (data == "1" || data == 1) {
+
+                        Swal.fire(
+                            "Completed",
+                            "Request has been updated",
+                            "success"
+                        );
+
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 500);
+
+                    }
+                    else {
+
+                        $("#modalUpdate .btnClickDisable")
+                            .prop("disabled", false);
+
+                        Swal.fire(
+                            "Something went wrong!",
+                            "Please try again",
+                            "error"
+                        );
+
+                    }
+
+                },
+
+                error: function () {
+
+                    $("#modalUpdate .btnClickDisable")
+                        .prop("disabled", false);
+
+                    Swal.fire(
+                        "Something went wrong!",
+                        "Please try again",
+                        "error"
+                    );
+
+                }
+
+            });
+
+        }
+
+
+        function parseJsonResult(data) {
+
+            if (typeof data === "string") {
+
+                try {
+                    return JSON.parse(data);
+                }
+                catch (e) {
+                    return [];
+                }
+
+            }
+
+            return data || [];
+
+        }
+
+
+        function loadLocations() {
+
+            $.getJSON(
+                '@Url.Action("GetItemListJsonResult", "Branch")',
+                function (data) {
+
+                    var dropDown =
+                        $("#BranchId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- All --</option>"
+                    );
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.BranchId,
+                                    text: item.Name
+                                })
+                            );
+
+                        }
+                    );
+
+                    var selectedId =
+                        '@ViewBag.BranchId';
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+                    if ($.fn.select2) {
+                        dropDown.trigger("change.select2");
+                    }
+
+                    loadDepartments();
+
+                }
+            );
+
+        }
+
+
+        $("#BranchId").on("change", function () {
+
+            loadDepartments();
+
+        });
+
+
+        function loadDepartments() {
+
+            var branchId =
+                $("#BranchId").val();
+
+
+            $.getJSON(
+                '@Url.Action("GetDepartmentListBtBranchIdJsonResult", "Department")',
+                {
+                    branchId: branchId
+                },
+                function (data) {
+
+                    var dropDown =
+                        $("#DepartmentId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- All --</option>"
+                    );
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.DepartmentId,
+                                    text: item.DepartmentName
+                                })
+                            );
+
+                        }
+                    );
+
+                    var selectedId =
+                        '@ViewBag.DepartmentId';
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+                    if ($.fn.select2) {
+                        dropDown.trigger("change.select2");
+                    }
+
+                }
+            );
+
+        }
+
+    </script>
+
+}

@@ -1,0 +1,185 @@
+﻿@model Domain.Department
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="card">
+
+            <div class="card-header d-flex justify-content-between align-items-center">
+
+                <h5 class="card-title mb-0">
+                    <i class="align-middle me-2" data-lucide="building"></i>
+                    Department
+                </h5>
+
+                <a href="@Url.Action("Index", "Department")"
+                   class="btn btn-sm btn-light">
+
+                    <i class="align-middle me-1" data-lucide="arrow-left"></i>
+                    Back
+
+                </a>
+
+            </div>
+
+
+            @using (Html.BeginForm("Edit", "Department", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true)
+
+                @Html.HiddenFor(model => model.DepartmentId)
+
+                <div class="card-body">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+
+                            @Html.LabelFor(
+                                model => model.DepartmentName,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.TextBoxFor(
+                                model => model.DepartmentName,
+                                new { @class = "form-control" }
+                            )
+
+                            @Html.ValidationMessageFor(
+                                model => model.DepartmentName,
+                                "",
+                                new { @class = "text-danger" }
+                            )
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            @Html.LabelFor(
+                                model => model.DAOCode,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.TextBoxFor(
+                                model => model.DAOCode,
+                                new { @class = "form-control" }
+                            )
+
+                            @Html.ValidationMessageFor(
+                                model => model.DAOCode,
+                                "",
+                                new { @class = "text-danger" }
+                            )
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            @Html.LabelFor(
+                                model => model.Email,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.TextBoxFor(
+                                model => model.Email,
+                                new
+                                {
+                                    @class = "form-control",
+                                    type = "email"
+                                }
+                            )
+
+                            @Html.ValidationMessageFor(
+                                model => model.Email,
+                                "",
+                                new { @class = "text-danger" }
+                            )
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            @Html.LabelFor(
+                                model => model.EscalationEmail,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.TextBoxFor(
+                                model => model.EscalationEmail,
+                                new
+                                {
+                                    @class = "form-control",
+                                    type = "email"
+                                }
+                            )
+
+                            @Html.ValidationMessageFor(
+                                model => model.EscalationEmail,
+                                "",
+                                new { @class = "text-danger" }
+                            )
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            @Html.LabelFor(
+                                model => model.ToleranceRate,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.TextBoxFor(
+                                model => model.ToleranceRate,
+                                new { @class = "form-control" }
+                            )
+
+                            @Html.ValidationMessageFor(
+                                model => model.ToleranceRate,
+                                "",
+                                new { @class = "text-danger" }
+                            )
+
+                            <div class="form-text">
+                                This value limits the number of active remote access requests allowed for this department.
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="card-footer">
+
+                    <div class="d-flex justify-content-end gap-2">
+
+                        <button type="reset"
+                                class="btn btn-sm btn-danger">
+
+                            <i class="align-middle me-1" data-lucide="rotate-ccw"></i>
+                            Cancel
+
+                        </button>
+
+                        <button type="submit"
+                                class="btn btn-sm btn-primary">
+
+                            <i class="align-middle me-1" data-lucide="save"></i>
+                            Save
+
+                        </button>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+</div>

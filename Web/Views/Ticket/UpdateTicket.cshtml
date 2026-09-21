@@ -1,0 +1,467 @@
+﻿@model Web.Models.TicketUpdateVM
+@using Service
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var latestUpdate = Model.Ticket.TicketUpdates
+        .OrderByDescending(u => u.UpdatedDate)
+        .FirstOrDefault();
+
+    var selectedStatus = Convert.ToInt32(Model.Status);
+}
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="card">
+
+            <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+
+                <h5 class="card-title mb-0">
+                    <i class="align-middle me-2" data-lucide="pencil"></i>
+                    Ticket Update | Ticket # @Model.Ticket.Code
+                </h5>
+
+                <a href="@Url.Action("Pending", "Ticket")"
+                   class="btn btn-sm btn-light">
+
+                    <i class="align-middle me-1" data-lucide="arrow-left"></i>
+                    Back
+
+                </a>
+
+            </div>
+
+            @using (Html.BeginForm("UpdateTicket", "Ticket", FormMethod.Post))
+            {
+                @Html.HiddenFor(model => model.TicketId)
+                @Html.HiddenFor(model => model.PendingTeamId)
+                @Html.HiddenFor(model => model.IsSLAReasonRequired)
+
+                <div class="card-body">
+
+                    <div class="row g-3">
+
+                        <div class="col-lg-5">
+
+                            @Html.Partial("_TicketMin", Model.Ticket)
+
+                            <div class="card mt-3">
+
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">
+                                        <i class="align-middle me-2" data-lucide="message-square"></i>
+                                        Latest Comment
+                                    </h5>
+                                </div>
+
+                                <div class="card-body">
+
+                                    @if (latestUpdate != null)
+                                    {
+                                        <div class="d-flex align-items-start gap-3">
+
+                                            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center flex-shrink-0"
+                                                 style="width: 42px; height: 42px;">
+
+                                                <i data-lucide="user"></i>
+
+                                            </div>
+
+                                            <div class="flex-grow-1">
+
+                                                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+
+                                                    <strong>
+                                                        @latestUpdate.UpdatedBy
+                                                    </strong>
+
+                                                    <span class="text-muted small">
+                                                        <i class="align-middle me-1" data-lucide="calendar"></i>
+                                                        @latestUpdate.UpdatedDate.ToShortDateString()
+                                                    </span>
+
+                                                </div>
+
+                                                <div class="text-muted mt-2">
+                                                    @latestUpdate.Comment
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="text-muted">
+
+                                            <i class="align-middle me-1" data-lucide="info"></i>
+                                            No comments yet
+
+                                        </div>
+                                    }
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-lg-7">
+
+                            <div class="card">
+
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">
+                                        <i class="align-middle me-2" data-lucide="clipboard-check"></i>
+                                        Update Status
+                                    </h5>
+                                </div>
+
+                                <div class="card-body">
+
+                                    <div class="mb-3">
+
+                                        @Html.LabelFor(
+                                            model => model.Status,
+                                            new { @class = "form-label" }
+                                        )
+
+                                        @Html.DropDownListFor(
+                                            model => model.Status,
+                                            new List<SelectListItem>(),
+                                            new { @class = "form-select" }
+                                        )
+
+                                        @Html.ValidationMessageFor(
+                                            model => model.Status,
+                                            "",
+                                            new { @class = "text-danger" }
+                                        )
+
+                                    </div>
+
+
+                                    <div id="vendorSection">
+
+                                        <div class="card mb-3">
+
+                                            <div class="card-header">
+                                                <h6 class="card-title mb-0">
+                                                    <i class="align-middle me-2" data-lucide="building-2"></i>
+                                                    Vendor Information
+                                                </h6>
+                                            </div>
+
+                                            <div class="card-body">
+
+                                                <div class="mb-3">
+
+                                                    @Html.LabelFor(
+                                                        model => model.VendorId,
+                                                        new { @class = "form-label" }
+                                                    )
+
+                                                    @Html.DropDownListFor(
+                                                        model => model.VendorId,
+                                                        new List<SelectListItem>(),
+                                                        new { @class = "form-select select2" }
+                                                    )
+
+                                                    @Html.ValidationMessageFor(
+                                                        model => model.VendorId,
+                                                        "",
+                                                        new { @class = "text-danger" }
+                                                    )
+
+                                                </div>
+
+                                                <div class="mb-0">
+
+                                                    @Html.LabelFor(
+                                                        model => model.VendorRefNo,
+                                                        new { @class = "form-label" }
+                                                    )
+
+                                                    @Html.TextBoxFor(
+                                                        model => model.VendorRefNo,
+                                                        new { @class = "form-control" }
+                                                    )
+
+                                                    @Html.ValidationMessageFor(
+                                                        model => model.VendorRefNo,
+                                                        "",
+                                                        new { @class = "text-danger" }
+                                                    )
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+
+                                    @if (Model.IsSLAReasonRequired)
+                                    {
+                                        <div id="slaReasonSection"
+                                             class="alert alert-warning">
+
+                                            <div class="d-flex align-items-start gap-2">
+
+                                                <i class="align-middle mt-1"
+                                                   data-lucide="triangle-alert"></i>
+
+                                                <div class="w-100">
+
+                                                    @Html.LabelFor(
+                                                        model => model.ReasonForSLA,
+                                                        new { @class = "form-label fw-semibold" }
+                                                    )
+
+                                                    @Html.TextAreaFor(
+                                                        model => model.ReasonForSLA,
+                                                        new
+                                                        {
+                                                            @class = "form-control",
+                                                            rows = "3"
+                                                        }
+                                                    )
+
+                                                    @Html.ValidationMessageFor(
+                                                        model => model.ReasonForSLA,
+                                                        "",
+                                                        new { @class = "text-danger" }
+                                                    )
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+                                    }
+
+
+                                    <div class="mb-0">
+
+                                        @Html.LabelFor(
+                                            model => model.Comment,
+                                            new { @class = "form-label" }
+                                        )
+
+                                        @Html.TextAreaFor(
+                                            model => model.Comment,
+                                            new
+                                            {
+                                                @class = "form-control",
+                                                rows = "4"
+                                            }
+                                        )
+
+                                        @Html.ValidationMessageFor(
+                                            model => model.Comment,
+                                            "",
+                                            new { @class = "text-danger" }
+                                        )
+
+                                    </div>
+
+                                </div>
+
+                                <div class="card-footer">
+
+                                    <div class="d-flex justify-content-end">
+
+                                        <button type="submit"
+                                                class="btn btn-sm btn-primary">
+
+                                            <i class="align-middle me-1" data-lucide="save"></i>
+                                            Update
+
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+</div>
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $("#VendorId").select2({
+                width: "100%"
+            });
+
+            loadStatus();
+            loadVendors();
+
+            $("#Status").on("change", function () {
+                showVendor();
+            });
+
+        });
+
+
+        function parseJsonResult(data) {
+
+            if (typeof data === "string") {
+
+                try {
+                    return JSON.parse(data);
+                }
+                catch (e) {
+                    return [];
+                }
+
+            }
+
+            return data || [];
+        }
+
+
+        function loadStatus() {
+
+            var teamId =
+                $("#PendingTeamId").val();
+
+            var dropDown =
+                $("#Status");
+
+            dropDown.empty();
+
+            dropDown.append(
+                "<option value='0'>-- Select --</option>"
+            );
+
+
+            $.getJSON(
+                '@Url.Action("GetTicketStatusListJsonResult", "TicketStatus")',
+                {
+                    teamId: teamId
+                },
+                function (data) {
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.Status,
+                                    text: item.StatusName
+                                })
+                            );
+
+                        }
+                    );
+
+
+                    var selectedStatus =
+                        '@selectedStatus';
+
+                    if (selectedStatus &&
+                        selectedStatus != "0") {
+
+                        dropDown.val(selectedStatus);
+
+                    }
+
+
+                    showVendor();
+
+                }
+            );
+
+        }
+
+
+        function loadVendors() {
+
+            var dropDown =
+                $("#VendorId");
+
+            dropDown.empty();
+
+            dropDown.append(
+                "<option value='0'>-- Select --</option>"
+            );
+
+
+            $.getJSON(
+                '@Url.Action("GetVendorListJsonResult", "Vendor")',
+                function (data) {
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.VendorId,
+                                    text: item.VendorName
+                                })
+                            );
+
+                        }
+                    );
+
+
+                    var selectedId =
+                        '@ViewBag.VendorId';
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+
+                    dropDown.trigger("change.select2");
+
+                }
+            );
+
+        }
+
+
+        function showVendor() {
+
+            var status =
+                $("#Status").val();
+
+
+            if (status == "30" ||
+                status == "31" ||
+                status == "33") {
+
+                $("#vendorSection").show();
+
+            }
+            else {
+
+                $("#vendorSection").hide();
+
+            }
+
+        }
+
+    </script>
+}

@@ -1,0 +1,324 @@
+﻿@model ICollection<Domain.AR.AccessRequest>
+@using Service.AR
+@using Service
+@using Domain.AR
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="card">
+
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="align-middle me-2" data-lucide="square-pen"></i>
+                    Inputter
+                </h5>
+            </div>
+
+            <div class="card-body">
+
+                <div id="accordion">
+
+                    @{
+                        var expandShow = "";
+
+                        foreach (var item in Model)
+                        {
+                            var collapseId = "G_" + item.AccessRequestId;
+
+                            <div class="card mb-3">
+
+                                <div class="card-header">
+
+                                    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-2">
+
+                                        <div>
+
+                                            <a href="#@collapseId"
+                                               data-bs-toggle="collapse"
+                                               class="text-body text-decoration-none fw-semibold collapsed"
+                                               aria-expanded="false"
+                                               aria-controls="@collapseId">
+
+                                                <i class="align-middle me-1" data-lucide="file-key"></i>
+
+                                                Request #@item.AccessRequestId
+
+                                            </a>
+
+                                            <span class="ms-2 text-muted">
+                                                @item.AccessRequestType.Name
+                                            </span>
+
+                                        </div>
+
+                                        <div class="d-flex gap-2">
+
+                                            <span class="badge bg-@AccessRequestService.GetUserTypeColor(item.AccessType)">
+                                                @item.AccessType.EnumDisplayName()
+                                            </span>
+
+                                            <span class="badge bg-@AccessRequestService.GetStatusColor(item.Status)">
+                                                @item.Team.TeamName
+                                            </span>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <div id="@collapseId"
+                                     class="collapse @expandShow"
+                                     data-bs-parent="#accordion">
+
+                                    <div class="card-body">
+
+                                        @Html.Partial("_RequestMin", item)
+
+                                    </div>
+
+                                    <div class="card-footer">
+
+                                        <div class="d-flex flex-wrap justify-content-end gap-2">
+
+                                            <a href="@Html.EncodedActionLink(
+                                                         "",
+                                                         "Info",
+                                                         "AccessRequest",
+                                                         "",
+                                                         new { id = item.AccessRequestId },
+                                                         null
+                                                     )"
+                                               target="_blank"
+                                               class="btn btn-sm btn-light">
+
+                                                <i class="align-middle me-1" data-lucide="info"></i>
+
+                                                More
+
+                                            </a>
+
+                                            <button type="button"
+                                                    data-id="@item.AccessRequestId"
+                                                    class="openModalUpdate btn btn-primary btn-sm"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#modalUpdate">
+
+                                                <i class="align-middle me-1" data-lucide="square-pen"></i>
+
+                                                Update
+
+                                            </button>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        }
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+<div class="modal fade"
+     id="modalUpdate"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title">
+                    Request #
+                    <span id="updateModalRequestId"></span>
+                    Update
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <input type="hidden"
+                       id="updateRequestId"
+                       value="" />
+
+                <div class="mb-3">
+
+                    <label for="updateComment"
+                           class="form-label">
+                        Comment
+                    </label>
+
+                    <textarea id="updateComment"
+                              class="form-control"
+                              rows="3"
+                              placeholder="Enter comment"></textarea>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn btn-light btn-sm"
+                        data-bs-dismiss="modal">
+
+                    <i class="align-middle me-1" data-lucide="x"></i>
+
+                    Cancel
+
+                </button>
+
+                <button type="button"
+                        class="btn btn-primary btn-sm btnClickDisable"
+                        onclick="updateRequest()">
+
+                    <i class="align-middle me-1" data-lucide="square-pen"></i>
+
+                    Update
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).on("click", ".openModalUpdate", function () {
+
+            var requestId = $(this).data("id");
+
+            $("#updateRequestId").val(requestId);
+
+            $("#updateModalRequestId").text(requestId);
+
+            $("#updateComment").val("");
+
+            $("#modalUpdate .btnClickDisable")
+                .prop("disabled", false);
+
+        });
+
+
+        function updateRequest() {
+
+            var requestId =
+                $("#updateRequestId").val();
+
+            var comment =
+                $("#updateComment").val();
+
+
+            if (!comment || comment.trim() === "") {
+
+                Swal.fire(
+                    "Error!",
+                    "Please enter a comment",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            $("#modalUpdate .btnClickDisable")
+                .prop("disabled", true);
+
+
+            $.ajax({
+
+                url: '@Url.Action("InputterUpdate", "AccessRequest")',
+
+                type: "GET",
+
+                dataType: "json",
+
+                data: {
+                    requestId: requestId,
+                    comment: comment.trim()
+                },
+
+                success: function (data) {
+
+                    if (data == "1" || data == 1) {
+
+                        Swal.fire(
+                            "Completed",
+                            "Request has been updated",
+                            "success"
+                        );
+
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 300);
+
+                    }
+                    else {
+
+                        $("#modalUpdate .btnClickDisable")
+                            .prop("disabled", false);
+
+                        Swal.fire(
+                            "Something went wrong!",
+                            "Please try again",
+                            "error"
+                        );
+
+                    }
+
+                },
+
+                error: function () {
+
+                    $("#modalUpdate .btnClickDisable")
+                        .prop("disabled", false);
+
+                    Swal.fire(
+                        "Something went wrong!",
+                        "Please try again",
+                        "error"
+                    );
+
+                }
+
+            });
+
+        }
+
+    </script>
+
+}

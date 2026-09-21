@@ -1,0 +1,522 @@
+﻿@model Domain.Ticket
+@using Service
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@Html.HiddenFor(model => model.TicketId)
+
+@Html.Partial("_Ticket", Model)
+
+
+<div class="row g-3 mt-1">
+
+    @if (Model.RequestedUser != null)
+    {
+        <div class="col-md-4">
+
+            <div class="card h-100">
+
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="align-middle me-2" data-lucide="user"></i>
+                        Requested By
+                    </h5>
+                </div>
+
+                <div class="card-body">
+
+                    <div class="mb-3">
+
+                        <div class="fw-semibold">
+                            @Model.RequestedUser.FullName
+                        </div>
+
+                        <div class="text-muted">
+                            @Model.RequestedBy
+                        </div>
+
+                    </div>
+
+                    <dl class="row mb-0">
+
+                        <dt class="col-sm-4">Company</dt>
+                        <dd class="col-sm-8">@Model.Company</dd>
+
+                        <dt class="col-sm-4">Designation</dt>
+                        <dd class="col-sm-8">@Model.RequestedUser.DesignationName</dd>
+
+                        <dt class="col-sm-4">Department</dt>
+                        <dd class="col-sm-8">@Model.RequestedUser.DepartmentName</dd>
+
+                        <dt class="col-sm-4">
+                            <i class="align-middle me-1" data-lucide="mail"></i>
+                            Email
+                        </dt>
+                        <dd class="col-sm-8">
+                            @Model.RequestedUser.Email
+                        </dd>
+
+                        <dt class="col-sm-4">
+                            <i class="align-middle me-1" data-lucide="phone"></i>
+                            Contact
+                        </dt>
+                        <dd class="col-sm-8">
+                            @Model.RequestedUser.ContactNo
+                        </dd>
+
+                    </dl>
+
+                </div>
+
+            </div>
+
+        </div>
+    }
+
+
+    <div class="col-md-4">
+
+        @if (Model.CreatedUser != null)
+        {
+            <div class="card mb-3">
+
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="align-middle me-2" data-lucide="user"></i>
+                        Created By
+                    </h5>
+                </div>
+
+                <div class="card-body">
+
+                    <div class="fw-semibold">
+                        @Model.CreatedBy - @Model.CreatedUser.FullName
+                    </div>
+
+                    <div class="text-muted">
+                        @Model.CreatedUser.DesignationName
+                    </div>
+
+                </div>
+
+            </div>
+        }
+
+
+        @if (Model.AssignedByUser != null)
+        {
+            <div class="card">
+
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="align-middle me-2" data-lucide="user-plus"></i>
+                        Assigned By
+                    </h5>
+                </div>
+
+                <div class="card-body">
+
+                    <div class="fw-semibold">
+                        @Model.AssignedBy - @Model.AssignedByUser.FullName
+                    </div>
+
+                    <div class="text-muted">
+                        @Model.AssignedByUser.DesignationName
+                    </div>
+
+                </div>
+
+            </div>
+        }
+
+    </div>
+
+
+    @if (Model.AssignedToUser != null)
+    {
+        <div class="col-md-4">
+
+            <div class="card h-100">
+
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="align-middle me-2" data-lucide="user-check"></i>
+                        Assigned To
+                    </h5>
+                </div>
+
+                <div class="card-body">
+
+                    <div class="mb-3">
+
+                        <div class="fw-semibold">
+                            @Model.AssignedToUser.FullName
+                        </div>
+
+                        <div class="text-muted">
+                            @Model.AssignedTo
+                        </div>
+
+                    </div>
+
+                    <dl class="row mb-0">
+
+                        <dt class="col-sm-4">Company</dt>
+                        <dd class="col-sm-8">@Model.AssignedToUser.CompanyName</dd>
+
+                        <dt class="col-sm-4">Designation</dt>
+                        <dd class="col-sm-8">@Model.AssignedToUser.DesignationName</dd>
+
+                        <dt class="col-sm-4">Department</dt>
+                        <dd class="col-sm-8">@Model.AssignedToUser.DepartmentName</dd>
+
+                        <dt class="col-sm-4">
+                            <i class="align-middle me-1" data-lucide="mail"></i>
+                            Email
+                        </dt>
+                        <dd class="col-sm-8">
+                            @Model.AssignedToUser.Email
+                        </dd>
+
+                        <dt class="col-sm-4">
+                            <i class="align-middle me-1" data-lucide="phone"></i>
+                            Contact
+                        </dt>
+                        <dd class="col-sm-8">
+                            @Model.AssignedToUser.ContactNo
+                        </dd>
+
+                    </dl>
+
+                </div>
+
+            </div>
+
+        </div>
+    }
+
+</div>
+
+
+<div class="row g-3 mt-1">
+
+    <div class="col-md-6">
+
+        <div class="card">
+
+            <div class="card-header d-flex justify-content-between align-items-center">
+
+                <h5 class="card-title mb-0">
+                    <i class="align-middle me-2" data-lucide="boxes"></i>
+                    Assets
+                </h5>
+
+                <button type="button"
+                        class="btn btn-sm btn-light"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#assetSection"
+                        aria-expanded="true"
+                        aria-controls="assetSection">
+
+                    <i class="align-middle" data-lucide="chevron-down"></i>
+
+                </button>
+
+            </div>
+
+            <div id="assetSection" class="collapse show">
+
+                <div class="card-body">
+
+                    @if (Model.ItemAssets != null && Model.ItemAssets.Any())
+                    {
+                        <ul class="list-group list-group-flush">
+
+                            @foreach (var item in Model.ItemAssets)
+                            {
+                                <li class="list-group-item px-0">
+
+                                    <a href="@Html.EncodedActionLink("", "Info", "Asset", "", new { id = item.AssetId }, null)"
+                                       target="_blank"
+                                       class="text-decoration-none">
+
+                                        <i class="align-middle me-1" data-lucide="box"></i>
+
+                                        @(item.Asset != null
+                                            ? item.Asset.AssetName
+                                            : "")
+
+                                        @if (item.Asset != null &&
+                                             !string.IsNullOrWhiteSpace(item.Asset.Description))
+                                        {
+                                            <span>
+                                                - @item.Asset.Description
+                                            </span>
+                                        }
+
+                                    </a>
+
+                                </li>
+                            }
+
+                        </ul>
+                    }
+                    else
+                    {
+                        <span class="text-muted">
+                            No assets assigned.
+                        </span>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="col-md-6">
+
+        <div class="card">
+
+            <div class="card-header d-flex justify-content-between align-items-center">
+
+                <h5 class="card-title mb-0">
+                    <i class="align-middle me-2" data-lucide="file-text"></i>
+                    Documents
+                </h5>
+
+                <button type="button"
+                        class="btn btn-sm btn-light"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#documentSection"
+                        aria-expanded="true"
+                        aria-controls="documentSection">
+
+                    <i class="align-middle" data-lucide="chevron-down"></i>
+
+                </button>
+
+            </div>
+
+            <div id="documentSection" class="collapse show">
+
+                <div class="card-body">
+
+                    @if (Model.TicketDocs != null && Model.TicketDocs.Any())
+                    {
+                        <ul class="list-group list-group-flush">
+
+                            @foreach (var doc in Model.TicketDocs)
+                            {
+                                <li class="list-group-item px-0">
+
+                                    <a href="@doc.FileUrl"
+                                       target="_blank"
+                                       class="text-decoration-none">
+
+                                        <i class="align-middle me-1" data-lucide="file-text"></i>
+                                        @doc.FileName
+
+                                    </a>
+
+                                </li>
+                            }
+
+                        </ul>
+                    }
+                    else
+                    {
+                        <span class="text-muted">
+                            No documents available.
+                        </span>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<div class="row g-3 mt-1">
+
+    <div class="col-lg-7">
+
+        <div class="card">
+
+            <div class="card-header d-flex justify-content-between align-items-center">
+
+                <h5 class="card-title mb-0">
+                    <i class="align-middle me-2" data-lucide="message-square"></i>
+                    Status Updates
+                </h5>
+
+                <button type="button"
+                        class="btn btn-sm btn-light"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#statusUpdateSection"
+                        aria-expanded="true"
+                        aria-controls="statusUpdateSection">
+
+                    <i class="align-middle" data-lucide="chevron-down"></i>
+
+                </button>
+
+            </div>
+
+            <div id="statusUpdateSection" class="collapse show">
+
+                <div class="card-body">
+
+                    @if (Model.TicketUpdates != null)
+                    {
+                        foreach (var item in Model.TicketUpdates.OrderBy(o => o.UpdatedDate))
+                        {
+                            <div class="border rounded p-3 mb-3">
+
+                                <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-2">
+
+                                    <div class="fw-semibold">
+
+                                        @if (item.UpdatedUser != null)
+                                        {
+                                            <span>
+                                                @item.UpdatedUser.EmpNo
+                                                |
+                                                @item.UpdatedUser.FullName
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span>N/A</span>
+                                        }
+
+                                    </div>
+
+                                    <div class="text-muted small">
+
+                                        <i class="align-middle me-1" data-lucide="clock"></i>
+                                        @item.SpentTime
+
+                                        <span class="mx-2">|</span>
+
+                                        <i class="align-middle me-1" data-lucide="calendar"></i>
+                                        @item.UpdatedDate
+
+                                    </div>
+
+                                </div>
+
+                                <div class="p-2 rounded bg-@TicketService.GetTicketStatusColor(item.Status)">
+
+                                    <strong>
+                                        @item.Status.EnumDisplayName()
+                                    </strong>
+
+                                    @if (!string.IsNullOrWhiteSpace(item.Comment))
+                                    {
+                                        <span>
+                                            | @item.Comment
+                                        </span>
+                                    }
+
+                                </div>
+
+                            </div>
+                        }
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="col-lg-5">
+
+        <div class="card">
+
+            <div class="card-header d-flex justify-content-between align-items-center">
+
+                <h5 class="card-title mb-0">
+                    <i class="align-middle me-2" data-lucide="history"></i>
+                    History
+                </h5>
+
+                <button type="button"
+                        class="btn btn-sm btn-light"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#historySection"
+                        aria-expanded="true"
+                        aria-controls="historySection">
+
+                    <i class="align-middle" data-lucide="chevron-down"></i>
+
+                </button>
+
+            </div>
+
+            <div id="historySection" class="collapse show">
+
+                <div class="card-body">
+
+                    @if (Model.ItemLogs != null)
+                    {
+                        foreach (var item in Model.ItemLogs.OrderBy(o => o.UpdatedDate))
+                        {
+                            <div class="border-bottom pb-3 mb-3">
+
+                                <div class="d-flex justify-content-between align-items-start gap-2 mb-1">
+
+                                    <strong>
+
+                                        @if (item.UpdatedUser != null)
+                                        {
+                                            <span>
+                                                @item.UpdatedUser.EmpNo
+                                                |
+                                                @item.UpdatedUser.FullName
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span>N/A</span>
+                                        }
+
+                                    </strong>
+
+                                    <span class="text-muted small">
+                                        @item.UpdatedDate
+                                    </span>
+
+                                </div>
+
+                                <div class="text-muted">
+                                    @item.Comment
+                                </div>
+
+                            </div>
+                        }
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

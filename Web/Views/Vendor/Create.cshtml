@@ -1,0 +1,158 @@
+﻿@model Domain.Vendor
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="card">
+
+            <div class="card-header d-flex justify-content-between align-items-center">
+
+                <h5 class="card-title mb-0">
+                    <i class="align-middle me-2" data-lucide="building-2"></i>
+                    Create New
+                </h5>
+
+                <a href="@Url.Action("Index", "Vendor")"
+                   class="btn btn-sm btn-light">
+
+                    <i class="align-middle me-1" data-lucide="arrow-left"></i>
+                    Back
+
+                </a>
+
+            </div>
+
+            @using (Html.BeginForm("Create", "Vendor", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true)
+
+                <div class="card-body">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+
+                            @Html.LabelFor(
+                                model => model.VendorName,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.TextBoxFor(
+                                model => model.VendorName,
+                                new { @class = "form-control" }
+                            )
+
+                            @Html.ValidationMessageFor(
+                                model => model.VendorName,
+                                "",
+                                new { @class = "text-danger" }
+                            )
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            @Html.LabelFor(
+                                model => model.ContactNo,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.TextBoxFor(
+                                model => model.ContactNo,
+                                new { @class = "form-control" }
+                            )
+
+                            @Html.ValidationMessageFor(
+                                model => model.ContactNo,
+                                "",
+                                new { @class = "text-danger" }
+                            )
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            @Html.LabelFor(
+                                model => model.Email,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.TextBoxFor(
+                                model => model.Email,
+                                new { @class = "form-control" }
+                            )
+
+                            @Html.ValidationMessageFor(
+                                model => model.Email,
+                                "",
+                                new { @class = "text-danger" }
+                            )
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            @Html.LabelFor(
+                                model => model.Address,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.TextBoxFor(
+                                model => model.Address,
+                                new { @class = "form-control" }
+                            )
+
+                            @Html.ValidationMessageFor(
+                                model => model.Address,
+                                "",
+                                new { @class = "text-danger" }
+                            )
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="card-footer">
+
+                    <div class="d-flex justify-content-end gap-2">
+
+                        <button type="reset"
+                                class="btn btn-sm btn-danger">
+
+                            <i class="align-middle me-1" data-lucide="rotate-ccw"></i>
+                            Cancel
+
+                        </button>
+
+                        <button type="submit"
+                                class="btn btn-sm btn-primary btnSumbitDisable">
+
+                            <i class="align-middle me-1" data-lucide="save"></i>
+                            Save
+
+                        </button>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+</div>
+
+
+@section scripts {
+
+    <script src="~/Scripts/jquery.validate.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
+
+}

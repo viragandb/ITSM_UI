@@ -1,0 +1,227 @@
+﻿@model Domain.AssetTransferRequest
+@using Service
+
+<div class="row g-4">
+
+    <div class="col-lg-8">
+
+        <dl class="row mb-0">
+
+            <dt class="col-lg-3">
+                @Html.LabelFor(model => Model.TransactionType)
+            </dt>
+
+            <dd class="col-lg-9">
+                @Model.TransactionType.EnumDisplayName()
+            </dd>
+
+            <dt class="col-lg-3">
+                From
+            </dt>
+
+            <dd class="col-lg-9">
+                @Model.BranchFrom.Name - @Model.DepartmentFrom.DepartmentName
+            </dd>
+
+            @if (Model.TransactionType == Domain.AssetTransactionTypeEnum.Transfer)
+            {
+                <dt class="col-lg-3">
+                    To
+                </dt>
+
+                <dd class="col-lg-9">
+                    @Model.Branch.Name - @Model.Department.DepartmentName
+                </dd>
+            }
+            else if (Model.TransactionType == Domain.AssetTransactionTypeEnum.SentToRepair)
+            {
+                <dt class="col-lg-3">
+                    To
+                </dt>
+
+                <dd class="col-lg-9">
+                    @Model.Vendor.VendorName
+                </dd>
+            }
+
+        </dl>
+
+        <hr />
+
+        <dl class="row mb-0">
+
+            <dt class="col-lg-3">
+                <i class="align-middle me-1" data-lucide="user"></i>
+                @Html.LabelFor(model => Model.InitiatedBy)
+            </dt>
+
+            <dd class="col-lg-3">
+                @Model.InitiatedUser.FullName
+            </dd>
+
+            <dt class="col-lg-2">
+                <i class="align-middle me-1" data-lucide="calendar"></i>
+                Date
+            </dt>
+
+            <dd class="col-lg-4">
+                @Model.InitiatedDate
+            </dd>
+
+            <dt class="col-lg-3">
+                <i class="align-middle me-1" data-lucide="message-square"></i>
+                Comment
+            </dt>
+
+            <dd class="col-lg-9">
+                @Model.Comment
+            </dd>
+
+        </dl>
+
+        @if (Model.AuthorizedBy != null)
+        {
+            <hr />
+
+            <dl class="row mb-0">
+
+                <dt class="col-lg-3">
+                    <i class="align-middle me-1" data-lucide="user-check"></i>
+                    @Html.LabelFor(model => Model.AuthorizedBy)
+                </dt>
+
+                <dd class="col-lg-3">
+                    @Model.AuthorizedUser.FullName
+                </dd>
+
+                <dt class="col-lg-2">
+                    <i class="align-middle me-1" data-lucide="calendar"></i>
+                    Date
+                </dt>
+
+                <dd class="col-lg-4">
+                    @Model.AuthorizedDate
+                </dd>
+
+                <dt class="col-lg-3">
+                    <i class="align-middle me-1" data-lucide="message-square"></i>
+                    Comment
+                </dt>
+
+                <dd class="col-lg-9">
+                    @Model.CommentAuthorize
+                </dd>
+
+            </dl>
+        }
+
+        @if (Model.CompletedBy != null)
+        {
+            <hr />
+
+            <dl class="row mb-0">
+
+                <dt class="col-lg-3">
+                    <i class="align-middle me-1" data-lucide="check-circle"></i>
+                    @Html.LabelFor(model => Model.CompletedBy)
+                </dt>
+
+                <dd class="col-lg-3">
+                    @Model.CompletedUser.FullName
+                </dd>
+
+                <dt class="col-lg-2">
+                    <i class="align-middle me-1" data-lucide="calendar"></i>
+                    Date
+                </dt>
+
+                <dd class="col-lg-4">
+                    @Model.CompletedDate
+                </dd>
+
+                <dt class="col-lg-3">
+                    <i class="align-middle me-1" data-lucide="message-square"></i>
+                    Comment
+                </dt>
+
+                <dd class="col-lg-9">
+                    @Model.CommentComplete
+                </dd>
+
+            </dl>
+        }
+
+    </div>
+
+
+    <div class="col-lg-4">
+
+        <div class="card">
+
+            <div class="card-header">
+
+                <h5 class="card-title mb-0">
+                    <i class="align-middle me-2" data-lucide="boxes"></i>
+                    Assets
+                </h5>
+
+            </div>
+
+            <div class="card-body">
+
+                @foreach (var item in Model.TransferItems)
+                {
+                    <div class="border-bottom pb-2 mb-2">
+
+                        <a href="@Html.EncodedActionLink("", "Info", "Asset", "", new { id = item.AssetId }, null)"
+                           target="_blank"
+                           class="text-decoration-none">
+
+                            <div class="fw-semibold">
+
+                                <i class="align-middle me-1" data-lucide="box"></i>
+
+                                @item.Asset.AssetNo
+                                -
+                                @item.Asset.AssetName
+
+                            </div>
+
+                            @if (item.AssignedTo != null)
+                            {
+                                <div class="text-muted small mt-1">
+
+                                    <i class="align-middle me-1" data-lucide="user"></i>
+
+                                    @item.AssignedToUser.FullName
+
+                                </div>
+                            }
+
+                        </a>
+
+                    </div>
+                }
+
+                @if (Model.AssignedTo != null)
+                {
+                    <div class="mt-3">
+
+                        <span class="fw-semibold">
+
+                            <i class="align-middle me-1" data-lucide="user"></i>
+
+                            @Model.AssignedToUser.FullName
+
+                        </span>
+
+                    </div>
+                }
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

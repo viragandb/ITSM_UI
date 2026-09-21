@@ -1,0 +1,335 @@
+﻿@model Domain.Asset
+@using Service
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("Update", "Asset", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card">
+
+                <div class="card-header d-flex align-items-center justify-content-between">
+
+                    <h5 class="card-title mb-0">
+                        <i class="align-middle me-2" data-lucide="box"></i>
+                        Asset # @Model.AssetNo
+
+                        <span class="badge bg-@AssetService.GetStatusColor(Model.Status) ms-2">
+                            @Model.Status.EnumDisplayName()
+                        </span>
+                    </h5>
+
+                    <a href="@Url.Action("Index", "Asset")"
+                       class="btn btn-sm btn-light">
+
+                        <i class="align-middle me-1" data-lucide="arrow-left"></i>
+                        Back
+
+                    </a>
+
+                </div>
+
+                <div class="card-body">
+
+                    @Html.HiddenFor(model => model.AssetId)
+                    @Html.HiddenFor(model => model.AssetNo)
+                    @Html.HiddenFor(model => model.AssetCategory)
+                    @Html.HiddenFor(model => model.AssetTypeId)
+                    @Html.HiddenFor(model => model.AssetType.AssetTypeName)
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+                                @Html.LabelFor(model => model.AssetCategory)
+                            </label>
+
+                            <div class="form-control bg-light">
+                                @Model.AssetCategory.EnumDisplayName()
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+                                @Html.LabelFor(model => model.AssetTypeId)
+                            </label>
+
+                            <div class="form-control bg-light">
+                                @Model.AssetType.AssetTypeName
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="row g-3 mt-1">
+
+                        <div class="col-md-6">
+
+                            @Html.LabelFor(
+                                model => model.AssetMakeId,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.DropDownListFor(
+                                model => model.AssetMakeId,
+                                new List<SelectListItem>(),
+                                new { @class = "form-select" }
+                            )
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            @Html.LabelFor(
+                                model => model.ModelName,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.TextBoxFor(
+                                model => model.ModelName,
+                                new { @class = "form-control" }
+                            )
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="row g-3 mt-1">
+
+                        <div class="col-md-6">
+
+                            @Html.LabelFor(
+                                model => model.SerialNo,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.TextBoxFor(
+                                model => model.SerialNo,
+                                new { @class = "form-control" }
+                            )
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            @Html.LabelFor(
+                                model => model.Barcode,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.TextBoxFor(
+                                model => model.Barcode,
+                                new { @class = "form-control" }
+                            )
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="row g-3 mt-1">
+
+                        <div class="col-md-6">
+
+                            @Html.LabelFor(
+                                model => model.AllocatedType,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.EnumDropDownListFor(
+                                model => model.AllocatedType,
+                                "-- Select --",
+                                new { @class = "form-select" }
+                            )
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            @Html.LabelFor(
+                                model => model.VendorId,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.DropDownListFor(
+                                model => model.VendorId,
+                                new List<SelectListItem>(),
+                                new { @class = "form-select" }
+                            )
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="row g-3 mt-1">
+
+                        <div class="col-12">
+
+                            @Html.LabelFor(
+                                model => model.Description,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.TextBoxFor(
+                                model => model.Description,
+                                new { @class = "form-control" }
+                            )
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="card-footer">
+
+                    <div class="d-flex justify-content-end">
+
+                        <button type="submit"
+                                class="btn btn-primary btnSubmitDisable">
+
+                            <i class="align-middle me-1" data-lucide="save"></i>
+                            Save
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+}
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            loadVendor();
+            loadMake();
+
+        });
+
+
+        function parseJsonResult(data) {
+
+            if (typeof data === "string") {
+
+                try {
+                    return JSON.parse(data);
+                }
+                catch (e) {
+                    return [];
+                }
+
+            }
+
+            return data || [];
+
+        }
+
+
+        function loadVendor() {
+
+            $.getJSON(
+                '@Url.Action("GetVendorListJsonResult", "Vendor")',
+                function (data) {
+
+                    var dropDown =
+                        $("#VendorId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- Select --</option>"
+                    );
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.VendorId,
+                                    text: item.VendorName
+                                })
+                            );
+
+                        }
+                    );
+
+                    var selectedId =
+                        '@ViewBag.VendorId';
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+                }
+            );
+
+        }
+
+
+        function loadMake() {
+
+            $.getJSON(
+                '@Url.Action("GetAssetMakeListJsonResult", "AssetMake")',
+                function (data) {
+
+                    var dropDown =
+                        $("#AssetMakeId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- Select --</option>"
+                    );
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.AssetMakeId,
+                                    text: item.Name
+                                })
+                            );
+
+                        }
+                    );
+
+                    var selectedId =
+                        '@ViewBag.AssetMakeId';
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+                }
+            );
+
+        }
+
+    </script>
+
+}

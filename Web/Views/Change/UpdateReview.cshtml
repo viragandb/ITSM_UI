@@ -1,0 +1,185 @@
+﻿@model Domain.Change
+@using Service
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="card">
+
+            <div class="card-header d-flex justify-content-between align-items-center">
+
+                <h5 class="card-title mb-0">
+                    <i class="align-middle me-2" data-lucide="message-square"></i>
+                    Review Change
+                </h5>
+
+                <a href="@Url.Action("Review", "Change")"
+                   class="btn btn-sm btn-light">
+
+                    <i class="align-middle me-1" data-lucide="arrow-left"></i>
+                    Back
+
+                </a>
+
+            </div>
+
+            @using (Html.BeginForm("UpdateReview", "Change", FormMethod.Post))
+            {
+                @Html.HiddenFor(model => model.ChangeId)
+
+                <div class="card-body">
+
+                    <div class="row g-4">
+
+                        <div class="col-lg-6">
+
+                            @Html.Partial("_ChangeMin", Model)
+
+                        </div>
+
+                        <div class="col-lg-6">
+
+                            <div class="card">
+
+                                <div class="card-header d-flex justify-content-between align-items-center">
+
+                                    <h5 class="card-title mb-0">
+                                        <i class="align-middle me-2" data-lucide="clipboard-check"></i>
+                                        Review
+                                    </h5>
+
+                                    <button type="button"
+                                            class="btn btn-sm btn-light"
+                                            data-bs-toggle="collapse"
+                                            data-bs-target="#reviewBody"
+                                            aria-expanded="true"
+                                            aria-controls="reviewBody">
+
+                                        <i class="align-middle" data-lucide="chevron-down"></i>
+
+                                    </button>
+
+                                </div>
+
+                                <div id="reviewBody"
+                                     class="collapse show">
+
+                                    <div class="card-body">
+
+                                        <div class="mb-3">
+
+                                            <label for="textComment"
+                                                   class="form-label">
+                                                Comment
+                                            </label>
+
+                                            <input type="text"
+                                                   id="textComment"
+                                                   name="textComment"
+                                                   placeholder="Enter Comment"
+                                                   class="form-control" />
+
+                                        </div>
+
+                                        <div class="mb-3">
+
+                                            <label class="form-label d-block">
+                                                Decision
+                                            </label>
+
+                                            <div class="form-check form-switch">
+
+                                                <input type="checkbox"
+                                                       id="checkboxApprove"
+                                                       name="checkboxApprove"
+                                                       value="true"
+                                                       checked
+                                                       class="form-check-input"
+                                                       role="switch" />
+
+                                                <label class="form-check-label"
+                                                       for="checkboxApprove"
+                                                       id="decisionLabel">
+                                                    Approve
+                                                </label>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="card-footer">
+
+                                        <div class="d-flex justify-content-end">
+
+                                            <button type="submit"
+                                                    class="btn btn-primary btn-sm">
+
+                                                <i class="align-middle me-1" data-lucide="save"></i>
+                                                Update
+
+                                            </button>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+</div>
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            updateDecisionLabel();
+
+            $("#checkboxApprove").on("change", function () {
+                updateDecisionLabel();
+            });
+
+        });
+
+
+        function updateDecisionLabel() {
+
+            if ($("#checkboxApprove").is(":checked")) {
+
+                $("#decisionLabel")
+                    .text("Approve")
+                    .removeClass("text-danger")
+                    .addClass("text-success");
+
+            }
+            else {
+
+                $("#decisionLabel")
+                    .text("Reject")
+                    .removeClass("text-success")
+                    .addClass("text-danger");
+
+            }
+
+        }
+
+    </script>
+}

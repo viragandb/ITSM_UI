@@ -1,0 +1,144 @@
+﻿
+@model ICollection<Domain.TaskUpdate>
+@using Service
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@using (Html.BeginForm("TaskPending", "ScheduledTask", FormMethod.Get, new { @class = "form-horizontal" }))
+{
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card box-danger">
+                <div class="card-header with-border">
+                    <h3 class="card-title">Tasks</h3>
+
+                </div>
+
+
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+
+                            <div class="form-group">
+
+                                <label class="control-label col-md-2">
+                                    Task Date :
+                                </label>
+                                <div class="col-md-2">
+                                    <div class="input-group date">
+                                        <div class="input-group-addon">
+                                            <i class="fa fa-calendar"></i>
+                                        </div>
+                                        <input type="text" name="StartDate" id="StartDate" value="@ViewBag.StartDate" autocomplete="off" class="form-control datepicker" />
+                                    </div>
+                                </div>
+
+
+                                <label class="control-label col-md-1">
+                                    To
+                                </label>
+                                <div class="col-md-2">
+                                    <div class="input-group date">
+                                        <div class="input-group-addon">
+                                            <i class="fa fa-calendar"></i>
+                                        </div>
+                                        <input type="text" name="EndDate" id="EndDate" value="@ViewBag.EndDate" autocomplete="off" class="form-control datepicker" />
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+                <div class="card-footer">
+                    <div class="text-right">
+                        <button type="submit" class="btn btn-social">
+                            <i class="fa fa-search"></i>Search
+                        </button>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+
+        <div class="col-lg-12">
+            <div class="card box-default">
+
+
+                <div class="card-body">
+                    @{
+                        foreach (var item in Model)
+                        {
+
+                            <div class="panel box box-@ScheduledTaskService.GetTaskRepeatTypeColor(item.ScheduledTask.RepeatType)">
+                                <div class="card-header">
+                                    <h4 class="card-title">
+                                        <a data-bs-toggle="collapse" data-parent="#accordion" href="#@item.TaskUpdateId">
+                                            @item.TaskDate.ToShortDateString() | @item.ScheduledTask.TaskName
+
+                                        </a>
+
+                                    </h4>
+                                    <div class="pull-right">
+                                        <a href="@Html.EncodedActionLink("", "TaskInfo", "ScheduledTask", "", new { id = item.ScheduledTaskId }, null)" target="_blank" class="btn btn-sm btn-default">
+                                            <i class="fa fa-info"></i>
+                                        </a>
+                                        <a href="@Html.EncodedActionLink("", "TaskUpdate", "ScheduledTask", "", new { id = item.TaskUpdateId }, null)" class="btn btn-sm btn-social btn-warning">
+                                            <i class="fa fa-pencil-square-o"></i>Complete
+                                        </a>
+                                    </div>
+
+                                </div>
+                                <div id="@item.TaskUpdateId" class="panel-collapse collapse">
+                                    <div class="card-body">
+                                        @Html.Partial("_ScheduledTask", item.ScheduledTask)
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        }
+                    }
+
+
+                </div>
+
+
+
+            </div>
+
+        </div>
+    </div>
+}
+@section scripts {
+
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $('#dataTable').DataTable({
+                "paging": false,
+                "lengthChange": true,
+                "searching": false,
+                "ordering": true,
+                "info": true,
+                "autoWidth": true
+            });
+
+
+        });
+
+
+
+    </script>
+}
+
+

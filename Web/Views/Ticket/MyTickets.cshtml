@@ -1,0 +1,564 @@
+﻿@using Service
+@model IEnumerable<Domain.Ticket>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("MyTickets", "Ticket", FormMethod.Get))
+{
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card">
+
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="align-middle me-2" data-lucide="ticket"></i>
+                        Tickets
+                    </h5>
+                </div>
+
+                <div class="card-body">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+
+                            <label for="CategoryId" class="form-label">
+                                Category
+                            </label>
+
+                            <select id="CategoryId"
+                                    name="CategoryId"
+                                    class="form-select">
+                                <option value=""></option>
+                            </select>
+
+                            <span class="text-danger"
+                                  data-valmsg-for="CategoryId"
+                                  data-valmsg-replace="true">
+                            </span>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <label for="TicketTypeId" class="form-label">
+                                Ticket Type
+                            </label>
+
+                            <select id="TicketTypeId"
+                                    name="TicketTypeId"
+                                    class="form-select">
+                                <option value=""></option>
+                            </select>
+
+                            <span class="text-danger"
+                                  data-valmsg-for="TicketTypeId"
+                                  data-valmsg-replace="true">
+                            </span>
+
+                        </div>
+
+                        <div class="col-md-3">
+
+                            <label for="StartDate" class="form-label">
+                                Requested Date From
+                            </label>
+
+                            <input type="date"
+                                   name="StartDate"
+                                   id="StartDate"
+                                   value="@ViewBag.StartDate"
+                                   class="form-control" />
+
+                        </div>
+
+                        <div class="col-md-3">
+
+                            <label for="EndDate" class="form-label">
+                                Requested Date To
+                            </label>
+
+                            <input type="date"
+                                   name="EndDate"
+                                   id="EndDate"
+                                   value="@ViewBag.EndDate"
+                                   class="form-control" />
+
+                        </div>
+
+                        <div class="col-md-3 d-flex align-items-end">
+
+                            <div class="form-check mb-2">
+
+                                <input class="form-check-input"
+                                       type="checkbox"
+                                       id="checkBoxSLA"
+                                       name="checkBoxSLA"
+                                       @ViewBag.SLA />
+
+                                <label for="checkBoxSLA"
+                                       class="form-check-label">
+                                    SLA Violations
+                                </label>
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-3 d-flex align-items-end">
+
+                            <div class="form-check mb-2">
+
+                                <input class="form-check-input"
+                                       type="checkbox"
+                                       id="checkBoxOnGoing"
+                                       name="checkBoxOnGoing"
+                                       @ViewBag.OnGoing />
+
+                                <label for="checkBoxOnGoing"
+                                       class="form-check-label">
+                                    On Going
+                                </label>
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <label for="StatusId" class="form-label">
+                                Status
+                            </label>
+
+                            <select id="StatusId"
+                                    name="StatusId"
+                                    class="form-select">
+                                <option value=""></option>
+                            </select>
+
+                            <span class="text-danger"
+                                  data-valmsg-for="StatusId"
+                                  data-valmsg-replace="true">
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="card-footer">
+
+                    <div class="d-flex justify-content-end">
+
+                        <button type="submit"
+                                class="btn btn-sm btn-primary">
+
+                            <i class="align-middle me-1" data-lucide="search"></i>
+                            Search
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card">
+
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="align-middle me-2" data-lucide="list"></i>
+                        My Tickets
+                    </h5>
+                </div>
+
+                <div class="card-body">
+
+                    <div class="table-responsive">
+
+                        <table id="dataTable"
+                               class="table table-striped table-hover align-middle w-100">
+
+                            <thead>
+                                <tr>
+                                    <th>Ticket Id</th>
+                                    <th>Type</th>
+                                    <th>Category</th>
+                                    <th>Asset Type</th>
+                                    <th>Subcategory</th>
+                                    <th>Requested By</th>
+                                    <th>Location</th>
+                                    <th>Requested Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+
+                                        <td>
+
+                                            <a href="@Html.EncodedActionLink("", "Info", "Ticket", "", new { id = item.TicketId }, null)"
+                                               target="_blank">
+
+                                                @item.Code
+
+                                            </a>
+
+                                        </td>
+
+                                        <td>
+
+                                            @if (item.RequestType != null)
+                                            {
+                                                <span class="badge bg-@TicketService.GetTicketTypeColor(item.RequestType.TicketType)">
+                                                    @item.RequestType.TicketType.EnumDisplayName()
+                                                </span>
+                                            }
+
+                                        </td>
+
+                                        <td>
+                                            @(item.RequestType != null &&
+                                              item.RequestType.Category != null
+                                                ? item.RequestType.Category.CategoryName
+                                                : "")
+                                        </td>
+
+                                        <td>
+                                            @(item.RequestType != null &&
+                                              item.RequestType.AssetType != null
+                                                ? item.RequestType.AssetType.AssetTypeName
+                                                : "")
+                                        </td>
+
+                                        <td>
+                                            @(item.RequestType != null &&
+                                              item.RequestType.SubCategory != null
+                                                ? item.RequestType.SubCategory.SubCategoryName
+                                                : "")
+                                        </td>
+
+                                        <td>
+                                            @(item.RequestedUser != null
+                                                ? item.RequestedUser.FullName
+                                                : "")
+                                        </td>
+
+                                        <td>
+                                            @(item.Branch != null
+                                                ? item.Branch.Name
+                                                : "")
+                                        </td>
+
+                                        <td>
+                                            @item.RequestedDate.ToShortDateString()
+                                        </td>
+
+                                        <td>
+
+                                            <span class="badge bg-@TicketService.GetTicketStatusColor(item.Status)">
+                                                @item.Status.EnumDisplayName()
+                                            </span>
+
+                                        </td>
+
+                                    </tr>
+                                }
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+
+    <div class="row g-3">
+
+        <div class="col-md-4">
+
+            <div class="card h-100">
+
+                <div class="card-header">
+
+                    <h5 class="card-title mb-0">
+                        <i class="align-middle me-2" data-lucide="chart-no-axes-column"></i>
+                        Status Summary
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    @foreach (Domain.TicketStatusEnum item in Enum.GetValues(typeof(Domain.TicketStatusEnum)))
+                    {
+                        var count = Model.Count(w => w.Status == item);
+
+                        if (count > 0)
+                        {
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+
+                                <span class="badge bg-@TicketService.GetTicketStatusColor(item)">
+                                    @item.EnumDisplayName()
+                                </span>
+
+                                <strong>
+                                    @count
+                                </strong>
+
+                            </div>
+                        }
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <div class="card h-100">
+
+                <div class="card-header">
+
+                    <h5 class="card-title mb-0">
+                        <i class="align-middle me-2" data-lucide="layers"></i>
+                        Ticket Type Summary
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+
+                        <span class="badge bg-@TicketService.GetTicketTypeColor(Domain.TicketTypeEnum.SR)">
+                            @Domain.TicketTypeEnum.SR.EnumDisplayName()
+                        </span>
+
+                        <strong>
+                            @Model.Count(w =>
+                                w.RequestType != null &&
+                                w.RequestType.TicketType == Domain.TicketTypeEnum.SR)
+                        </strong>
+
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <span class="badge bg-@TicketService.GetTicketTypeColor(Domain.TicketTypeEnum.IN)">
+                            @Domain.TicketTypeEnum.IN.EnumDisplayName()
+                        </span>
+
+                        <strong>
+                            @Model.Count(w =>
+                                w.RequestType != null &&
+                                w.RequestType.TicketType == Domain.TicketTypeEnum.IN)
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+}
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $("#dataTable").DataTable({
+                paging: false,
+                lengthChange: true,
+                searching: true,
+                ordering: true,
+                info: true,
+                responsive: true,
+                autoWidth: false
+            });
+
+            loadTicketTypes();
+            loadStatus();
+            loadCategory();
+
+        });
+
+
+        function parseJsonResult(data) {
+
+            if (typeof data === "string") {
+
+                try {
+                    return JSON.parse(data);
+                }
+                catch (e) {
+                    return [];
+                }
+
+            }
+
+            return data || [];
+        }
+
+
+        function loadTicketTypes() {
+
+            var dropDown = $("#TicketTypeId");
+
+            dropDown.empty();
+
+            dropDown.append(
+                "<option value='0'>-- All --</option>"
+            );
+
+
+            $.getJSON(
+                '@Url.Action("GetTicketTypesJsonResult", "RequestType")',
+                function (data) {
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.Id,
+                                    text: item.Name
+                                })
+                            );
+
+                        }
+                    );
+
+
+                    var selectedId =
+                        '@ViewBag.TicketTypeId';
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+                }
+            );
+
+        }
+
+
+        function loadStatus() {
+
+            var dropDown = $("#StatusId");
+
+            dropDown.empty();
+
+            dropDown.append(
+                "<option value='0'>-- All --</option>"
+            );
+
+
+            $.getJSON(
+                '@Url.Action("GetStatusJsonResult", "Ticket")',
+                function (data) {
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.Id,
+                                    text: item.Name
+                                })
+                            );
+
+                        }
+                    );
+
+
+                    var selectedId =
+                        '@ViewBag.StatusId';
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+                }
+            );
+
+        }
+
+
+        function loadCategory() {
+
+            var dropDown = $("#CategoryId");
+
+            dropDown.empty();
+
+            dropDown.append(
+                "<option value='0'>-- All --</option>"
+            );
+
+
+            $.getJSON(
+                '@Url.Action("GetCategoryListJsonResult", "Category")',
+                function (data) {
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.CategoryId,
+                                    text: item.CategoryName
+                                })
+                            );
+
+                        }
+                    );
+
+
+                    var selectedId =
+                        '@ViewBag.CategoryId';
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+                }
+            );
+
+        }
+
+    </script>
+}

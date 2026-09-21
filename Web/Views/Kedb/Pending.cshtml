@@ -1,0 +1,420 @@
+﻿@model ICollection<Domain.KedbItem>
+@using Service
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="card">
+
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="align-middle me-2" data-lucide="database"></i>
+                    Request
+                </h5>
+            </div>
+
+            <div class="card-body">
+
+                <div class="accordion" id="kedbAccordion">
+
+                    @foreach (var item in Model)
+                    {
+                        var collapseId = "kedb_" + item.KedbItemId;
+
+                        <div class="accordion-item">
+
+                            <h2 class="accordion-header"
+                                id="heading_@item.KedbItemId">
+
+                                <button class="accordion-button collapsed"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#@collapseId"
+                                        aria-expanded="false"
+                                        aria-controls="@collapseId">
+
+                                    <div class="w-100 d-flex justify-content-between align-items-center me-3 flex-wrap gap-2">
+
+                                        <div>
+
+                                            <span>
+                                                @(item.RequestType != null && item.RequestType.Category != null
+                                                    ? item.RequestType.Category.CategoryName
+                                                    : "N/A")
+                                            </span>
+
+                                            <i class="align-middle mx-2"
+                                               data-lucide="chevrons-right"></i>
+
+                                            <span>
+                                                @(item.RequestType != null && item.RequestType.AssetType != null
+                                                    ? item.RequestType.AssetType.AssetTypeName
+                                                    : "N/A")
+                                            </span>
+
+                                            <i class="align-middle mx-2"
+                                               data-lucide="chevrons-right"></i>
+
+                                            <strong>
+                                                @(item.RequestType != null && item.RequestType.SubCategory != null
+                                                    ? item.RequestType.SubCategory.SubCategoryName
+                                                    : "N/A")
+                                            </strong>
+
+                                        </div>
+
+                                        <div class="text-muted small">
+                                            @item.Subject
+                                        </div>
+
+                                    </div>
+
+                                </button>
+
+                            </h2>
+
+                            <div id="@collapseId"
+                                 class="accordion-collapse collapse"
+                                 aria-labelledby="heading_@item.KedbItemId"
+                                 data-bs-parent="#kedbAccordion">
+
+                                <div class="accordion-body">
+
+                                    <dl class="row mb-0">
+
+                                        <dt class="col-md-2 text-md-end">
+                                            @Html.DisplayNameFor(model => item.RequestType.CategoryId)
+                                        </dt>
+
+                                        <dd class="col-md-2">
+                                            @(item.RequestType != null && item.RequestType.Category != null
+                                                ? item.RequestType.Category.CategoryName
+                                                : "N/A")
+                                        </dd>
+
+
+                                        <dt class="col-md-2 text-md-end">
+                                            @Html.DisplayNameFor(model => item.RequestType.AssetTypeId)
+                                        </dt>
+
+                                        <dd class="col-md-2">
+                                            @(item.RequestType != null && item.RequestType.AssetType != null
+                                                ? item.RequestType.AssetType.AssetTypeName
+                                                : "N/A")
+                                        </dd>
+
+
+                                        <dt class="col-md-2 text-md-end">
+                                            @Html.DisplayNameFor(model => item.RequestType.SubCategoryId)
+                                        </dt>
+
+                                        <dd class="col-md-2">
+                                            @(item.RequestType != null && item.RequestType.SubCategory != null
+                                                ? item.RequestType.SubCategory.SubCategoryName
+                                                : "N/A")
+                                        </dd>
+
+
+                                        <dt class="col-md-2 text-md-end">
+                                            @Html.DisplayNameFor(model => item.RequestType.TeamId)
+                                        </dt>
+
+                                        <dd class="col-md-2">
+                                            @(item.RequestType != null && item.RequestType.Team != null
+                                                ? item.RequestType.Team.TeamName
+                                                : "N/A")
+                                        </dd>
+
+
+                                        @if (item.TicketId != null)
+                                        {
+                                            <dt class="col-md-2 text-md-end">
+                                                Ticket
+                                            </dt>
+
+                                            <dd class="col-md-2">
+
+                                                <a href="@Html.EncodedActionLink("", "TicketInfo", "Ticket", "", new { id = item.TicketId }, null)"
+                                                   target="_blank">
+
+                                                    @(item.Ticket != null ? item.Ticket.Code : item.TicketId.ToString())
+
+                                                </a>
+
+                                            </dd>
+                                        }
+
+
+                                        @if (item.ProblemId != null)
+                                        {
+                                            <dt class="col-md-2 text-md-end">
+                                                Problem
+                                            </dt>
+
+                                            <dd class="col-md-2">
+
+                                                <a href="@Html.EncodedActionLink("", "Info", "Problem", "", new { id = item.ProblemId }, null)"
+                                                   target="_blank">
+
+                                                    Problem @item.ProblemId
+
+                                                </a>
+
+                                            </dd>
+                                        }
+
+
+                                        <dt class="col-md-2 text-md-end mt-2">
+                                            @Html.DisplayNameFor(model => item.Subject)
+                                        </dt>
+
+                                        <dd class="col-md-10 mt-2">
+                                            @item.Subject
+                                        </dd>
+
+
+                                        <dt class="col-md-2 text-md-end">
+                                            @Html.DisplayNameFor(model => item.RootCause)
+                                        </dt>
+
+                                        <dd class="col-md-10"
+                                            style="white-space: pre-wrap;">
+                                            @item.RootCause
+                                        </dd>
+
+
+                                        <dt class="col-md-2 text-md-end">
+                                            @Html.DisplayNameFor(model => item.Solution)
+                                        </dt>
+
+                                        <dd class="col-md-10"
+                                            style="white-space: pre-wrap;">
+                                            @item.Solution
+                                        </dd>
+
+
+                                        <dt class="col-md-2 text-md-end">
+                                            @Html.DisplayNameFor(model => item.RequestedDate)
+                                        </dt>
+
+                                        <dd class="col-md-2">
+                                            @item.RequestedDate
+                                        </dd>
+
+
+                                        <dt class="col-md-2 text-md-end">
+                                            @Html.DisplayNameFor(model => item.RequestedBy)
+                                        </dt>
+
+                                        <dd class="col-md-6">
+                                            @item.RequestedBy
+                                            |
+                                            @(item.RequestedUser != null
+                                                ? item.RequestedUser.FullName
+                                                : "N/A")
+                                        </dd>
+
+                                    </dl>
+
+                                </div>
+
+                                <div class="card-footer">
+
+                                    <div class="d-flex justify-content-end gap-2">
+
+                                        <button type="button"
+                                                class="btn btn-sm btn-danger"
+                                                onclick="rejectItem('@item.KedbItemId')">
+
+                                            <i class="align-middle me-1"
+                                               data-lucide="thumbs-down">
+                                            </i>
+
+                                            Reject
+
+                                        </button>
+
+                                        <button type="button"
+                                                class="btn btn-sm btn-primary"
+                                                onclick="approveItem('@item.KedbItemId')">
+
+                                            <i class="align-middle me-1"
+                                               data-lucide="thumbs-up">
+                                            </i>
+
+                                            Approve
+
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        function approveItem(itemId) {
+
+            Swal.fire({
+                title: "Are you sure?",
+                text: "Do you want to approve?",
+                icon: "warning",
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                showCancelButton: true,
+                reverseButtons: true
+            }).then(function (result) {
+
+                if (result.isConfirmed || result.value) {
+
+                    $.ajax({
+
+                        url: '@Url.Action("Approve", "Kedb")',
+
+                        type: "GET",
+
+                        dataType: "json",
+
+                        data: {
+                            id: itemId
+                        },
+
+                        success: function (data) {
+
+                            if (data == "1" || data == 1) {
+
+                                Swal.fire(
+                                    "Approved!",
+                                    "Request has been approved",
+                                    "success"
+                                );
+
+                                setTimeout(function () {
+                                    window.location.reload();
+                                }, 1000);
+
+                            }
+                            else {
+
+                                Swal.fire(
+                                    "Something went wrong!",
+                                    "Request cannot be processed, Please try again",
+                                    "error"
+                                );
+
+                            }
+
+                        },
+
+                        error: function () {
+
+                            Swal.fire(
+                                "Something went wrong!",
+                                "Request cannot be processed",
+                                "error"
+                            );
+
+                        }
+
+                    });
+
+                }
+
+            });
+
+        }
+
+
+        function rejectItem(itemId) {
+
+            Swal.fire({
+                title: "Are you sure?",
+                text: "Do you want to reject?",
+                icon: "warning",
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                showCancelButton: true,
+                reverseButtons: true
+            }).then(function (result) {
+
+                if (result.isConfirmed || result.value) {
+
+                    $.ajax({
+
+                        url: '@Url.Action("Reject", "Kedb")',
+
+                        type: "GET",
+
+                        dataType: "json",
+
+                        data: {
+                            id: itemId
+                        },
+
+                        success: function (data) {
+
+                            if (data == "1" || data == 1) {
+
+                                Swal.fire(
+                                    "Rejected!",
+                                    "Request has been rejected",
+                                    "success"
+                                );
+
+                                setTimeout(function () {
+                                    window.location.reload();
+                                }, 1000);
+
+                            }
+                            else {
+
+                                Swal.fire(
+                                    "Something went wrong!",
+                                    "Request cannot be processed, Please try again",
+                                    "error"
+                                );
+
+                            }
+
+                        },
+
+                        error: function () {
+
+                            Swal.fire(
+                                "Something went wrong!",
+                                "Request cannot be processed",
+                                "error"
+                            );
+
+                        }
+
+                    });
+
+                }
+
+            });
+
+        }
+
+    </script>
+}

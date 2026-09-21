@@ -1,0 +1,273 @@
+﻿@using Service
+@model IEnumerable<Domain.Event>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("Index", "Event", FormMethod.Get))
+{
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card">
+
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="align-middle me-2" data-lucide="calendar"></i>
+                        Events
+                    </h5>
+                </div>
+
+                <div class="card-body">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-4">
+
+                            <label for="EventTypeId" class="form-label">
+                                Event Type
+                            </label>
+
+                            <select id="EventTypeId"
+                                    name="EventTypeId"
+                                    class="form-select">
+                            </select>
+
+                        </div>
+
+                        <div class="col-md-2">
+
+                            <label for="StartDate" class="form-label">
+                                Event Date
+                            </label>
+
+                            <input type="date"
+                                   name="StartDate"
+                                   id="StartDate"
+                                   value="@ViewBag.StartDate"
+                                   class="form-control" />
+
+                        </div>
+
+                        <div class="col-md-2">
+
+                            <label for="EndDate" class="form-label">
+                                To
+                            </label>
+
+                            <input type="date"
+                                   name="EndDate"
+                                   id="EndDate"
+                                   value="@ViewBag.EndDate"
+                                   class="form-control" />
+
+                        </div>
+
+                        <div class="col-md-4">
+
+                            <label for="StatusId" class="form-label">
+                                Status
+                            </label>
+
+                            @Html.DropDownList(
+                                "StatusId",
+                                EnumHelper.GetSelectList(typeof(Domain.EventStatusEnum)),
+                                "-- All --",
+                                new { @class = "form-select" }
+                            )
+
+                            <span class="text-danger"
+                                  data-valmsg-for="StatusId"
+                                  data-valmsg-replace="true">
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="card-footer">
+
+                    <div class="d-flex justify-content-end">
+
+                        <button type="submit"
+                                class="btn btn-sm btn-primary">
+
+                            <i class="align-middle me-1" data-lucide="search"></i>
+                            Search
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card">
+
+                <div class="card-body">
+
+                    <div class="table-responsive">
+
+                        <table id="dataTable"
+                               class="table table-striped table-hover align-middle w-100">
+
+                            <thead>
+                                <tr>
+                                    <th>Event</th>
+                                    <th>Event Type</th>
+                                    <th>Subject</th>
+                                    <th>Event Date/Time</th>
+                                    <th>Requested By</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+
+                                        <td>
+
+                                            <a href="@Html.EncodedActionLink("", "Info", "Event", "", new { id = item.EventId }, null)"
+                                               target="_blank">
+
+                                                Event @item.EventId
+
+                                            </a>
+
+                                        </td>
+
+                                        <td>
+                                            @(item.EventType != null ? item.EventType.EventTypeName : "N/A")
+                                        </td>
+
+                                        <td>
+                                            @item.Subject
+                                        </td>
+
+                                        <td>
+                                            @item.EventDate
+                                        </td>
+
+                                        <td>
+                                            @(item.RequestedUser != null ? item.RequestedUser.FullName : "N/A")
+                                        </td>
+
+                                        <td>
+
+                                            <span class="badge bg-@EventService.GetStatusColor(item.Status)">
+                                                @item.Status.EnumDisplayName()
+                                            </span>
+
+                                        </td>
+
+                                    </tr>
+                                }
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+}
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $("#dataTable").DataTable({
+                paging: true,
+                lengthChange: true,
+                searching: true,
+                ordering: true,
+                info: true,
+                responsive: true,
+                autoWidth: false
+            });
+
+            loadEventType();
+
+        });
+
+
+        function parseJsonResult(data) {
+
+            if (typeof data === "string") {
+
+                try {
+                    return JSON.parse(data);
+                }
+                catch (e) {
+                    return [];
+                }
+
+            }
+
+            return data || [];
+        }
+
+
+        function loadEventType() {
+
+            $.getJSON(
+                '@Url.Action("GetEventTypeListJsonResult", "Event")',
+                function (data) {
+
+                    var dropDown = $("#EventTypeId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- All --</option>"
+                    );
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.EventTypeId,
+                                    text: item.EventTypeName
+                                })
+                            );
+
+                        }
+                    );
+
+                    var selectedId = '@ViewBag.EventTypeId';
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+                }
+            );
+
+        }
+
+    </script>
+}

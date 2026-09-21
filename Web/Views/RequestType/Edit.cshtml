@@ -1,0 +1,209 @@
+﻿
+@model Web.Models.RequestTypeVM
+@using Service
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+
+}
+
+
+<div class="row">
+    <div class="col-md-12">
+        <!-- Horizontal Form -->
+        <div class="card card-primary card-outline">
+            <div class="card-header with-border">
+                <h3 class="card-title">Request Type Details</h3>
+                <div class="card-tools pull-right">
+                    <a href="@Url.Action("Index", "RequestType", new{ teamId =ViewBag.TeamId})" class="btn btn-sm btn-default">
+                        <i class="fa fa-arrow-left"></i>&nbsp;&nbsp;Back
+                    </a>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <!-- form start -->
+
+            @using (Html.BeginForm("Edit", "RequestType", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true)
+
+                @Html.HiddenFor(model => model.RequestTypeId)
+
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+
+
+                            <div class="form-group row">
+                                @Html.LabelFor(model => model.TicketType, new { @class = "col-md-4 col-form-label" })
+                                <div class="col-md-8">
+                                    <label class="control-label">
+                                        @Model.TicketType.EnumDisplayName()
+                                        @Html.HiddenFor(model => model.TicketType)
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                @Html.LabelFor(model => model.TeamId, new { @class = "col-md-4 col-form-label" })
+                                <div class="col-md-8">
+                                    <select id="TeamId" name="TeamId" class="form-control form-control-sm"></select>
+                                    <span class="help-block" data-valmsg-for="TeamId" data-valmsg-replace="true"></span>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                @Html.LabelFor(model => model.CategoryId, new { @class = "col-md-4 col-form-label" })
+                                <div class="col-md-8">
+                                    <label class="control-label">
+                                        @Model.Category.CategoryName
+                                        @Html.HiddenFor(model => model.Category.CategoryName)
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                @Html.LabelFor(model => model.AssetTypeId, new { @class = "col-md-4 col-form-label" })
+                                <div class="col-md-8">
+                                    <label class="control-label">
+                                        @Model.AssetType.AssetTypeName
+                                        @Html.HiddenFor(model => model.AssetType.AssetTypeName)
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                @Html.LabelFor(model => model.SubCategoryId, new { @class = "col-md-4 col-form-label" })
+                                <div class="col-md-8">
+                                    <label class="control-label">
+                                        @Model.SubCategory.SubCategoryName
+                                        @Html.HiddenFor(model => model.SubCategory.SubCategoryName)
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                @Html.LabelFor(model => model.RequestTypeName, new { @class = "col-md-4 col-form-label" })
+                                <div class="col-md-8">
+                                    <label class="control-label">
+                                        @Model.RequestTypeName
+                                        @Html.HiddenFor(model => model.RequestTypeName)
+                                    </label>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-md-1"></div>
+                        <div class="col-md-5">
+                            <div id="SR_Sla" class="form-group row ">
+                                @Html.LabelFor(model => model.Sla, new { @class = "col-md-4 col-form-label" })
+                                <div class="col-md-2">
+                                    @Html.TextBoxFor(model => model.Sla, new { @class = "form-control form-control-sm" })
+                                    @Html.ValidationMessageFor(model => model.Sla, null, new { @class = "text-danger" })
+                                </div>
+                            </div>
+
+                            <div id="IN_Sla" class="form-group row ">
+
+                                <table id="dataTable" class="table table-bordered table-striped table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Priority </th>
+                                            <th>Respond Hrs</th>
+                                            <th>Resolve Hrs</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            if (Model.TicketType == Domain.TicketTypeEnum.IN)
+                                            {
+                                                for (int i = 0; i < Model.RequestTypePriorities.Count; i++)
+                                                {
+                                                    @Html.HiddenFor(m => Model.RequestTypePriorities[i].Priority)
+                                                    <tr>
+
+                                                        <td>@Model.RequestTypePriorities[i].Priority</td>
+                                                        <td width="200px">
+                                                            @Html.TextBoxFor(m => Model.RequestTypePriorities[i].Respond, new { @class = "form-control form-control-sm" })
+                                                        </td>
+                                                        <td width="200px">
+                                                            @Html.TextBoxFor(m => Model.RequestTypePriorities[i].Resolve, new { @class = "form-control form-control-sm" })
+                                                        </td>
+
+                                                    </tr>
+                                                }
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.box-body -->
+                <div class="card-footer">
+                    <div class="text-right">
+                        <button type="reset" class="btn btn-sm btn-danger"><i class="fa fa-undo"></i>&nbsp;&nbsp;Cancel</button>
+                        <button type="submit" class="btn btn-sm btn-primary"><i class="fa fa-save"></i>&nbsp;&nbsp;Save</button>
+
+                    </div>
+                </div>
+                <!-- /.box-footer -->
+            }
+        </div>
+        <!-- /.box -->
+    </div>
+</div>
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            loadTeams();
+
+            disableSLA();
+
+        });
+
+        function loadTeams() {
+            $.getJSON("@Url.Action("GetTeamListJsonResult", "Team")", function (data) {
+                var dropDown = $("#TeamId");
+                dropDown.empty();
+                dropDown.append("<option value='0'>-- Select --</option>");
+                $.each(JSON.parse(data), function (index, optionaldata) {
+                    dropDown.append($('<option />', { value: optionaldata.TeamId }).html(optionaldata.TeamName));
+                });
+
+                if ('@ViewBag.TeamId') {
+                     $('#TeamId').val('@ViewBag.TeamId').attr("selected", "selected");
+                }
+
+
+            });
+        }
+
+        function disableSLA() {
+            var _ticketType = $("#TicketType").val();
+
+            if (_ticketType == 'IN') {
+                $("#IN_Sla").show();
+                $("#SR_Sla").hide();
+            }
+            else {
+                $("#SR_Sla").show();
+                $("#IN_Sla").hide();
+            }
+
+        }
+
+
+    </script>
+
+}
+
+
+

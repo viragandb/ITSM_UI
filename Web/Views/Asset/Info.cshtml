@@ -1,0 +1,1296 @@
+﻿@model Domain.Asset
+@using Service
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="card">
+
+            <div class="card-header">
+
+                <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-2">
+
+                    <h5 class="card-title mb-0">
+                        <i class="align-middle me-2" data-lucide="box"></i>
+                        Asset # @Model.AssetNo
+                        <span class="text-muted">| @Model.AssetName</span>
+                    </h5>
+
+                    <div class="d-flex flex-wrap gap-2">
+
+                        <span class="badge bg-@AssetService.GetPriorityColor(Model.Priority)">
+                            Classification : @Model.Priority.EnumDisplayName()
+                        </span>
+
+                        <span class="badge bg-@AssetService.GetStatusColor(Model.Status)">
+                            @Model.Status.EnumDisplayName()
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="card-body">
+
+                <div class="row g-4">
+
+                    <div class="col-lg-9">
+
+                        <dl class="row mb-0">
+
+                            <dt class="col-lg-3">
+                                @Html.LabelFor(model => Model.AssetCategory)
+                            </dt>
+                            <dd class="col-lg-3">
+                                @Model.AssetCategory.EnumDisplayName()
+                            </dd>
+
+                            <dt class="col-lg-3">
+                                @Html.LabelFor(model => Model.AssetTypeId)
+                            </dt>
+                            <dd class="col-lg-3">
+                                @Model.AssetType.AssetTypeName
+                            </dd>
+
+                            <dt class="col-lg-3">
+                                @Html.LabelFor(model => Model.AssetMakeId)
+                            </dt>
+                            <dd class="col-lg-3">
+                                @Model.AssetMake.Name
+                            </dd>
+
+                            <dt class="col-lg-3">
+                                @Html.LabelFor(model => Model.ModelName)
+                            </dt>
+                            <dd class="col-lg-3">
+                                @Model.ModelName
+                            </dd>
+
+                            <dt class="col-lg-3">
+                                @Html.LabelFor(model => Model.AssetNo)
+                            </dt>
+                            <dd class="col-lg-3">
+                                @Model.AssetNo
+                            </dd>
+
+                            <dt class="col-lg-3">
+                                @Html.LabelFor(model => Model.SerialNo)
+                            </dt>
+                            <dd class="col-lg-3">
+                                @Model.SerialNo
+                            </dd>
+
+                            <dt class="col-lg-3">
+                                @Html.LabelFor(model => Model.Barcode)
+                            </dt>
+                            <dd class="col-lg-3">
+                                @Model.Barcode
+                            </dd>
+
+                            <dt class="col-lg-3">
+                                @Html.LabelFor(model => Model.PurchasePrice)
+                            </dt>
+                            <dd class="col-lg-3">
+                                @Model.PurchasePrice
+                            </dd>
+
+                        </dl>
+
+                        <hr />
+
+                        <dl class="row mb-0">
+
+                            <dt class="col-lg-3">
+                                @Html.LabelFor(model => Model.GRNote.PONumber)
+                            </dt>
+
+                            <dd class="col-lg-3">
+
+                                <a href="@Html.EncodedActionLink("", "GRNInfo", "Asset", "", new { id = Model.GRNote.GRNoteId }, null)"
+                                   target="_blank">
+
+                                    <i class="align-middle me-1" data-lucide="external-link"></i>
+                                    @Model.GRNote.PONumber
+
+                                </a>
+
+                            </dd>
+
+                            <dt class="col-lg-3">
+                                @Html.LabelFor(model => Model.GRNote.PurchaseDate)
+                            </dt>
+
+                            <dd class="col-lg-3">
+
+                                @if (Model.GRNote.PurchaseDate > Model.StockInDate)
+                                {
+                                    @Model.StockInDate.ToShortDateString()
+                                }
+                                else
+                                {
+                                    @Model.GRNote.PurchaseDate.ToShortDateString()
+                                }
+
+                            </dd>
+
+                            <dt class="col-lg-3">
+                                @Html.LabelFor(model => Model.GRNote.GRNNumber)
+                            </dt>
+
+                            <dd class="col-lg-3">
+
+                                <a href="@Html.EncodedActionLink("", "GRNInfo", "Asset", "", new { id = Model.GRNote.GRNoteId }, null)"
+                                   target="_blank">
+
+                                    <i class="align-middle me-1" data-lucide="external-link"></i>
+                                    @Model.GRNote.GRNNumber
+
+                                </a>
+
+                            </dd>
+
+                            <dt class="col-lg-3">
+                                @Html.LabelFor(model => Model.StockInDate)
+                            </dt>
+
+                            <dd class="col-lg-3">
+                                @Model.StockInDate.ToShortDateString()
+                            </dd>
+
+                        </dl>
+
+                        <hr />
+
+                        <dl class="row mb-0">
+
+                            <dt class="col-lg-3">
+                                @Html.LabelFor(model => Model.WarrantyPeriod)
+                            </dt>
+
+                            <dd class="col-lg-3">
+                                @Model.WarrantyPeriod
+                            </dd>
+
+                            <dt class="col-lg-3">
+                                @Html.LabelFor(model => Model.WarrantyExpire)
+                            </dt>
+
+                            <dd class="col-lg-3">
+
+                                @if (Model.WarrantyPeriod == 0)
+                                {
+                                    <span>N/A</span>
+                                }
+                                else
+                                {
+                                    @Model.WarrantyExpire.ToShortDateString()
+                                }
+
+                            </dd>
+
+                            <dt class="col-lg-3">
+                                @Html.LabelFor(model => Model.MaintenanceFrequency)
+                            </dt>
+
+                            <dd class="col-lg-3">
+                                @Model.MaintenanceFrequency.EnumDisplayName()
+                            </dd>
+
+                            <dt class="col-lg-3">
+                                @Html.LabelFor(model => Model.NextMaintenanceDate)
+                            </dt>
+
+                            <dd class="col-lg-3">
+
+                                @if (Model.MaintenanceFrequency == Domain.MaintenanceFrequencyEnum.N_A)
+                                {
+                                    <span>N/A</span>
+                                }
+                                else
+                                {
+                                    @Model.NextMaintenanceDate.ToShortDateString()
+                                }
+
+                            </dd>
+
+                            <dt class="col-lg-3">
+                                @Html.LabelFor(model => Model.AllocatedType)
+                            </dt>
+
+                            <dd class="col-lg-3">
+                                @Model.AllocatedType.EnumDisplayName()
+                            </dd>
+
+                            <dt class="col-lg-3">
+                                @Html.LabelFor(model => Model.ToBeReturnedDate)
+                            </dt>
+
+                            <dd class="col-lg-3">
+
+                                @if (Model.AllocatedType == Domain.AllocatedTypeEnum.Internal)
+                                {
+                                    <span>N/A</span>
+                                }
+                                else
+                                {
+                                    @Model.ToBeReturnedDate.ToShortDateString()
+                                }
+
+                            </dd>
+
+                        </dl>
+
+                        <hr />
+
+                        <dl class="row mb-0">
+
+                            <dt class="col-lg-3">
+                                @Html.LabelFor(model => Model.Description)
+                            </dt>
+
+                            <dd class="col-lg-9">
+                                @Model.Description
+                            </dd>
+
+                        </dl>
+
+                        <hr />
+
+                        <dl class="row mb-0">
+
+                            <dt class="col-lg-3">
+
+                                <i class="align-middle me-1" data-lucide="user"></i>
+                                Updated By
+
+                            </dt>
+
+                            <dd class="col-lg-3">
+                                @Model.UpdatedBy
+                            </dd>
+
+                            <dt class="col-lg-3">
+
+                                <i class="align-middle me-1" data-lucide="calendar"></i>
+                                Date
+
+                            </dt>
+
+                            <dd class="col-lg-3">
+                                @Model.UpdatedDate
+                            </dd>
+
+                            @if (Model.VerifiedBy != null)
+                            {
+                                <dt class="col-lg-3">
+
+                                    <i class="align-middle me-1" data-lucide="user-check"></i>
+                                    @Html.LabelFor(model => Model.VerifiedBy)
+
+                                </dt>
+
+                                <dd class="col-lg-3">
+                                    @Model.VerifiedBy
+                                </dd>
+
+                                <dt class="col-lg-3">
+
+                                    <i class="align-middle me-1" data-lucide="calendar-check"></i>
+                                    @Html.LabelFor(model => Model.VerifiedDate)
+
+                                </dt>
+
+                                <dd class="col-lg-3">
+                                    @Model.VerifiedDate
+                                </dd>
+                            }
+
+                        </dl>
+
+                    </div>
+
+                    <div class="col-lg-3">
+
+                        <div class="card mb-3">
+
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">
+                                    <i class="align-middle me-2" data-lucide="info"></i>
+                                    Asset Location
+                                </h5>
+                            </div>
+
+                            <div class="card-body">
+
+                                <div class="d-flex align-items-start mb-3">
+
+                                    <i class="align-middle me-2 mt-1"
+                                       data-lucide="building"></i>
+
+                                    <span>@Model.Branch.Name</span>
+
+                                </div>
+
+                                <div class="d-flex align-items-start mb-3">
+
+                                    <i class="align-middle me-2 mt-1"
+                                       data-lucide="building-2"></i>
+
+                                    <span>@Model.Department.DepartmentName</span>
+
+                                </div>
+
+                                <div class="d-flex align-items-start mb-3">
+
+                                    <i class="align-middle me-2 mt-1"
+                                       data-lucide="users"></i>
+
+                                    <span>@Model.ResponsibleTeam.TeamName</span>
+
+                                </div>
+
+                                <div class="d-flex align-items-start">
+
+                                    <i class="align-middle me-2 mt-1"
+                                       data-lucide="wrench"></i>
+
+                                    <span>@Model.Vendor.VendorName</span>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        @if (Model.AssignedTo != null)
+                        {
+                            <div class="card mb-3">
+
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">
+                                        <i class="align-middle me-2" data-lucide="user"></i>
+                                        Assigned To
+                                    </h5>
+                                </div>
+
+                                <div class="card-body">
+
+                                    <div class="d-flex align-items-center">
+
+                                        <img src="@Model.AssignedToUser.ProImageName"
+                                             alt="User Avatar"
+                                             class="rounded-circle me-3"
+                                             width="48"
+                                             height="48" />
+
+                                        <div>
+
+                                            <div class="fw-semibold">
+                                                @Model.AssignedToUser.FullName
+                                            </div>
+
+                                            <div class="text-muted small">
+                                                @Model.AssignedToUser.DesignationName
+                                            </div>
+
+                                            <div class="text-muted small">
+                                                @Model.AssignedToUser.DepartmentName
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        }
+
+                    </div>
+
+                </div>
+
+
+                <div class="row g-4 mt-1">
+
+                    <div class="col-lg-4">
+
+                        <div class="card">
+
+                            <div class="card-header d-flex align-items-center justify-content-between">
+
+                                <h5 class="card-title mb-0">
+                                    <i class="align-middle me-2" data-lucide="tags"></i>
+                                    Asset Log
+                                </h5>
+
+                                <button type="button"
+                                        class="btn btn-sm btn-light"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#assetLogBody"
+                                        aria-expanded="true"
+                                        aria-controls="assetLogBody">
+
+                                    <i class="align-middle" data-lucide="chevron-down"></i>
+
+                                </button>
+
+                            </div>
+
+                            <div id="assetLogBody"
+                                 class="collapse show">
+
+                                <div class="card-body">
+
+                                    @foreach (var log in Model.AssetLogs.OrderBy(o => o.UpdatedDate))
+                                    {
+                                        <div class="d-flex mb-4">
+
+                                            <img src="@log.UpdatedUser.ProImageName"
+                                                 alt="User Image"
+                                                 class="rounded-circle me-3"
+                                                 width="40"
+                                                 height="40" />
+
+                                            <div class="flex-grow-1">
+
+                                                <div class="d-flex justify-content-between">
+
+                                                    <span class="fw-semibold">
+                                                        @log.UpdatedUser.FullName
+                                                    </span>
+
+                                                    <span class="text-muted small">
+                                                        @log.UpdatedDate
+                                                    </span>
+
+                                                </div>
+
+                                                <div class="text-muted mt-1">
+                                                    @log.Comment
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+                                    }
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="col-lg-8">
+
+                        <div class="card">
+
+                            <div class="card-header d-flex align-items-center justify-content-between">
+
+                                <h5 class="card-title mb-0">
+                                    <i class="align-middle me-2" data-lucide="history"></i>
+                                    Transaction History
+                                </h5>
+
+                                <button type="button"
+                                        class="btn btn-sm btn-light"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#transactionHistoryBody"
+                                        aria-expanded="true"
+                                        aria-controls="transactionHistoryBody">
+
+                                    <i class="align-middle" data-lucide="chevron-down"></i>
+
+                                </button>
+
+                            </div>
+
+                            <div id="transactionHistoryBody"
+                                 class="collapse show">
+
+                                <div class="card-body">
+
+                                    <div class="card mb-4">
+
+                                        <div class="card-header">
+
+                                            <h6 class="card-title mb-0">
+                                                <i class="align-middle me-2" data-lucide="users"></i>
+                                                Assigned User History
+                                            </h6>
+
+                                        </div>
+
+                                        <div class="card-body">
+
+                                            <div class="table-responsive"
+                                                 style="max-height:220px; overflow-y:auto;">
+
+                                                <table class="table table-sm table-hover align-middle mb-0">
+
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Assigned User</th>
+                                                            <th>Initiated</th>
+                                                            <th>Authorized</th>
+                                                            <th>Completed</th>
+                                                        </tr>
+                                                    </thead>
+
+                                                    <tbody>
+
+                                                        @if (Model.TransferItemRequests != null &&
+                                                             Model.TransferItemRequests.Any())
+                                                        {
+                                                            foreach (var item in Model.TransferItemRequests)
+                                                            {
+                                                                var req = item.AssetTransferRequest;
+
+                                                                <tr>
+
+                                                                    <td class="align-top">
+
+                                                                        <div class="fw-semibold">
+
+                                                                            @if (req.AssignedToUser != null)
+                                                                            {
+                                                                                @req.AssignedToUser.FullName
+                                                                            }
+                                                                            else if (!string.IsNullOrEmpty(req.AssignedTo))
+                                                                            {
+                                                                                @req.AssignedTo
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <span>N/A</span>
+                                                                            }
+
+                                                                        </div>
+
+                                                                    </td>
+
+                                                                    <td class="align-top">
+
+                                                                        @if (req != null)
+                                                                        {
+                                                                            <div class="fw-semibold">
+
+                                                                                @if (req.InitiatedUser != null)
+                                                                                {
+                                                                                    @req.InitiatedUser.FullName
+                                                                                }
+                                                                                else
+                                                                                {
+                                                                                    @req.InitiatedBy
+                                                                                }
+
+                                                                            </div>
+
+                                                                            <div class="text-muted small mb-2">
+                                                                                @req.InitiatedDate.ToString("yyyy-MM-dd HH:mm")
+                                                                            </div>
+
+                                                                            <div class="small text-truncate"
+                                                                                 style="max-width:260px;"
+                                                                                 title="@req.Comment">
+
+                                                                                @(string.IsNullOrEmpty(req.Comment)
+                                                                                    ? "—"
+                                                                                    : req.Comment)
+
+                                                                            </div>
+                                                                        }
+
+                                                                    </td>
+
+                                                                    <td class="align-top">
+
+                                                                        @if (req != null &&
+                                                                             !string.IsNullOrEmpty(req.AuthorizedBy))
+                                                                        {
+                                                                            <div class="fw-semibold">
+
+                                                                                @if (req.AuthorizedUser != null)
+                                                                                {
+                                                                                    @req.AuthorizedUser.FullName
+                                                                                }
+                                                                                else
+                                                                                {
+                                                                                    @req.AuthorizedBy
+                                                                                }
+
+                                                                            </div>
+
+                                                                            <div class="text-muted small mb-2">
+                                                                                @req.AuthorizedDate.ToString("yyyy-MM-dd HH:mm")
+                                                                            </div>
+
+                                                                            <div class="small text-truncate"
+                                                                                 style="max-width:260px;"
+                                                                                 title="@req.CommentAuthorize">
+
+                                                                                @(string.IsNullOrEmpty(req.CommentAuthorize)
+                                                                                    ? "—"
+                                                                                    : req.CommentAuthorize)
+
+                                                                            </div>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <span class="badge bg-secondary">
+                                                                                Pending
+                                                                            </span>
+                                                                        }
+
+                                                                    </td>
+
+                                                                    <td class="align-top">
+
+                                                                        @if (req != null &&
+                                                                             !string.IsNullOrEmpty(req.CompletedBy))
+                                                                        {
+                                                                            <div class="fw-semibold">
+
+                                                                                @if (req.CompletedUser != null)
+                                                                                {
+                                                                                    @req.CompletedUser.FullName
+                                                                                }
+                                                                                else
+                                                                                {
+                                                                                    @req.CompletedBy
+                                                                                }
+
+                                                                            </div>
+
+                                                                            <div class="text-muted small mb-2">
+                                                                                @req.CompletedDate.ToString("yyyy-MM-dd HH:mm")
+                                                                            </div>
+
+                                                                            <div class="small text-truncate"
+                                                                                 style="max-width:260px;"
+                                                                                 title="@req.CommentComplete">
+
+                                                                                @(string.IsNullOrEmpty(req.CommentComplete)
+                                                                                    ? "—"
+                                                                                    : req.CommentComplete)
+
+                                                                            </div>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <span class="badge bg-warning text-dark">
+                                                                                In Progress
+                                                                            </span>
+                                                                        }
+
+                                                                    </td>
+
+                                                                </tr>
+                                                            }
+                                                        }
+                                                        else
+                                                        {
+                                                            <tr>
+                                                                <td colspan="4"
+                                                                    class="text-center text-muted py-4">
+
+                                                                    No transfer requests found for this asset.
+
+                                                                </td>
+                                                            </tr>
+                                                        }
+
+                                                    </tbody>
+
+                                                </table>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+
+                                    @foreach (var status in Model.TransferItemRequests.OrderBy(o => o.AssetTransferRequest.InitiatedDate))
+                                    {
+                                        <div class="d-flex mb-4">
+
+                                            <img src="@status.AssetTransferRequest.InitiatedUser.ProImageName"
+                                                 alt="User Image"
+                                                 class="rounded-circle me-3"
+                                                 width="42"
+                                                 height="42" />
+
+                                            <div class="flex-grow-1">
+
+                                                <div class="d-flex flex-column flex-md-row justify-content-between mb-2">
+
+                                                    <span class="fw-semibold">
+                                                        @status.AssetTransferRequest.InitiatedUser.FullName
+                                                    </span>
+
+                                                    <span class="text-muted small">
+
+                                                        <i class="align-middle me-1"
+                                                           data-lucide="calendar"></i>
+
+                                                        @status.AssetTransferRequest.UpdatedDate
+
+                                                    </span>
+
+                                                </div>
+
+                                                <div class="border rounded p-3">
+
+                                                    <div class="d-flex flex-column flex-md-row justify-content-between gap-2">
+
+                                                        <div>
+
+                                                            <div class="fw-semibold">
+                                                                @status.AssetTransferRequest.Branch.Name
+                                                                -
+                                                                @status.AssetTransferRequest.Department.DepartmentName
+                                                            </div>
+
+                                                            <div class="text-muted mt-1">
+                                                                @status.AssetTransferRequest.Comment
+                                                            </div>
+
+                                                        </div>
+
+                                                        <div class="text-md-end">
+
+                                                            <span class="badge bg-info">
+
+                                                                @status.AssetTransferRequest.TransactionType.EnumDisplayName()
+                                                                -
+                                                                @status.AssetTransferRequest.Status.EnumDisplayName()
+
+                                                            </span>
+
+                                                        </div>
+
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+                                    }
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                @if (ViewBag.DisposalRequestId != null)
+                {
+                    <div class="row mt-4">
+
+                        <div class="col-12">
+
+                            <div class="card">
+
+                                <div class="card-header d-flex align-items-center justify-content-between">
+
+                                    <h5 class="card-title mb-0">
+
+                                        <i class="align-middle me-2"
+                                           data-lucide="trash-2"></i>
+
+                                        Disposal Information
+
+                                    </h5>
+
+                                    <button type="button"
+                                            class="btn btn-sm btn-light"
+                                            data-bs-toggle="collapse"
+                                            data-bs-target="#disposalInformationBody"
+                                            aria-expanded="true"
+                                            aria-controls="disposalInformationBody">
+
+                                        <i class="align-middle"
+                                           data-lucide="chevron-down"></i>
+
+                                    </button>
+
+                                </div>
+
+                                <div id="disposalInformationBody"
+                                     class="collapse show">
+
+                                    <div class="card-body">
+
+                                        <div class="table-responsive">
+
+                                            <table class="table table-striped table-hover align-middle">
+
+                                                <thead>
+                                                    <tr>
+                                                        <th>Request Id</th>
+                                                        <th>Title</th>
+                                                        <th>Status</th>
+                                                        <th>Requested Date</th>
+                                                    </tr>
+                                                </thead>
+
+                                                <tbody>
+
+                                                    <tr>
+
+                                                        <td>
+
+                                                            <a href="@Html.EncodedActionLink(
+                                                                         "",
+                                                                         "DisposalRequestInfo",
+                                                                         "AssetTransaction",
+                                                                         "",
+                                                                         new { id = ViewBag.DisposalRequestId },
+                                                                         null
+                                                                     )"
+                                                               target="_blank">
+
+                                                                <i class="align-middle me-1"
+                                                                   data-lucide="external-link"></i>
+
+                                                                #@ViewBag.DisposalRequestId
+
+                                                            </a>
+
+                                                        </td>
+
+                                                        <td>
+                                                            @(ViewBag.Title ?? "N/A")
+                                                        </td>
+
+                                                        <td>
+                                                            @(ViewBag.Status ?? "N/A")
+                                                        </td>
+
+                                                        <td>
+                                                            @(ViewBag.RequestedDate ?? "N/A")
+                                                        </td>
+
+                                                    </tr>
+
+                                                </tbody>
+
+                                            </table>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                }
+
+
+                <div class="row mt-4">
+
+                    <div class="col-12">
+
+                        <div class="card">
+
+                            <div class="card-header d-flex align-items-center justify-content-between">
+
+                                <h5 class="card-title mb-0">
+
+                                    <i class="align-middle me-2"
+                                       data-lucide="ticket"></i>
+
+                                    Tickets
+
+                                </h5>
+
+                                <button type="button"
+                                        class="btn btn-sm btn-light"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#ticketsBody"
+                                        aria-expanded="true"
+                                        aria-controls="ticketsBody">
+
+                                    <i class="align-middle"
+                                       data-lucide="chevron-down"></i>
+
+                                </button>
+
+                            </div>
+
+                            <div id="ticketsBody"
+                                 class="collapse show">
+
+                                <div class="card-body">
+
+                                    <div class="table-responsive">
+
+                                        <table class="table table-striped table-hover align-middle">
+
+                                            <thead>
+                                                <tr>
+                                                    <th>Ticket Id</th>
+                                                    <th>Category</th>
+                                                    <th>Asset Type</th>
+                                                    <th>Subcategory</th>
+                                                    <th>Location</th>
+                                                    <th>Request By</th>
+                                                    <th>Requested Date</th>
+                                                    <th>Last Updated Date</th>
+                                                    <th>Status</th>
+                                                    <th class="text-end">Spent Time</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+
+                                                @foreach (var ticket in Model.Tickets.OrderBy(o => o.Ticket.RequestedDate))
+                                                {
+                                                    <tr>
+
+                                                        <td>
+
+                                                            <a href="@Html.EncodedActionLink(
+                                                                         "",
+                                                                         "Info",
+                                                                         "Ticket",
+                                                                         "",
+                                                                         new { id = ticket.TicketId },
+                                                                         null
+                                                                     )"
+                                                               target="_blank">
+
+                                                                <i class="align-middle me-1"
+                                                                   data-lucide="external-link"></i>
+
+                                                                @ticket.Ticket.Code
+
+                                                            </a>
+
+                                                        </td>
+
+                                                        <td>
+
+                                                            <span class="badge bg-@TicketService.GetTicketTypeColor(ticket.Ticket.RequestType.TicketType)">
+                                                                @ticket.Ticket.RequestType.Category.CategoryName
+                                                            </span>
+
+                                                        </td>
+
+                                                        <td>
+                                                            @ticket.Ticket.RequestType.AssetType.AssetTypeName
+                                                        </td>
+
+                                                        <td>
+                                                            @ticket.Ticket.RequestType.SubCategory.SubCategoryName
+                                                        </td>
+
+                                                        <td>
+                                                            @ticket.Ticket.Branch.Name
+                                                        </td>
+
+                                                        <td>
+
+                                                            @if (ticket.Ticket.RequestedUser != null)
+                                                            {
+                                                                @ticket.Ticket.RequestedUser.FullName
+                                                            }
+
+                                                        </td>
+
+                                                        <td>
+                                                            @ticket.Ticket.RequestedDate
+                                                        </td>
+
+                                                        <td>
+                                                            @ticket.Ticket.UpdatedDate
+                                                        </td>
+
+                                                        <td>
+
+                                                            <span class="badge bg-@TicketService.GetTicketStatusColor(ticket.Ticket.Status)">
+                                                                @ticket.Ticket.Status.EnumDisplayName()
+                                                            </span>
+
+                                                            @if (ticket.Ticket.IsTimeViolated)
+                                                            {
+                                                                <span class="badge bg-danger">
+                                                                    SLA Violated
+                                                                </span>
+                                                            }
+
+                                                        </td>
+
+                                                        <td class="text-end">
+                                                            @ticket.Ticket.SpentTime
+                                                        </td>
+
+                                                    </tr>
+                                                }
+
+                                            </tbody>
+
+                                        </table>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="row mt-4">
+
+                    <div class="col-12">
+
+                        <div class="card">
+
+                            <div class="card-header d-flex align-items-center justify-content-between">
+
+                                <h5 class="card-title mb-0">
+
+                                    <i class="align-middle me-2"
+                                       data-lucide="network"></i>
+
+                                    Linked Assets Tree
+
+                                </h5>
+
+                                <button type="button"
+                                        class="btn btn-sm btn-light"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#linkedAssetsBody"
+                                        aria-expanded="true"
+                                        aria-controls="linkedAssetsBody">
+
+                                    <i class="align-middle"
+                                       data-lucide="chevron-down"></i>
+
+                                </button>
+
+                            </div>
+
+                            <div id="linkedAssetsBody"
+                                 class="collapse show">
+
+                                <div class="card-body">
+
+                                    <div class="row g-4">
+
+                                        <div class="col-md-6 border-end">
+
+                                            <h6 class="fw-semibold border-bottom pb-2 mb-3">
+
+                                                <i class="align-middle me-1"
+                                                   data-lucide="arrow-up"></i>
+
+                                                Contained Within (Master Asset)
+
+                                            </h6>
+
+                                            @{
+                                                var activeParents = Model.ParentLinks?
+                                                    .Where(p => !p.IsDeleted)
+                                                    .ToList();
+                                            }
+
+                                            @if (activeParents != null &&
+                                                 activeParents.Any())
+                                            {
+                                                <div class="list-group">
+
+                                                    @foreach (var link in activeParents)
+                                                    {
+                                                        if (link.ParentAsset != null)
+                                                        {
+                                                            <div class="list-group-item">
+
+                                                                <div class="d-flex flex-column flex-md-row justify-content-between gap-2">
+
+                                                                    <div>
+
+                                                                        <div class="fw-semibold">
+                                                                            @link.ParentAsset.AssetName
+                                                                            |
+                                                                            @link.ParentAsset.AssetType.AssetTypeName
+                                                                        </div>
+
+                                                                        <a href="@Html.EncodedActionLink(
+                                                                                     "",
+                                                                                     "Info",
+                                                                                     "Asset",
+                                                                                     "",
+                                                                                     new { id = link.ParentAssetId },
+                                                                                     null
+                                                                                 )"
+                                                                           class="badge bg-danger text-decoration-none mt-1">
+
+                                                                            @link.ParentAsset.AssetNo
+
+                                                                        </a>
+
+                                                                    </div>
+
+                                                                    <small class="text-muted text-md-end">
+
+                                                                        Linked by @link.UpdatedBy
+
+                                                                        <br />
+
+                                                                        @link.UpdatedDate.ToString("yyyy-MM-dd")
+
+                                                                    </small>
+
+                                                                </div>
+
+                                                            </div>
+                                                        }
+                                                    }
+
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="text-muted small">
+
+                                                    <i class="align-middle me-1"
+                                                       data-lucide="info"></i>
+
+                                                    This hardware item is a top-level independent asset.
+
+                                                </div>
+                                            }
+
+                                        </div>
+
+
+                                        <div class="col-md-6">
+
+                                            <h6 class="fw-semibold border-bottom pb-2 mb-3">
+
+                                                <i class="align-middle me-1"
+                                                   data-lucide="arrow-down"></i>
+
+                                                Sub-Components Installed (Sub Asset)
+
+                                            </h6>
+
+                                            @{
+                                                var activeChildren = Model.ChildLinks?
+                                                    .Where(c => !c.IsDeleted)
+                                                    .ToList();
+                                            }
+
+                                            @if (activeChildren != null &&
+                                                 activeChildren.Any())
+                                            {
+                                                <div class="list-group">
+
+                                                    @foreach (var link in activeChildren)
+                                                    {
+                                                        if (link.ChildAsset != null)
+                                                        {
+                                                            <div class="list-group-item">
+
+                                                                <div class="d-flex flex-column flex-md-row justify-content-between gap-2">
+
+                                                                    <div>
+
+                                                                        <div class="fw-semibold">
+                                                                            @link.ChildAsset.AssetName
+                                                                            |
+                                                                            @link.ChildAsset.AssetType.AssetTypeName
+                                                                        </div>
+
+                                                                        <a href="@Html.EncodedActionLink(
+                                                                                     "",
+                                                                                     "Info",
+                                                                                     "Asset",
+                                                                                     "",
+                                                                                     new { id = link.ChildAssetId },
+                                                                                     null
+                                                                                 )"
+                                                                           class="badge bg-success text-decoration-none mt-1">
+
+                                                                            @link.ChildAsset.AssetNo
+
+                                                                        </a>
+
+                                                                    </div>
+
+                                                                    <small class="text-muted text-md-end">
+
+                                                                        Linked by @link.UpdatedBy
+
+                                                                        <br />
+
+                                                                        @link.UpdatedDate.ToString("yyyy-MM-dd")
+
+                                                                    </small>
+
+                                                                </div>
+
+                                                            </div>
+                                                        }
+                                                    }
+
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="text-muted small">
+
+                                                    <i class="align-middle me-1"
+                                                       data-lucide="info"></i>
+
+                                                    No sub-components are currently attached to this asset.
+
+                                                </div>
+                                            }
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>

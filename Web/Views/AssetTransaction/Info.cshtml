@@ -1,0 +1,291 @@
+﻿@model Domain.AssetTransferRequest
+@using Service
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="card">
+
+            <div class="card-header d-flex align-items-center justify-content-between">
+
+                <h5 class="card-title mb-0">
+                    <i class="align-middle me-2" data-lucide="arrow-right-left"></i>
+                    #@Model.AssetTransferRequestId
+                    <span class="ms-1">@Model.TransactionType.EnumDisplayName()</span>
+                </h5>
+
+                <span class="badge bg-@AssetTransferRequestService.GetTransTypeColor(Model.TransactionType)">
+                    @Model.Status.EnumDisplayName()
+                </span>
+
+            </div>
+
+            <div class="card-body">
+
+                <div class="row g-4">
+
+                    <div class="col-lg-6">
+
+                        <dl class="row mb-0">
+
+                            <dt class="col-lg-3">
+                                @Html.LabelFor(model => Model.TransactionType)
+                            </dt>
+
+                            <dd class="col-lg-9">
+                                @Model.TransactionType.EnumDisplayName()
+                            </dd>
+
+                            <dt class="col-lg-3">
+                                From
+                            </dt>
+
+                            <dd class="col-lg-9">
+                                @Model.BranchFrom.Name - @Model.DepartmentFrom.DepartmentName
+                            </dd>
+
+                            @if (Model.TransactionType == Domain.AssetTransactionTypeEnum.SentToRepair)
+                            {
+                                <dt class="col-lg-3">
+                                    To
+                                </dt>
+
+                                <dd class="col-lg-9">
+                                    @Model.Vendor.VendorName
+                                </dd>
+                            }
+                            else
+                            {
+                                <dt class="col-lg-3">
+                                    To
+                                </dt>
+
+                                <dd class="col-lg-9">
+                                    @Model.Branch.Name - @Model.Department.DepartmentName
+                                </dd>
+                            }
+
+                        </dl>
+
+                        <hr />
+
+                        <dl class="row mb-0">
+
+                            <dt class="col-lg-3">
+                                <i class="align-middle me-1" data-lucide="user"></i>
+                                @Html.LabelFor(model => Model.InitiatedBy)
+                            </dt>
+
+                            <dd class="col-lg-9">
+                                @Model.InitiatedUser.FullName
+                            </dd>
+
+                            <dt class="col-lg-3">
+                                <i class="align-middle me-1" data-lucide="calendar"></i>
+                                Date
+                            </dt>
+
+                            <dd class="col-lg-9">
+                                @Model.InitiatedDate
+                            </dd>
+
+                            <dt class="col-lg-3">
+                                <i class="align-middle me-1" data-lucide="message-square"></i>
+                                Comment
+                            </dt>
+
+                            <dd class="col-lg-9">
+                                @Model.Comment
+                            </dd>
+
+                        </dl>
+
+                        @if (Model.AuthorizedBy != null)
+                        {
+                            <hr />
+
+                            <dl class="row mb-0">
+
+                                <dt class="col-lg-3">
+                                    <i class="align-middle me-1" data-lucide="user"></i>
+                                    @Html.LabelFor(model => Model.AuthorizedBy)
+                                </dt>
+
+                                <dd class="col-lg-9">
+                                    @Model.AuthorizedUser.FullName
+                                </dd>
+
+                                <dt class="col-lg-3">
+                                    <i class="align-middle me-1" data-lucide="calendar"></i>
+                                    Date
+                                </dt>
+
+                                <dd class="col-lg-9">
+                                    @Model.AuthorizedDate
+                                </dd>
+
+                                <dt class="col-lg-3">
+                                    <i class="align-middle me-1" data-lucide="message-square"></i>
+                                    Comment
+                                </dt>
+
+                                <dd class="col-lg-9">
+                                    @Model.CommentAuthorize
+                                </dd>
+
+                            </dl>
+                        }
+
+                        @if (Model.CompletedBy != null)
+                        {
+                            <hr />
+
+                            <dl class="row mb-0">
+
+                                <dt class="col-lg-3">
+                                    <i class="align-middle me-1" data-lucide="check-circle"></i>
+                                    @Html.LabelFor(model => Model.CompletedBy)
+                                </dt>
+
+                                <dd class="col-lg-9">
+                                    @Model.CompletedUser.FullName
+                                </dd>
+
+                                <dt class="col-lg-3">
+                                    <i class="align-middle me-1" data-lucide="calendar"></i>
+                                    Date
+                                </dt>
+
+                                <dd class="col-lg-9">
+                                    @Model.CompletedDate
+                                </dd>
+
+                                <dt class="col-lg-3">
+                                    <i class="align-middle me-1" data-lucide="message-square"></i>
+                                    Comment
+                                </dt>
+
+                                <dd class="col-lg-9">
+                                    @Model.CommentComplete
+                                </dd>
+
+                            </dl>
+                        }
+
+                        @if (Model.AssignedTo != null)
+                        {
+                            <hr />
+
+                            <dl class="row mb-0">
+
+                                <dt class="col-lg-3">
+                                    <i class="align-middle me-1" data-lucide="user"></i>
+                                    @Html.LabelFor(model => Model.AssignedTo)
+                                </dt>
+
+                                <dd class="col-lg-9">
+                                    @Model.AssignedToUser.FullName
+                                </dd>
+
+                            </dl>
+                        }
+
+                    </div>
+
+
+                    <div class="col-lg-6">
+
+                        <div class="card">
+
+                            <div class="card-header">
+
+                                <h5 class="card-title mb-0">
+                                    <i class="align-middle me-2" data-lucide="boxes"></i>
+                                    Assets
+                                </h5>
+
+                            </div>
+
+                            <div class="card-body">
+
+                                <div class="table-responsive">
+
+                                    <table id="dataTable"
+                                           class="table table-striped table-hover align-middle w-100">
+
+                                        <thead>
+                                            <tr>
+                                                <th>Asset No</th>
+                                                <th>Asset Type</th>
+                                                <th>Make</th>
+                                                <th>Model</th>
+                                                <th>Serial No</th>
+                                                <th>Barcode</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+
+                                            @foreach (var item in Model.TransferItems)
+                                            {
+                                                <tr>
+
+                                                    <td>
+                                                        <a href="@Html.EncodedActionLink("", "Info", "Asset", "", new { id = item.AssetId }, null)"
+                                                           target="_blank">
+                                                            @item.Asset.AssetNo
+                                                        </a>
+                                                    </td>
+
+                                                    <td>
+                                                        @item.Asset.AssetType.AssetTypeName
+                                                    </td>
+
+                                                    <td>
+                                                        @item.Asset.AssetMake.Name
+                                                    </td>
+
+                                                    <td>
+                                                        @item.Asset.ModelName
+                                                    </td>
+
+                                                    <td>
+                                                        @item.Asset.SerialNo
+                                                    </td>
+
+                                                    <td>
+                                                        @item.Asset.Barcode
+                                                    </td>
+
+                                                    <td>
+                                                        @item.Asset.Status.EnumDisplayName()
+                                                    </td>
+
+                                                </tr>
+                                            }
+
+                                        </tbody>
+
+                                    </table>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>

@@ -1,0 +1,144 @@
+﻿@model Domain.RA.RemoteAgreement
+
+
+@{
+    Layout = null;
+}
+
+<style>
+    @@media print {
+        body * {
+            visibility: hidden;
+        }
+
+        #printArea, #printArea * {
+            visibility: visible;
+        }
+
+        #printArea {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+        }
+    }
+</style>
+
+<div id="printArea" class="container">
+
+    <div class="text-center mb-4">
+        <h4><strong>ANNEXURE – II</strong></h4>
+        <p>Remote Access / Work From Home Agreement</p>
+    </div>
+
+    <hr />
+
+    <p>
+        This Agreement is on <strong>@DateTime.Now.ToString("dd MMM yyyy")</strong> between:
+
+    </p>
+    <p>
+        <strong>Employer:</strong> National Development Bank PLC, located at No 40 Nawam Mawatha Colombo 02 Sri
+        Lanka<br />
+        <strong>Employee:</strong> <strong>@Model.RemoteAccessRequest.CreatedUser.FullName</strong>, residing at <strong>@Model.CurrentlyResidingAddress</strong>
+    </p>
+    <br />
+
+    <p>
+        <strong>1. Purpose</strong><br />
+        This agreement outlines the terms and conditions under which the employee will perform their
+        duties remotely, outside the employer's premises
+    </p>
+    <p>
+        <strong>2. Duration</strong><br />
+        Remote work will commence on <strong>@Model.RemoteAccessRequest.StartDate.ToString("dd MMM yyyy")</strong> and continue until <strong>@Model.RemoteAccessRequest.EndDate.ToString("dd MMM yyyy")</strong>  or until terminated by
+        either party with
+        <strong>
+            @if (Model.NoticePeriod != null)
+            {
+                @Model.NoticePeriod
+            }
+            else
+            {
+                <span>[to be filled by HR]</span>
+            }
+        </strong> notice.
+    </p>
+    <p>
+        <strong>3. Work Location</strong><br />
+        The employee will work from the <strong>@Model.RemoteAccessRequest.RemoteWorkLocation.</strong>  Any change must be
+        approved by the employer.
+    </p>
+    <p>
+        <strong>4. Work Hours</strong><br />
+        The employee agrees to maintain regular work hours from <strong>@Model.RemoteAccessRequest.StartDate.ToString("dd MMM yyyy")</strong> to <strong>@Model.RemoteAccessRequest.EndDate.ToString("dd MMM yyyy")</strong>,
+        <strong>
+            @if (Model.DaysOfWeek != null)
+            {
+                @Model.DaysOfWeek
+            }
+            else
+            {
+                <span>[to be filled by HR]</span>
+            }
+        </strong>
+        Days of Week, in accordance with the Shop and Office Employees Act.
+    </p>
+    <p>
+        <strong>5. Duties and Responsibilities</strong><br />
+        The employee will continue to perform the duties outlined in their employment contract and Job
+        Description and any additional tasks assigned remotely.
+    </p>
+    <p>
+        <strong>6. Equipment and Expenses  </strong><br />
+        The employer will provide the required equipment for the employee to perform his work
+        responsibilities.
+        <ul typeof="circle">
+            <li>The employee is responsible for maintaining a safe and ergonomic workspace.  </li>
+            <li>Reimbursement for work-related expenses must be pre-approved.  </li>
+        </ul>
+    </p>
+    <p>
+        <strong>7. Data Security and Confidentiality  </strong><br />
+        The employee agrees to:
+        <ul typeof="circle">
+            <li>Use secure networks and devices.</li>
+            <li>Protect company data and confidential information.</li>
+            <li>Report any breaches immediately. </li>
+        </ul>
+        And comply by the Bank’s IT policy requirements.
+    </p>
+    <p>
+        <strong>8. Performance Monitoring  </strong><br />
+        The employer may use Tools and Methods to monitor productivity and ensure compliance with
+        company standards.
+    </p>
+    <p>
+        <strong>9. Leave and Benefits </strong><br />
+        All statutory leave entitlements <i>(annual leave, sick leave)</i> remain unchanged and applicable.
+    </p>
+
+    <hr />
+
+    <div class="row mt-3">
+       
+        <div class="col-md-6">
+            @if (Model.SignedByEmployer != null)
+            {
+                <p><strong>Employer Signature</strong></p>
+                <p>@Model.SignedByEmployer.FullName</p>
+                <p>@Model.SignedByEmployer.EmpNo</p>
+                <p>@DateTime.Now.ToString("dd MMM yyyy")</p>
+            }
+            </div>
+      
+
+        <div class="col-md-6 text-right">
+            <p><strong>Employee Signature</strong></p>
+            <p>@Model.RemoteAccessRequest.CreatedUser.FullName</p>
+            <p>@Model.RemoteAccessRequest.CreatedUser.EmpNo</p>
+            <p>@DateTime.Now.ToString("dd MMM yyyy")</p>
+        </div>
+    </div>
+
+</div>

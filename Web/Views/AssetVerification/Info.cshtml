@@ -1,0 +1,300 @@
+﻿@model Domain.AssetVerificationRequest
+@using Service
+@using Domain
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="card">
+
+            <div class="card-header">
+
+                <h5 class="card-title mb-0">
+                    <i class="align-middle me-2" data-lucide="check-circle"></i>
+                    Asset Verification | Request #@Model.AssetVerificationRequestId
+                </h5>
+
+            </div>
+
+            @Html.HiddenFor(model => model.AssetVerificationRequestId)
+
+            <div class="card-body">
+
+                <div class="row g-4">
+
+                    <div class="col-lg-8">
+
+                        <dl class="row mb-0">
+
+                            <dt class="col-sm-3">
+                                @Html.DisplayNameFor(model => model.BranchId)
+                            </dt>
+
+                            <dd class="col-sm-3">
+                                @Model.Branch.Name
+                            </dd>
+
+                            <dt class="col-sm-3">
+                                @Html.DisplayNameFor(model => model.DepartmentId)
+                            </dt>
+
+                            <dd class="col-sm-3">
+                                @Model.Department.DepartmentName
+                            </dd>
+
+                            <dt class="col-sm-3">
+                                @Html.DisplayNameFor(model => model.AssetCategory)
+                            </dt>
+
+                            <dd class="col-sm-3">
+                                @Model.AssetCategory.EnumDisplayName()
+                            </dd>
+
+                            <dt class="col-sm-3">
+                                @Html.DisplayNameFor(model => model.VerificationDate)
+                            </dt>
+
+                            <dd class="col-sm-3">
+                                @Model.VerificationDate.ToString("dd/MM/yyyy")
+                            </dd>
+
+                        </dl>
+
+                        @if (!string.IsNullOrWhiteSpace(Model.Comment))
+                        {
+                            <hr />
+
+                            <div class="mb-3">
+
+                                <div class="fw-semibold mb-1">
+                                    <i class="align-middle me-1" data-lucide="message-square"></i>
+                                    @Html.DisplayNameFor(model => model.Comment)
+                                </div>
+
+                                <div class="text-muted">
+                                    @Model.Comment
+                                </div>
+
+                            </div>
+
+                            <hr />
+
+                            if (!string.IsNullOrWhiteSpace(Model.VerifiedDocName))
+                            {
+                                <div>
+
+                                    <a href="@Model.VerifiedDocName"
+                                       target="_blank"
+                                       class="btn btn-sm btn-outline-primary">
+
+                                        <i class="align-middle me-1" data-lucide="file-text"></i>
+                                        Verified Document
+
+                                    </a>
+
+                                </div>
+
+                                <hr />
+                            }
+                        }
+
+                    </div>
+
+
+                    <div class="col-lg-4">
+
+                        <dl class="row mb-0">
+
+                            <dt class="col-sm-5">
+                                @Html.DisplayNameFor(model => model.Status)
+                            </dt>
+
+                            <dd class="col-sm-7">
+
+                                <span class="badge bg-secondary">
+                                    @Model.Status.EnumDisplayName()
+                                </span>
+
+                            </dd>
+
+                            <dt class="col-sm-5">
+                                @Html.DisplayNameFor(model => model.RequestedBy)
+                            </dt>
+
+                            <dd class="col-sm-7">
+                                @Model.RequestedUser.FullName
+                            </dd>
+
+                            <dt class="col-sm-5">
+                                @Html.DisplayNameFor(model => model.RequestedDate)
+                            </dt>
+
+                            <dd class="col-sm-7">
+                                @Model.RequestedDate
+                            </dd>
+
+                            @if (Model.VerifiedBy != null)
+                            {
+                                <dt class="col-sm-5">
+                                    @Html.DisplayNameFor(model => model.VerifiedBy)
+                                </dt>
+
+                                <dd class="col-sm-7">
+                                    @Model.VerifiedUser.FullName
+                                </dd>
+
+                                <dt class="col-sm-5">
+                                    @Html.DisplayNameFor(model => model.VerifiedDate)
+                                </dt>
+
+                                <dd class="col-sm-7">
+                                    @Model.VerifiedDate
+                                </dd>
+                            }
+
+                        </dl>
+
+                    </div>
+
+                </div>
+
+
+                <hr />
+
+
+                <div class="d-flex justify-content-between align-items-center mb-3">
+
+                    <h5 class="mb-0">
+                        <i class="align-middle me-2" data-lucide="boxes"></i>
+                        Assets
+                    </h5>
+
+                    <span class="badge bg-secondary">
+                        Total: @(Model.Assets != null ? Model.Assets.Count : 0)
+                    </span>
+
+                </div>
+
+
+                <div class="table-responsive">
+
+                    <table id="dataTable"
+                           class="table table-striped table-hover align-middle w-100">
+
+                        <thead>
+
+                            <tr>
+                                <th>Asset #</th>
+                                <th>Barcode</th>
+                                <th>Serial #</th>
+                                <th>Asset Type</th>
+                                <th>Asset Make</th>
+                                <th>Model Name</th>
+                                <th>Availability</th>
+                                <th>Comment</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            @if (Model.Assets != null)
+                            {
+                                foreach (var item in Model.Assets)
+                                {
+                                    <tr>
+
+                                        <td>
+
+                                            <a href="@Html.EncodedActionLink("", "Info", "Asset", "", new { id = item.AssetId }, null)"
+                                               target="_blank">
+
+                                                #@item.AssetId
+
+                                            </a>
+
+                                        </td>
+
+                                        <td>
+                                            @item.Asset.Barcode
+                                        </td>
+
+                                        <td>
+                                            @item.Asset.SerialNo
+                                        </td>
+
+                                        <td>
+                                            @item.Asset.AssetType.AssetTypeName
+                                        </td>
+
+                                        <td>
+                                            @item.Asset.AssetMake.Name
+                                        </td>
+
+                                        <td>
+                                            @item.Asset.ModelName
+                                        </td>
+
+                                        <td>
+
+                                            @if (item.IsAvailable)
+                                            {
+                                                <span class="badge bg-success">
+                                                    Yes
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-danger">
+                                                    No
+                                                </span>
+                                            }
+
+                                        </td>
+
+                                        <td>
+                                            @item.Comment
+                                        </td>
+
+                                    </tr>
+                                }
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $("#dataTable").DataTable({
+                responsive: true,
+                autoWidth: false,
+                paging: false,
+                searching: true,
+                ordering: true,
+                info: true,
+                lengthChange: false
+            });
+
+        });
+
+    </script>
+}

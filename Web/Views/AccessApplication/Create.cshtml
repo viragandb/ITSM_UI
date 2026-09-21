@@ -1,0 +1,310 @@
+﻿@model Web.Models.AccessApplicationVM
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+
+    <div class="col-12">
+
+        <div class="card">
+
+            <div class="card-header d-flex align-items-center justify-content-between">
+
+                <h5 class="card-title mb-0">
+                    Create New
+                </h5>
+
+                <a href="@Url.Action("Index", "AccessApplication")"
+                   class="btn btn-sm btn-light">
+
+                    <i class="align-middle me-1"
+                       data-lucide="arrow-left"></i>
+
+                    Back
+
+                </a>
+
+            </div>
+
+            @using (Html.BeginForm(
+                "Create",
+                "AccessApplication",
+                FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+
+                @Html.ValidationSummary(
+                    true,
+                    "",
+                    new { @class = "alert alert-danger" }
+                )
+
+                <div class="card-body">
+
+                    <div class="row mb-3">
+
+                        <div class="col-md-2">
+
+                            @Html.LabelFor(
+                                model => model.AccessPrivilegeCategoryId,
+                                new { @class = "form-label" }
+                            )
+
+                        </div>
+
+                        <div class="col-md-5">
+
+                            <select id="AccessPrivilegeCategoryId"
+                                    name="AccessPrivilegeCategoryId"
+                                    class="form-select">
+
+                                <option value="0">
+                                    -- Select --
+                                </option>
+
+                            </select>
+
+                            <span class="text-danger"
+                                  data-valmsg-for="AccessPrivilegeCategoryId"
+                                  data-valmsg-replace="true">
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="row mb-3">
+
+                        <div class="col-md-2">
+
+                            @Html.LabelFor(
+                                model => model.AssetCategory,
+                                new { @class = "form-label" }
+                            )
+
+                        </div>
+
+                        <div class="col-md-5">
+
+                            @Html.EnumDropDownListFor(
+                                model => model.AssetCategory,
+                                "-- Select --",
+                                new { @class = "form-select" }
+                            )
+
+                            @Html.ValidationMessageFor(
+                                model => model.AssetCategory,
+                                "",
+                                new { @class = "text-danger" }
+                            )
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="row mb-3">
+
+                        <div class="col-md-2">
+
+                            @Html.LabelFor(
+                                model => model.AssetTypeId,
+                                new { @class = "form-label" }
+                            )
+
+                        </div>
+
+                        <div class="col-md-5">
+
+                            <select id="AssetTypeId"
+                                    name="AssetTypeId"
+                                    class="form-select">
+
+                                <option value="0">
+                                    -- Select --
+                                </option>
+
+                            </select>
+
+                            <span class="text-danger"
+                                  data-valmsg-for="AssetTypeId"
+                                  data-valmsg-replace="true">
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="card-footer">
+
+                    <div class="d-flex justify-content-end gap-2">
+
+                        <button type="reset"
+                                class="btn btn-danger">
+
+                            <i class="align-middle me-1"
+                               data-lucide="rotate-ccw"></i>
+
+                            Cancel
+
+                        </button>
+
+                        <button type="submit"
+                                class="btn btn-primary btnSubmitDisable">
+
+                            <i class="align-middle me-1"
+                               data-lucide="save"></i>
+
+                            Save
+
+                        </button>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            loadAssetType();
+            loadAccessPrivilegeCategories();
+
+        });
+
+
+        function parseJsonResult(data) {
+
+            if (typeof data === "string") {
+
+                try {
+                    return JSON.parse(data);
+                }
+                catch (e) {
+                    return [];
+                }
+
+            }
+
+            return data || [];
+
+        }
+
+
+        function loadAccessPrivilegeCategories() {
+
+            $.getJSON(
+                '@Url.Action("GetItemsJsonResult", "AccessPrivilegeCategory")',
+                function (data) {
+
+                    var dropDown =
+                        $("#AccessPrivilegeCategoryId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- Select --</option>"
+                    );
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $('<option/>', {
+                                    value: item.AccessPrivilegeCategoryId,
+                                    text: item.Name
+                                })
+                            );
+
+                        }
+                    );
+
+                    var selectedId =
+                        '@ViewBag.AccessPrivilegeCategoryId';
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+                }
+            );
+
+        }
+
+
+        $("select#AssetCategory").on(
+            "change",
+            function () {
+
+                loadAssetType();
+
+            }
+        );
+
+
+        function loadAssetType() {
+
+            var categoryId =
+                $('#AssetCategory').val();
+
+            $.getJSON(
+                '@Url.Action("GetAssetTypeByAssetCategoryListJsonResult", "AssetType")',
+                {
+                    assetCategory: categoryId
+                },
+                function (data) {
+
+                    var dropDown =
+                        $("#AssetTypeId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- Select --</option>"
+                    );
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $('<option/>', {
+                                    value: item.AssetTypeId,
+                                    text: item.AssetTypeName
+                                })
+                            );
+
+                        }
+                    );
+
+                    var selectedId =
+                        '@ViewBag.AssetTypeId';
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+                }
+            );
+
+        }
+
+    </script>
+
+}

@@ -1,0 +1,319 @@
+﻿
+
+@model IEnumerable<Domain.ScheduledTask>
+@using Service
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+}
+
+
+@using (Html.BeginForm("Index", "ScheduledTask", FormMethod.Get, new { @class = "form-horizontal" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card box-danger">
+                <div class="card-header with-border">
+                    <h3 class="card-title">Task Templates</h3>
+                    <div class="card-tools pull-right">
+                        <a href="@Url.Action("Create", "ScheduledTask")" class="btn btn-social btn-cancel">
+                            <i class="fa fa-plus"></i>Add New
+                        </a>
+                    </div>
+                </div>
+
+
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+
+                            <div class="form-group">
+
+                                <label class="control-label col-md-2">
+                                    Team :
+                                </label>
+                                <div class="col-md-4">
+                                    <select id="TeamId" name="TeamId" class="form-control">
+                                        <option value=""></option>
+                                    </select>
+                                </div>
+
+
+                            </div>
+                            <div class="form-group">
+
+                                <label class="control-label col-md-2">
+                                    Category :
+                                </label>
+                                <div class="col-md-4">
+                                    <select id="TaskCategoryId" name="TaskCategoryId" class="form-control">
+                                        <option value=""></option>
+                                    </select>
+                                </div>
+
+                            </div>
+
+                            <div class="form-group">
+
+                                <label class="control-label col-md-2">
+                                    Assigned To :
+                                </label>
+                                <div class="col-md-6">
+                                    <select id="AssignedTo" name="AssignedTo" class="form-control">
+                                        <option value=""></option>
+                                    </select>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="card-footer">
+                    <div class="text-right">
+                        <button type="submit" class="btn btn-social">
+                            <i class="fa fa-search"></i>Search
+                        </button>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="row">
+
+        <div class="col-md-12">
+            <div class="card box-default">
+                <div class="card-body">
+
+                    <table id="dataTable" class="table table-bordered table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Task Name</th>
+                                <th>Category</th>
+                                <th>Task User</th>
+                                <th>Reviewer</th>
+                                <th>Start Date</th>
+                                <th>Repeat </th>
+                                <th>Score </th>
+                                <th>Applicable For KPI </th>
+                                <th>Check List</th>
+                                <th>Updated By</th>
+                                <th>Updated Date</th>
+                                <th ></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                foreach (var item in Model)
+                                {
+                            <tr>
+                                <td>
+
+
+                                    <a href="@Html.EncodedActionLink("", "TaskInfo", "ScheduledTask", "", new { id = item.ScheduledTaskId }, null)" target="_blank" class="t">
+                                        @item.ScheduledTaskId - @item.TaskName
+                                    </a>
+                                </td>
+                                <td>@item.TaskCategory.TaskCategoryName</td>
+                                <td>@item.User.FullName</td>
+                                <td>@item.Reviewer.FullName</td>
+
+                                <td>@item.StartDate.ToShortDateString()</td>
+                                <td>
+                                    @*@item.RepeatType.EnumDisplayName()*@
+
+                                    <span class="label text- label-@ScheduledTaskService.GetTaskRepeatTypeColor(@item.RepeatType)">
+                                        @item.RepeatType.EnumDisplayName()
+                                    </span>
+                                </td>
+                                <td align="right">@item.Score</td>
+                                <td>@item.IsKPI</td>
+                                <td>@item.IsChecklist</td>
+                                <td>@item.UpdatedBy</td>
+                                <td>@item.UpdatedDate</td>
+                                <td >
+
+                                    <a href="@Url.Action("Edit", "ScheduledTask", new { id = item.ScheduledTaskId })" class="btn btn-social-icon btn-edit">
+                                        <i class="fa fa-pencil"></i>
+                                    </a>
+                                    <a onclick="deleteItem('@item.ScheduledTaskId')" class="btn btn-social-icon btn-delete">
+                                        <i class="fa fa-trash-o"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                                }
+                            }
+                        </tbody>
+
+                    </table>
+
+                </div>
+                <!-- /.box-body -->
+
+            </div>
+
+        </div>
+    </div>
+
+}
+
+@section scripts {
+
+
+    <script src="~/Scripts/jquery.validate.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $('#dataTable').DataTable({
+                "paging": false,
+                "lengthChange": true,
+                "searching": true,
+                "ordering": true,
+                "info": true,
+                "autoWidth": true
+            });
+
+            loadCategory();
+            loadTeams();
+        });
+
+
+        $("select#TeamId").change(function (evt) {
+            loadUsers();
+            loadCategory();
+
+        });
+
+        function loadTeams() {
+
+            $.getJSON("@Url.Action("GetTeamUserListJsonResult", "Team")", function (data) {
+                var dropDown = $("#TeamId");
+
+                dropDown.empty();
+                dropDown.append("<option value='0'>-- Select --</option>");
+
+                $.each(JSON.parse(data), function (index, optionaldata) {
+                    dropDown.append($('<option />', { value: optionaldata.TeamId }).html(optionaldata.TeamName));
+                });
+
+                if ('@ViewBag.TeamId') {
+                      $('#TeamId').val(@ViewBag.TeamId).attr("selected", "selected");
+                 }
+
+                loadUsers();
+                loadCategory();
+            });
+
+        }
+
+         function loadUsers() {
+             var _teamId = $('#TeamId').val();
+
+            $.getJSON("@Url.Action("GetUsersByTeamIdJsonResult", "User")",
+              {
+                  teamId: _teamId
+              }, function (data) {
+                  var dropDown = $("#AssignedTo");
+
+                  dropDown.empty();
+                  dropDown.append("<option value='0'>-- All --</option>");
+
+                  $.each(JSON.parse(data), function (index, optionaldata) {
+                      dropDown.append($('<option/>', { value: optionaldata.EmpNo }).html(optionaldata.EmpNo + ' - ' +optionaldata.FullName + ' (' + optionaldata.DesignationName + ')' ));
+                  });
+
+                   if ('@ViewBag.AssignedTo') {
+                       $('#AssignedTo').val(@ViewBag.AssignedTo).attr("selected", "selected");
+                 }
+
+              });
+        }
+
+
+          function loadCategory() {
+              var _teamId = $('#TeamId').val();
+
+              $.getJSON("@Url.Action("GetTaskCategoriesListJsonResult", "TaskCategory")",
+                  {
+                      teamId: _teamId
+
+                  }, function (data) {
+                var dropDown = $("#TaskCategoryId");
+
+                dropDown.empty();
+                dropDown.append("<option value='0'>-- All --</option>");
+
+                $.each(JSON.parse(data), function (index, optionaldata) {
+                    dropDown.append($('<option />', { value: optionaldata.TaskCategoryId }).html(optionaldata.TaskCategoryName + ' ( ' + optionaldata.Weightage + '% ) ' ));
+                });
+
+                if ('@ViewBag.TaskCategoryId') {
+                    $('#TaskCategoryId').val(@ViewBag.TaskCategoryId).attr("selected", "selected");
+                 }
+
+
+            });
+
+        }
+
+
+        function deleteItem(itemId) {
+
+            swal({
+                title: "Are you sure?",
+                text: "Do you want to delete?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                closeOnConfirm: true,
+                closeOnCancel: true
+            }, function (isConfirm) {
+                if (isConfirm) {
+                    $.ajax({
+                        url: "@Url.Action("Delete", "ScheduledTask")",
+                        type: 'GET',
+                        dataType: "json",
+                        data: { id: itemId },
+                        success: function (data) {
+                            if (data == "1") {
+                                swal("Deleted!", "Record has been deleted", "success");
+                                setTimeout(function () {
+                                    window.location.reload();
+                                }, 1000);
+                            }
+                            else if(data == "2")
+                                swal("Data in use!", "Data is currently in use and can not be deleted", "error");
+                            else
+                                swal("Something went wrong!", "Data is not deleted, Please try again", "error");
+                        },
+                        error: function (xhr) {
+                            swal("Something went wrong!", "Data is not deleted, Please try again", "error");
+                        }
+                    });
+
+                } else {
+                    swal("Cancelled", "Action canceled, Data is not deleted", "error");
+                }
+            });
+        }
+
+
+    </script>
+
+}
+
+

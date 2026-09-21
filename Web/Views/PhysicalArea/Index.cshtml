@@ -1,0 +1,120 @@
+﻿@using Service
+@model IEnumerable<Domain.AR.PhysicalArea>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("Index", "PhysicalArea", FormMethod.Post, new { @class = "form-horizontal" }))
+{
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card card-primary card-outline">
+
+                <div class="card-header with-border">
+                    <h3 class="card-title">Physical Access Area </h3>
+                    <div class="card-tools pull-right">
+                        <a href="@Url.Action("Create", "PhysicalArea")" class="btn btn-sm btn-default">
+                            <i class="fa fa-plus"></i>&nbsp;&nbsp;Add New
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card-body">
+
+                    <table id="dataTable" class="table table-bordered table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Location</th>
+                                <th>Name</th>
+                                <th>Updated By</th>
+                                <th>Updated Date</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                foreach (var item in Model)
+                                {
+                                    <tr>
+
+                                        <td>@item.Branch.Name</td>
+                                        <td>@item.Name</td>
+                                        <td>@item.UpdatedBy</td>
+                                        <td>@item.UpdatedDate</td>
+                                        <td>
+                                            <a href="@Url.Action("Edit", "PhysicalArea", new { id = item.PhysicalAreaId })" class="btn btn-primary"><i class="fas fa-pencil-alt"></i></a>
+
+                                            <a onclick="deleteItem('@item.PhysicalAreaId')" class="btn btn-sm btn-danger">
+                                                <i class="fa fa-trash-alt text-white"></i>
+                                            </a>
+
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+
+                    </table>
+                </div>
+
+
+
+            </div>
+        </div>
+    </div>
+
+}
+
+@section scripts {
+
+    <script type="text/javascript">
+         function deleteItem(itemId) {
+            Swal.fire({
+            title: 'Are you sure?',
+            text: "Do you want to delete?",
+            icon: 'warning',
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+            showCancelButton: true,
+            reverseButtons: true,
+            }).then(function (result) {
+                    if (result.value) {
+                         $.ajax({
+                        url: "@Url.Action("Delete", "PhysicalArea")", type: 'GET', dataType: "json",
+                        data: { id: itemId },
+                        success: function (data) {
+                            if (data == "1") {
+                                Swal.fire("Deleted!", "Record has been deleted", "success");
+                                setTimeout(function () {
+                                    window.location.reload();
+                                }, 1000);
+                            }
+                            else if(data == "2")
+                                Swal.fire("Data in use!", "Data is currently in use and can not be deleted", "error");
+                            else
+                                Swal.fire("Something went wrong!", "Data is not deleted, Please try again", "error");
+                        },
+                        error: function (xhr) {
+                            Swal.fire("Something went wrong!", "Data is not deleted, Please try again", "error");
+                             }
+                        });
+                    }
+             });
+        }
+
+        $(document).ready(function () {
+
+            $('#dataTable').DataTable({
+                "paging": true,
+                "lengthChange": true,
+                "searching": true,
+                "ordering": true,
+                "info": true,
+                "autoWidth": true
+            });
+        });
+
+
+
+    </script>
+}

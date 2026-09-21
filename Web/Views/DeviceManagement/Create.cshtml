@@ -1,0 +1,675 @@
+﻿@model Web.Models.NewDeviceManagementVM
+@using Service
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("Create", "DeviceManagement", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card">
+
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="align-middle me-2" data-lucide="plus"></i>
+                        New Request
+                    </h5>
+                </div>
+
+                <div class="card-body">
+
+                    <div class="row g-4">
+
+                        <div class="col-lg-8">
+
+                            <div class="mb-3">
+
+                                @Html.LabelFor(
+                                    model => model.Subject,
+                                    new { @class = "form-label" }
+                                )
+
+                                @Html.TextBoxFor(
+                                    model => model.Subject,
+                                    new { @class = "form-control" }
+                                )
+
+                                @Html.ValidationMessageFor(
+                                    model => model.Subject,
+                                    "",
+                                    new { @class = "text-danger" }
+                                )
+
+                            </div>
+
+
+                            <div class="mb-3">
+
+                                @Html.LabelFor(
+                                    model => model.Description,
+                                    new { @class = "form-label" }
+                                )
+
+                                @Html.TextAreaFor(
+                                    model => model.Description,
+                                    new
+                                    {
+                                        @class = "form-control",
+                                        rows = "4",
+                                        style = "white-space: pre-wrap;"
+                                    }
+                                )
+
+                                @Html.ValidationMessageFor(
+                                    model => model.Description,
+                                    "",
+                                    new { @class = "text-danger" }
+                                )
+
+                            </div>
+
+
+                            <div class="row g-3">
+
+                                <div class="col-md-8">
+
+                                    <div class="mb-3">
+
+                                        @Html.LabelFor(
+                                            model => model.DurationType,
+                                            new { @class = "form-label" }
+                                        )
+
+                                        @Html.EnumDropDownListFor(
+                                            model => model.DurationType,
+                                            "-- Select --",
+                                            new { @class = "form-select" }
+                                        )
+
+                                    </div>
+
+                                </div>
+
+                                <div class="col-md-4">
+
+                                    <div class="mb-3"
+                                         id="Duration_ExpireDate">
+
+                                        @Html.LabelFor(
+                                            model => model.ExpireDate,
+                                            new { @class = "form-label" }
+                                        )
+
+                                        @Html.TextBoxFor(
+                                            model => model.ExpireDate,
+                                            "{0:yyyy-MM-dd}",
+                                            new
+                                            {
+                                                @class = "form-control",
+                                                type = "date"
+                                            }
+                                        )
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="row g-3">
+
+                                <div class="col-md-8">
+
+                                    <div class="mb-3">
+
+                                        @Html.LabelFor(
+                                            model => model.ApprovalBy,
+                                            new { @class = "form-label" }
+                                        )
+
+                                        @Html.TextBoxFor(
+                                            model => model.ApprovalByUserName,
+                                            new
+                                            {
+                                                placeholder = "Type name here to search",
+                                                @class = "form-control",
+                                                autocomplete = "off"
+                                            }
+                                        )
+
+                                        @Html.HiddenFor(model => model.ApprovalBy)
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="row g-3">
+
+                                <div class="col-md-8">
+
+                                    <div class="mb-3">
+
+                                        @Html.LabelFor(
+                                            model => model.DeviceManagementType,
+                                            new { @class = "form-label" }
+                                        )
+
+                                        @Html.EnumDropDownListFor(
+                                            model => model.DeviceManagementType,
+                                            "-- Select --",
+                                            new { @class = "form-select" }
+                                        )
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-lg-4">
+
+                            <div class="card h-100">
+
+                                <div class="card-header">
+
+                                    <h5 class="card-title mb-0">
+                                        <i class="align-middle me-2" data-lucide="user"></i>
+                                        Requested For
+                                    </h5>
+
+                                </div>
+
+                                <div class="card-body">
+
+                                    <div id="InternalUser">
+
+                                        <div class="mb-3">
+
+                                            @Html.LabelFor(
+                                                model => model.RequestedBy,
+                                                new { @class = "form-label" }
+                                            )
+
+                                            @Html.TextBoxFor(
+                                                model => model.RequestedBy,
+                                                new
+                                                {
+                                                    placeholder = "Type name here to search",
+                                                    @class = "form-control",
+                                                    autocomplete = "off"
+                                                }
+                                            )
+
+                                        </div>
+
+
+                                        <div class="mb-3">
+
+                                            @Html.LabelFor(
+                                                model => model.RequestedUser.FullName,
+                                                new { @class = "form-label" }
+                                            )
+
+                                            @Html.TextBoxFor(
+                                                model => model.RequestedUser.FullName,
+                                                new
+                                                {
+                                                    @class = "form-control",
+                                                    @readonly = "readonly"
+                                                }
+                                            )
+
+                                        </div>
+
+
+                                        <div class="mb-3">
+
+                                            @Html.LabelFor(
+                                                model => model.RequestedUser.DesignationName,
+                                                new { @class = "form-label" }
+                                            )
+
+                                            @Html.TextBoxFor(
+                                                model => model.RequestedUser.DesignationName,
+                                                new
+                                                {
+                                                    @class = "form-control",
+                                                    @readonly = "readonly"
+                                                }
+                                            )
+
+                                        </div>
+
+
+                                        <div class="mb-3">
+
+                                            @Html.LabelFor(
+                                                model => model.RequestedUser.Email,
+                                                new { @class = "form-label" }
+                                            )
+
+                                            @Html.TextBoxFor(
+                                                model => model.RequestedUser.Email,
+                                                new
+                                                {
+                                                    @class = "form-control",
+                                                    @readonly = "readonly"
+                                                }
+                                            )
+
+                                        </div>
+
+
+                                        <div class="mb-3">
+
+                                            @Html.LabelFor(
+                                                model => model.RequestedUser.ContactNo,
+                                                new { @class = "form-label" }
+                                            )
+
+                                            @Html.TextBoxFor(
+                                                model => model.RequestedUser.ContactNo,
+                                                new
+                                                {
+                                                    @class = "form-control",
+                                                    @readonly = "readonly"
+                                                }
+                                            )
+
+                                        </div>
+
+
+                                        <div class="mb-0">
+
+                                            @Html.LabelFor(
+                                                model => model.AssetId,
+                                                new { @class = "form-label" }
+                                            )
+
+                                            @Html.DropDownListFor(
+                                                model => model.AssetId,
+                                                new List<SelectListItem>(),
+                                                new { @class = "form-select select2" }
+                                            )
+
+                                            @Html.ValidationMessageFor(
+                                                model => model.AssetId,
+                                                "",
+                                                new { @class = "text-danger" }
+                                            )
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="card-footer">
+
+                    <div class="d-flex justify-content-end">
+
+                        <button type="submit"
+                                id="btnSave"
+                                class="btn btn-sm btn-primary btnSubmitDisable">
+
+                            <i class="align-middle me-1" data-lucide="send"></i>
+                            Submit
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+}
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $("#AssetId").select2({
+                width: "100%"
+            });
+
+            SearchADUser();
+            SearchADUserApproval();
+            GetDuration();
+            loadAssets();
+
+
+            $("#DurationType").on("change", function () {
+                GetDuration();
+            });
+
+
+            $("#DeviceManagementType").on("change", function () {
+                loadAssets();
+            });
+
+        });
+
+
+        function parseJsonResult(data) {
+
+            if (typeof data === "string") {
+
+                try {
+                    return JSON.parse(data);
+                }
+                catch (e) {
+                    return [];
+                }
+
+            }
+
+            return data || [];
+        }
+
+
+        function SearchADUser() {
+
+            $("#RequestedBy").autocomplete({
+
+                source: function (request, response) {
+
+                    $.ajax({
+
+                        url: '@Url.Action("GetSearchUserByNameJsonResult", "User")',
+
+                        dataType: "json",
+
+                        data: {
+                            term: request.term
+                        },
+
+                        success: function (data) {
+
+                            response(
+                                $.map(data, function (val) {
+
+                                    return {
+                                        label: val.EmpNo + " - " + val.FullName + " | " + val.DepartmentName,
+                                        value: val.EmpNo,
+                                        itemId: val.EmpNo,
+                                        itemName: val.FullName,
+                                        itemDesignation: val.DesignationName,
+                                        itemDepartment: val.DepartmentName,
+                                        itemEmail: val.Email
+                                    };
+
+                                })
+                            );
+
+                        }
+
+                    });
+
+                },
+
+                minLength: 1,
+
+                select: function (event, ui) {
+
+                    $("#RequestedBy").val(ui.item.itemId);
+
+                    $("#RequestedUser_FullName")
+                        .val(ui.item.itemName);
+
+                    $("#RequestedUser_DesignationName")
+                        .val(ui.item.itemDesignation);
+
+                    $("#RequestedUser_Email")
+                        .val(ui.item.itemEmail);
+
+                    loadSysUserData(ui.item.itemId);
+
+                    return false;
+                },
+
+                change: function (event, ui) {
+
+                    if (!ui.item) {
+
+                        $("#RequestedUser_FullName").val("");
+                        $("#RequestedUser_DesignationName").val("");
+                        $("#RequestedUser_Email").val("");
+                        $("#RequestedUser_ContactNo").val("");
+
+                    }
+
+                }
+
+            });
+
+        }
+
+
+        function SearchADUserApproval() {
+
+            $("#ApprovalByUserName").autocomplete({
+
+                source: function (request, response) {
+
+                    $.ajax({
+
+                        url: '@Url.Action("GetSearchUserByNameJsonResult", "User")',
+
+                        dataType: "json",
+
+                        data: {
+                            term: request.term
+                        },
+
+                        success: function (data) {
+
+                            response(
+                                $.map(data, function (val) {
+
+                                    return {
+                                        label: val.EmpNo + " - " + val.FullName + " | " + val.DepartmentName,
+                                        value: val.EmpNo,
+                                        itemId: val.EmpNo
+                                    };
+
+                                })
+                            );
+
+                        }
+
+                    });
+
+                },
+
+                minLength: 1,
+
+                select: function (event, ui) {
+
+                    $("#ApprovalByUserName")
+                        .val(ui.item.label);
+
+                    $("#ApprovalBy")
+                        .val(ui.item.itemId);
+
+                    return false;
+                },
+
+                change: function (event, ui) {
+
+                    if (!ui.item) {
+                        $("#ApprovalBy").val("");
+                    }
+
+                }
+
+            });
+
+        }
+
+
+        function loadSysUserData(userId) {
+
+            if (!userId) {
+                return;
+            }
+
+
+            $.getJSON(
+
+                '@Url.Action("GetSysUserJsonResult", "User")',
+
+                {
+                    lanId: userId
+                },
+
+                function (data) {
+
+                    var userData =
+                        parseJsonResult(data);
+
+
+                    $.each(
+                        userData,
+                        function (index, value) {
+
+                            if (index === "ContactNo") {
+
+                                $("#RequestedUser_ContactNo")
+                                    .val(value);
+
+                            }
+
+                        }
+                    );
+
+                }
+            );
+
+
+            loadAssets();
+
+        }
+
+
+        function GetDuration() {
+
+            var durationType =
+                $("#DurationType").val();
+
+
+            if (durationType == "2") {
+
+                $("#Duration_ExpireDate")
+                    .show();
+
+            }
+            else {
+
+                $("#Duration_ExpireDate")
+                    .hide();
+
+                $("#ExpireDate")
+                    .val("");
+
+            }
+
+        }
+
+
+        function loadAssets() {
+
+            var type =
+                $("#DeviceManagementType").val();
+
+            var requestUser =
+                $("#RequestedBy").val();
+
+            var dropDown =
+                $("#AssetId");
+
+
+            dropDown.empty();
+
+            dropDown.append(
+                "<option value='0'>-- N/A --</option>"
+            );
+
+
+            if (!type || !requestUser) {
+
+                dropDown.trigger("change.select2");
+
+                return;
+            }
+
+
+            $.getJSON(
+
+                '@Url.Action("GetAssetListAvbByUserDM", "Asset")',
+
+                {
+                    deviceManagementtype: type,
+                    userId: requestUser
+                },
+
+                function (data) {
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- N/A --</option>"
+                    );
+
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.AssetId,
+                                    text: item.Barcode + " - " + item.AssetName
+                                })
+                            );
+
+                        }
+                    );
+
+
+                    dropDown.trigger("change.select2");
+
+                }
+            );
+
+        }
+
+    </script>
+}

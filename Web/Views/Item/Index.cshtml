@@ -1,0 +1,230 @@
+﻿@using Service
+@model IEnumerable<Domain.Item>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("Index", "Item", FormMethod.Post))
+{
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card">
+
+                <div class="card-header d-flex justify-content-between align-items-center">
+
+                    <h5 class="card-title mb-0">
+                        <i class="align-middle me-2" data-lucide="boxes"></i>
+                        Assets
+                    </h5>
+
+                    <a href="@Url.Action("Create", "Item")"
+                       class="btn btn-sm btn-primary">
+
+                        <i class="align-middle me-1" data-lucide="plus"></i>
+                        Add New
+
+                    </a>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="table-responsive">
+
+                        <table id="dataTable"
+                               class="table table-striped table-hover align-middle w-100">
+
+                            <thead>
+                                <tr>
+                                    <th>Asset Name</th>
+                                    <th>Asset Code</th>
+                                    <th>Bar Code</th>
+                                    <th>Model No</th>
+                                    <th>Company</th>
+                                    <th>Location</th>
+                                    <th class="text-end">Action</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+
+                                        <td>
+                                            @item.ItemName
+                                        </td>
+
+                                        <td>
+                                            @item.ItemSerialNo
+                                        </td>
+
+                                        <td>
+                                            @item.ItemBarCode
+                                        </td>
+
+                                        <td>
+                                            @item.ItemModelNo
+                                        </td>
+
+                                        <td>
+                                            @(item.Company != null ? item.Company.CompanyName : "N/A")
+                                        </td>
+
+                                        <td>
+                                            @(item.Location != null ? item.Location.LocationName : "N/A")
+                                        </td>
+
+                                        <td class="text-end">
+
+                                            <div class="btn-group btn-group-sm">
+
+                                                <a href="@Url.Action("Edit", "Item", new { id = item.ItemId })"
+                                                   class="btn btn-primary"
+                                                   title="Edit">
+
+                                                    <i class="align-middle" data-lucide="pencil"></i>
+
+                                                </a>
+
+                                                <button type="button"
+                                                        class="btn btn-danger"
+                                                        title="Delete"
+                                                        onclick="deleteItem('@item.ItemId', '@HttpUtility.JavaScriptStringEncode(item.ItemName ?? "")')">
+
+                                                    <i class="align-middle" data-lucide="trash-2"></i>
+
+                                                </button>
+
+                                            </div>
+
+                                        </td>
+
+                                    </tr>
+                                }
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+}
+
+
+@section scripts {
+
+    <script src="~/Scripts/jquery.validate.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
+    <script src="~/Scripts/custom_functions.js"></script>
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $("#dataTable").DataTable({
+                paging: true,
+                lengthChange: true,
+                searching: true,
+                ordering: true,
+                info: true,
+                responsive: true,
+                autoWidth: false
+            });
+
+        });
+
+
+        function deleteItem(itemId, itemName) {
+
+            Swal.fire({
+
+                title: "Are you sure?",
+                text: "Do you want to delete: " + itemName + "?",
+                icon: "warning",
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                showCancelButton: true,
+                reverseButtons: true
+
+            }).then(function (result) {
+
+                if (result.isConfirmed || result.value) {
+
+                    $.ajax({
+
+                        url: '@Url.Action("Delete", "Item")',
+
+                        type: "GET",
+
+                        dataType: "json",
+
+                        data: {
+                            id: itemId
+                        },
+
+                        success: function (data) {
+
+                            if (data == "1" || data == 1) {
+
+                                Swal.fire(
+                                    "Deleted!",
+                                    "Record has been deleted",
+                                    "success"
+                                );
+
+                                setTimeout(function () {
+                                    window.location.reload();
+                                }, 1000);
+
+                            }
+                            else if (data == "2" || data == 2) {
+
+                                Swal.fire(
+                                    "Data in use!",
+                                    "Data is currently in use and cannot be deleted",
+                                    "error"
+                                );
+
+                            }
+                            else {
+
+                                Swal.fire(
+                                    "Something went wrong!",
+                                    "Data is not deleted, Please try again",
+                                    "error"
+                                );
+
+                            }
+
+                        },
+
+                        error: function () {
+
+                            Swal.fire(
+                                "Something went wrong!",
+                                "Data is not deleted, Please try again",
+                                "error"
+                            );
+
+                        }
+
+                    });
+
+                }
+
+            });
+
+        }
+
+    </script>
+}

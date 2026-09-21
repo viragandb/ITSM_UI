@@ -1,0 +1,386 @@
+﻿@using Service
+@model IEnumerable<Domain.KPIRatio>
+@{
+    /**/
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@using (Html.BeginForm("KPIUserSummary", "Report", FormMethod.Get, new { @class = "form-horizontal" }))
+{
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card box-danger">
+                <div class="card-header with-border">
+                    <h3 class="card-title">Tasks</h3>
+                    <div class="card-tools pull-right">
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <div class="form-group">
+
+
+                        <label class="control-label col-md-2">
+                            Team :
+                        </label>
+                        <div class="col-md-6">
+                            <select id="TeamId" name="TeamId" class="form-control">
+                                <option value=""></option>
+                            </select>
+                        </div>
+
+
+                    </div>
+                    <div class="form-group">
+
+                        <label class="control-label col-md-2">
+                            Task Owner :
+                        </label>
+                        <div class="col-md-6">
+                            <select id="UserEmpNo" name="UserEmpNo" class="form-control">
+                                <option value=""></option>
+                            </select>
+                            <span class="help-block" data-valmsg-for="UserEmpNo" data-valmsg-replace="true"></span>
+                        </div>
+
+                    </div>
+                    <div class="form-group row">
+
+                        <label class="control-label col-md-2">
+                            Task Date :
+                        </label>
+                        <div class="col-md-2">
+                            <div class="input-group date">
+                                <div class="input-group-addon">
+                                    <i class="fa fa-calendar"></i>
+                                </div>
+                                <input type="text" name="StartDate" id="StartDate" value="@ViewBag.StartDate" class="form-control datepicker" />
+                            </div>
+                        </div>
+
+
+                        <label class="control-label col-md-1">
+                            To
+                        </label>
+                        <div class="col-md-2">
+                            <div class="input-group date">
+                                <div class="input-group-addon">
+                                    <i class="fa fa-calendar"></i>
+                                </div>
+                                <input type="text" name="EndDate" id="EndDate" value="@ViewBag.EndDate" class="form-control datepicker" />
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="text-right">
+                        <button type="submit" class="btn btn-social">
+                            <i class="fa fa-search"></i>Search
+                        </button>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+
+        <div class="col-md-12">
+            <!-- Horizontal Form -->
+            <div class="card box-default">
+                <div class="card-body">
+
+                    <table id="dataTable" class="table table-bordered table-striped table-hover">
+
+
+                        <thead>
+                            <tr>
+                                @*<th>Date</th>
+
+                                    <th>User</th>*@
+
+                                <th class="text-right"><a href="#" data-bs-toggle="tooltip" title="((On-line Hrs on the Service Desk + Total Time Spend on Work Notes) / 8 * 100) *(20%)">Working Time - A (W 20)</a></th>
+                                <th class="text-right"><a href="#" data-bs-toggle="tooltip" title="(100 - (No.of Missed Calls / No.of Received Calls * 100)) *(20%)">Answerd Call - B (W-20)</a></th>
+                                <th class="text-right"> <a href="#" data-bs-toggle="tooltip" title="(Total Ticket Entered / Total Calls Received * 100) *(100%)">Ticket Entering - C (W-10)</a></th>
+                                <th class="text-right"><a href="#" data-bs-toggle="tooltip" title="(100 - (No.of Abandoned Calls / No.of Received Calls * 100)) *(20%)">Abandoned Call - D (W-20)</a></th>
+                                <th class="text-right"><a href="#" data-bs-toggle="tooltip" title="(100 - (SLA violated Tickets / No.of Updated Tickets * 100)) *(25%)">SLA Violations - E (W-25)</a></th>
+                                <th class="text-right"><a href="#" data-bs-toggle="tooltip" title="(First Level Resolved Tickets / No.of Assigned Tickets * 100) *(5%)">First Level Resolution - F (W-5)</a></th>
+                                <th class="text-right" width="100px"><a href="#" data-bs-toggle="tooltip" title="(A + B + C + D + E + F)">Final Value</a></th>
+
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            @{
+                                foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td colspan="7">
+                                            <div class="progress-group">
+                                                <span class="progress-text">
+                                                    <input type="checkbox" id="checkboxSelect" class="checkboxSelect" checked="checked" />
+                                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                    @*@item.Date.ToShortDateString() &nbsp; &nbsp;|&nbsp;&nbsp;*@
+                                                    @item.EmpNo - @item.User.FullName
+                                                </span>
+                                                <span class="progress-number">
+                                                    <b>
+                                                        <lable id="finalValCell">@item.FinalValue</lable>
+                                                    </b> / 100
+                                                </span>
+
+                                                <div class="progress sm">
+                                                    <div class="progress-bar progress-bar-aqua" style="width:   @item.FinalValue%"></div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr></tr>
+                                    <tr>
+                                        <td align="right">
+
+                                            @if (@ViewBag.RatioWorkingTimeMax == @item.RatioWorkingTime)
+                                            {
+                                                <span class="label text- label-warning">
+                                                    @item.RatioWorkingTime
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                @item.RatioWorkingTime
+
+                                            }
+                                        </td>
+                                        <td align="right">
+                                            @if (@ViewBag.RatioAnswerdCallMax == @item.RatioAnswerdCall)
+                                            {
+                                                <span class="label text- label-warning">
+                                                    @item.RatioAnswerdCall
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                @item.RatioAnswerdCall
+
+                                            }
+
+                                        </td>
+                                        <td align="right">
+                                            @if (@ViewBag.RatioTicketEnteringMax == @item.RatioTicketEntering)
+                                            {
+                                                <span class="label text- label-warning">
+                                                    @item.RatioTicketEntering
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                @item.RatioTicketEntering
+
+                                            }
+                                        </td>
+                                        <td align="right">
+                                            @if (@ViewBag.RatioAbundantCallMax == @item.RatioAbundantCall)
+                                            {
+                                                <span class="label text- label-warning">
+                                                    @item.RatioAbundantCall
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                @item.RatioAbundantCall
+
+                                            }
+                                        </td>
+                                        <td align="right">
+                                            @if (@ViewBag.RatioSLAMax == @item.RatioSLA)
+                                            {
+                                                <span class="label text- label-warning">
+                                                    @item.RatioSLA
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                @item.RatioSLA
+
+                                            }
+                                        </td>
+                                        <td align="right">
+                                            @if (@ViewBag.RatioFirstLResolveMax == @item.RatioFirstLResolve)
+                                            {
+                                                <span class="label text- label-warning">
+                                                    @item.RatioFirstLResolve
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                @item.RatioFirstLResolve
+
+                                            }
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="7"></td>
+                                    </tr>
+
+                                }
+
+
+                            }
+
+
+
+                            <tr>
+                                <td colspan="7">
+                                    <div class="progress-group">
+                                        <span class="progress-text">
+                                            Average KPI Value of All
+                                        </span>
+                                        <span class="progress-number">
+                                            <b>
+                                                <lable id="finalValCellTot">@ViewBag.TotAvg</lable>
+                                            </b> / 100
+                                        </span>
+
+                                        <div class="progress sm">
+                                            <div class="progress-bar progress-bar-yellow" id="finalProgressBar" style="width:   @ViewBag.TotAvg%"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+
+
+
+                    </table>
+
+                </div>
+                <!-- /.box-body -->
+
+            </div>
+            <!-- /.box -->
+
+        </div>
+    </div>
+}
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            $('[data-bs-toggle="tooltip"]').tooltip();
+            //$('#dataTable').DataTable({
+            //    "paging": false,
+            //    "lengthChange": true,
+            //    "searching": true,
+            //    "ordering": true,
+            //    "info": true,
+            //    "autoWidth": true
+            //});
+
+            loadTeams();
+        });
+
+        $('.checkboxSelect').click(function () {
+            calculatorTotal()
+        });
+        function calculatorTotal() {
+            var totalVal = 0;
+            var rowInt = 0;
+            $('#dataTable tr').each(function () {
+                var row = $(this);
+                if (row.find('input[type="checkbox"]').is(':checked')) {
+                    rowInt +=1;
+                    totalVal += parseFloat(row.find('#finalValCell').text());
+                }
+            });
+
+            var finalVal = totalVal / rowInt
+            finalVal = parseFloat(finalVal).toFixed(2)
+
+            $('#finalValCellTot').text(finalVal);
+            $('#finalProgressBar').attr('style', 'width: ' + finalVal+'%');
+
+        }
+
+        //$('input[type=checkbox]').change(function () {
+        //    $('#dataTable > tbody  tr').each(function () {
+        //        if ($('input[type=checkbox]').is(':checked')) {
+        //           // $('#btnexcellSelect').removeAttr('disabled');
+        //            alert('123');
+        //        } else {
+        //           // $('#btnexcellSelect').attr('disabled', 'disabled');
+        //        }
+        //        //if ($(this).is(':checked')) {
+        //        //    console.log($(this).attr('id'));
+        //        //} else {
+        //        //    console.log($(this).attr('id'));
+        //        //}
+        //    });
+        //});
+
+         $("select#TeamId").change(function (evt) {
+            loadUsers();
+
+        });
+
+        function loadTeams() {
+
+            $.getJSON("@Url.Action("GetTeamUserListJsonResult", "Team")", function (data) {
+                var dropDown = $("#TeamId");
+
+                dropDown.empty();
+                dropDown.append("<option value='0'>-- All --</option>");
+
+                $.each(JSON.parse(data), function (index, optionaldata) {
+                    dropDown.append($('<option />', { value: optionaldata.TeamId }).html(optionaldata.TeamName));
+                });
+
+                if ('@ViewBag.TeamId') {
+                      $('#TeamId').val(@ViewBag.TeamId).attr("selected", "selected");
+                 }
+
+                loadUsers();
+            });
+
+        }
+
+         function loadUsers() {
+             var _teamId = $('#TeamId').val();
+
+            $.getJSON("@Url.Action("GetUsersByTeamIdJsonResult", "User")",
+              {
+                  teamId: _teamId
+              }, function (data) {
+                  var dropDown = $("#UserEmpNo");
+
+                  dropDown.empty();
+                  dropDown.append("<option value='0'>-- All --</option>");
+
+                  $.each(JSON.parse(data), function (index, optionaldata) {
+                      dropDown.append($('<option/>', { value: optionaldata.EmpNo }).html(optionaldata.EmpNo + ' - ' +optionaldata.FullName + ' (' + optionaldata.DesignationName + ')' ));
+                  });
+
+                   if ('@ViewBag.UserEmpNo') {
+                       $('#UserEmpNo').val(@ViewBag.UserEmpNo).attr("selected", "selected");
+                 }
+
+              });
+        }
+
+
+    </script>
+}
+
+
+
+
+

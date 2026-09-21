@@ -1,0 +1,269 @@
+﻿@model Domain.Ticket
+@using Service
+
+<div class="row g-4">
+
+    <div class="col-lg-8">
+
+        <div class="mb-3">
+            <strong>
+                @Html.DisplayNameFor(model => model.Subject)
+            </strong>
+
+            <div class="text-muted mt-1">
+                @Model.Subject
+            </div>
+        </div>
+
+        <hr />
+
+        <div class="mb-3">
+            <strong>
+                @Html.DisplayNameFor(model => model.Description)
+            </strong>
+
+            <div class="text-muted mt-1" style="white-space: pre-wrap;">
+                @Model.Description
+            </div>
+        </div>
+
+        <hr />
+
+        <dl class="row mb-0">
+
+            <dt class="col-md-2">
+                @Html.DisplayNameFor(model => model.RequestType.TicketType)
+            </dt>
+
+            <dd class="col-md-4">
+                @Model.RequestType.TicketType.EnumDisplayName()
+            </dd>
+
+            <dt class="col-md-2">
+                @Html.DisplayNameFor(model => model.RequestType.CategoryId)
+            </dt>
+
+            <dd class="col-md-4">
+                @(Model.RequestType != null && Model.RequestType.Category != null
+                    ? Model.RequestType.Category.CategoryName
+                    : "N/A")
+            </dd>
+
+            <dt class="col-md-2">
+                @Html.DisplayNameFor(model => model.RequestType.AssetTypeId)
+            </dt>
+
+            <dd class="col-md-4">
+                @(Model.RequestType != null && Model.RequestType.AssetType != null
+                    ? Model.RequestType.AssetType.AssetTypeName
+                    : "N/A")
+            </dd>
+
+            <dt class="col-md-2">
+                @Html.DisplayNameFor(model => model.RequestType.SubCategoryId)
+            </dt>
+
+            <dd class="col-md-4">
+                @(Model.RequestType != null && Model.RequestType.SubCategory != null
+                    ? Model.RequestType.SubCategory.SubCategoryName
+                    : "N/A")
+            </dd>
+
+        </dl>
+
+        <hr />
+
+        <dl class="row mb-0">
+
+            <dt class="col-md-2">
+                @Html.DisplayNameFor(model => model.OccurredDate)
+            </dt>
+
+            <dd class="col-md-4">
+                @Model.OccurredDate
+            </dd>
+
+            <dt class="col-md-2">
+                @Html.DisplayNameFor(model => model.RequestedDate)
+            </dt>
+
+            <dd class="col-md-4">
+                @Model.RequestedDate
+            </dd>
+
+            <dt class="col-md-2">
+                @Html.DisplayNameFor(model => model.TicketMedium)
+            </dt>
+
+            <dd class="col-md-4">
+                @Model.TicketMedium.EnumDisplayName()
+            </dd>
+
+            @if ((int)Model.Priority > 0)
+            {
+                <dt class="col-md-2">
+                    @Html.DisplayNameFor(model => model.Priority)
+                </dt>
+
+                <dd class="col-md-4">
+                    @Model.Priority.EnumDisplayName()
+                </dd>
+            }
+
+        </dl>
+
+        <hr />
+
+        <div class="row g-2 align-items-center">
+
+            <div class="col-lg-6">
+
+                <span class="badge bg-@TicketService.GetTicketStatusColor(Model.Status)">
+                    @Model.Status.EnumDisplayName()
+                </span>
+
+            </div>
+
+            <div class="col-lg-6">
+
+                <div class="d-flex justify-content-lg-end flex-wrap gap-2">
+
+                    <span class="badge bg-info">
+                        SLA @Model.Resolve Hrs.
+                    </span>
+
+                    <span class="badge bg-success">
+                        Spent Time @Model.SpentTime Hrs.
+                    </span>
+
+                    @if (Model.IsTimeViolated)
+                    {
+                        <span class="badge bg-danger">
+                            SLA Violated
+                        </span>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="col-lg-4">
+
+        <div class="card h-100">
+
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="align-middle me-2" data-lucide="user"></i>
+                    Requester
+                </h5>
+            </div>
+
+            <div class="card-body">
+
+                <div class="mb-3">
+
+                    <strong class="d-flex align-items-center mb-1">
+                        <i class="align-middle me-2" data-lucide="user"></i>
+                        @Html.DisplayNameFor(model => model.RequestedBy)
+                    </strong>
+
+                    <div class="text-muted">
+                        @Model.RequestedBy
+                        -
+                        @(Model.RequestedUser != null
+                            ? Model.RequestedUser.FullName
+                            : "N/A")
+                    </div>
+
+                </div>
+
+                <div class="mb-3">
+
+                    <strong class="d-flex align-items-center mb-1">
+                        <i class="align-middle me-2" data-lucide="building"></i>
+                        @Html.DisplayNameFor(model => model.DepartmentId)
+                    </strong>
+
+                    <div class="text-muted">
+
+                        @if (Model.DepartmentId != null && Model.Department != null)
+                        {
+                            @Model.Department.DepartmentName
+                        }
+                        else
+                        {
+                            @Model.DepartmentName
+                        }
+
+                    </div>
+
+                </div>
+
+                <div class="mb-3">
+
+                    <strong class="d-flex align-items-center mb-1">
+                        <i class="align-middle me-2" data-lucide="briefcase"></i>
+                        @Html.DisplayNameFor(model => model.RequestedUser.DesignationName)
+                    </strong>
+
+                    <div class="text-muted">
+                        @(Model.RequestedUser != null
+                            ? Model.RequestedUser.DesignationName
+                            : "N/A")
+                    </div>
+
+                </div>
+
+                <div class="mb-3">
+
+                    <strong class="d-flex align-items-center mb-1">
+                        <i class="align-middle me-2" data-lucide="phone"></i>
+                        @Html.DisplayNameFor(model => model.ContactNo)
+                    </strong>
+
+                    <div class="text-muted">
+                        @Model.ContactNo
+                    </div>
+
+                </div>
+
+                <div class="mb-3">
+
+                    <strong class="d-flex align-items-center mb-1">
+                        <i class="align-middle me-2" data-lucide="mail"></i>
+                        @Html.DisplayNameFor(model => model.ContactEmail)
+                    </strong>
+
+                    <div class="text-muted">
+                        @Model.ContactEmail
+                    </div>
+
+                </div>
+
+                <div class="mb-0">
+
+                    <strong class="d-flex align-items-center mb-1">
+                        <i class="align-middle me-2" data-lucide="building-2"></i>
+                        @Html.DisplayNameFor(model => model.BranchId)
+                    </strong>
+
+                    <div class="text-muted">
+                        @(Model.Branch != null
+                            ? Model.Branch.Name
+                            : "N/A")
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

@@ -1,0 +1,334 @@
+﻿@model ICollection<Domain.Event>
+@using Service
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="card">
+
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="align-middle me-2" data-lucide="calendar"></i>
+                    Events
+                </h5>
+            </div>
+
+            <div class="card-body">
+
+                <div class="accordion" id="eventAccordion">
+
+                    @foreach (var item in Model)
+                    {
+                        var collapseId = "event_" + item.EventId;
+
+                        <div class="accordion-item">
+
+                            <h2 class="accordion-header"
+                                id="heading_@item.EventId">
+
+                                <button class="accordion-button collapsed"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#@collapseId"
+                                        aria-expanded="false"
+                                        aria-controls="@collapseId">
+
+                                    <div class="w-100 d-flex justify-content-between align-items-center me-3">
+
+                                        <div>
+                                            <strong>Event @item.EventId</strong>
+
+                                            <span class="mx-2 text-muted">|</span>
+
+                                            @item.Subject
+
+                                            <i class="align-middle mx-2"
+                                               data-lucide="chevrons-right">
+                                            </i>
+
+                                            <strong>
+                                                @(item.EventType != null
+                                                    ? item.EventType.EventTypeName
+                                                    : "N/A")
+                                            </strong>
+                                        </div>
+
+                                        <div class="text-muted small">
+                                            @item.EventDate.ToShortDateString()
+                                        </div>
+
+                                    </div>
+
+                                </button>
+
+                            </h2>
+
+                            <div id="@collapseId"
+                                 class="accordion-collapse collapse"
+                                 aria-labelledby="heading_@item.EventId"
+                                 data-bs-parent="#eventAccordion">
+
+                                <div class="accordion-body">
+
+                                    <div class="d-flex justify-content-end mb-3">
+
+                                        <a href="@Html.EncodedActionLink("", "Info", "Event", "", new { id = item.EventId }, null)"
+                                           target="_blank"
+                                           class="btn btn-sm btn-light"
+                                           title="View Details">
+
+                                            <i class="align-middle me-1"
+                                               data-lucide="info">
+                                            </i>
+                                            View
+
+                                        </a>
+
+                                    </div>
+
+                                    @Html.Partial("_Event", item)
+
+                                </div>
+
+                                <div class="card-footer">
+
+                                    <div class="d-flex justify-content-end">
+
+                                        <button type="button"
+                                                class="openTaskUpdate btn btn-sm btn-primary"
+                                                data-id="@item.EventId"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#closeEventModal">
+
+                                            <i class="align-middle me-1"
+                                               data-lucide="check-square">
+                                            </i>
+
+                                            Close Event
+
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+<div class="modal fade"
+     id="closeEventModal"
+     tabindex="-1"
+     aria-labelledby="closeEventModalLabel"
+     aria-hidden="true">
+
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title"
+                    id="closeEventModalLabel">
+
+                    <i class="align-middle me-2"
+                       data-lucide="check-circle">
+                    </i>
+
+                    Action Taken
+
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <input type="hidden"
+                       name="clTaskId"
+                       id="clTaskId"
+                       value="" />
+
+                <div class="mb-3">
+
+                    <label for="textComment"
+                           class="form-label">
+
+                        Action Taken
+
+                    </label>
+
+                    <textarea id="textComment"
+                              name="textComment"
+                              class="form-control"
+                              rows="4"
+                              placeholder="Enter action taken"></textarea>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn btn-light"
+                        data-bs-dismiss="modal">
+
+                    <i class="align-middle me-1"
+                       data-lucide="x">
+                    </i>
+
+                    Close
+
+                </button>
+
+                <button type="button"
+                        id="btnUpdateEvent"
+                        class="btn btn-primary"
+                        onclick="updateTask()">
+
+                    <i class="align-middle me-1"
+                       data-lucide="check-circle">
+                    </i>
+
+                    Update
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).on("click", ".openTaskUpdate", function () {
+
+            var taskId = $(this).data("id");
+
+            $("#clTaskId").val(taskId);
+            $("#textComment").val("");
+
+        });
+
+
+        function updateTask() {
+
+            var taskId = $("#clTaskId").val();
+            var taskComment = $("#textComment").val().trim();
+            var button = $("#btnUpdateEvent");
+
+
+            if (!taskComment) {
+
+                Swal.fire(
+                    "Error!",
+                    "Please enter comment",
+                    "error"
+                );
+
+                return;
+            }
+
+
+            button.prop("disabled", true);
+
+
+            $.ajax({
+
+                url: '@Url.Action("Close", "Event")',
+
+                type: "GET",
+
+                dataType: "json",
+
+                data: {
+                    id: taskId,
+                    comment: taskComment
+                },
+
+                success: function (data) {
+
+                    if (data == "1" || data == 1) {
+
+                        var modalElement =
+                            document.getElementById("closeEventModal");
+
+                        var modalInstance =
+                            bootstrap.Modal.getInstance(modalElement);
+
+                        if (modalInstance) {
+                            modalInstance.hide();
+                        }
+
+
+                        Swal.fire(
+                            "Updated",
+                            "Event has been closed",
+                            "success"
+                        );
+
+
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 500);
+
+                    }
+                    else {
+
+                        button.prop("disabled", false);
+
+                        Swal.fire(
+                            "Something went wrong!",
+                            "Please try again",
+                            "error"
+                        );
+
+                    }
+
+                },
+
+                error: function () {
+
+                    button.prop("disabled", false);
+
+                    Swal.fire(
+                        "Something went wrong!",
+                        "Please try again",
+                        "error"
+                    );
+
+                }
+
+            });
+
+        }
+
+    </script>
+}

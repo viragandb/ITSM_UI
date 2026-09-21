@@ -1,0 +1,381 @@
+﻿@model Domain.DR.DisposalRequest
+@using Service.DR
+@using Service
+
+@{
+    ViewBag.Title = "DisposalRequestInfo";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="card">
+
+            <div class="card-header d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-2">
+
+                <h5 class="card-title mb-0">
+                    <i class="align-middle me-2" data-lucide="trash-2"></i>
+                    Request #@Model.DisposalRequestId
+                    <span class="text-muted ms-1">Disposal</span>
+                </h5>
+
+                <span class="badge bg-@DisposalRequestService.GetStatusColor(Model.Status)">
+                    @Model.Status.EnumDisplayName()
+                </span>
+
+            </div>
+
+            <div class="card-body">
+
+                <div class="row g-4">
+
+                    <div class="col-lg-8">
+
+                        <div class="mb-3">
+
+                            <label class="form-label fw-semibold">
+                                @Html.LabelFor(model => Model.Title)
+                            </label>
+
+                            <div class="text-muted">
+                                @Model.Title
+                            </div>
+
+                        </div>
+
+                        <hr />
+
+                        <div class="mb-3">
+
+                            <label class="form-label fw-semibold">
+                                @Html.LabelFor(model => Model.BuyerName)
+                            </label>
+
+                            <div class="text-muted">
+
+                                @if (Model.BuyerName.IsEmpty())
+                                {
+                                    <span>N/A</span>
+                                }
+                                else
+                                {
+                                    @Model.BuyerName
+                                }
+
+                            </div>
+
+                        </div>
+
+                        <hr />
+
+                        <div class="mb-4">
+
+                            <label class="form-label fw-semibold">
+                                @Html.LabelFor(model => Model.RequestCreatedDate)
+                            </label>
+
+                            <div class="text-muted">
+                                @Model.RequestCreatedDate.ToShortDateString()
+                            </div>
+
+                        </div>
+
+
+                        <div class="card">
+
+                            <div class="card-header">
+
+                                <h5 class="card-title mb-0">
+                                    <i class="align-middle me-2" data-lucide="boxes"></i>
+                                    Assets Selected For Disposal
+                                </h5>
+
+                            </div>
+
+                            <div class="card-body">
+
+                                <div class="table-responsive"
+                                     style="max-height:350px; overflow-y:auto;">
+
+                                    <table id="assetTable"
+                                           class="table table-sm table-striped table-hover align-middle mb-0">
+
+                                        <thead>
+                                            <tr>
+                                                <th>Asset No</th>
+                                                <th>Asset Name</th>
+                                                <th>Model</th>
+                                                <th>Serial No</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody id="assetTableBody">
+
+                                            @foreach (var disposedItem in Model.DisposalItems.Where(e => !e.IsDeleted))
+                                            {
+                                                <tr>
+
+                                                    <td>
+                                                        @disposedItem.Asset.AssetNo
+                                                    </td>
+
+                                                    <td>
+                                                        @disposedItem.Asset.AssetName
+                                                    </td>
+
+                                                    <td>
+                                                        @disposedItem.Asset.ModelName
+                                                    </td>
+
+                                                    <td>
+                                                        @disposedItem.Asset.SerialNo
+                                                    </td>
+
+                                                </tr>
+                                            }
+
+                                        </tbody>
+
+                                    </table>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="col-lg-4">
+
+                        @if (Model.DisposalRequestDocs != null)
+                        {
+                            <div class="card">
+
+                                <div class="card-header">
+
+                                    <h5 class="card-title mb-0">
+                                        <i class="align-middle me-2" data-lucide="paperclip"></i>
+                                        Documents
+                                    </h5>
+
+                                </div>
+
+                                <div class="card-body">
+
+                                    @foreach (var item in Model.DisposalRequestDocs)
+                                    {
+                                        <div class="mb-2">
+
+                                            <a href="@item.FileUrl"
+                                               target="_blank"
+                                               class="text-decoration-none">
+
+                                                <i class="align-middle me-1"
+                                                   data-lucide="file-text"></i>
+
+                                                @item.DocumentName
+
+                                            </a>
+
+                                        </div>
+                                    }
+
+                                </div>
+
+                            </div>
+                        }
+
+                    </div>
+
+                </div>
+
+
+                <div class="row g-4 mt-1">
+
+                    <div class="col-lg-8">
+
+                        <div class="card">
+
+                            <div class="card-header d-flex align-items-center justify-content-between">
+
+                                <h5 class="card-title mb-0">
+                                    <i class="align-middle me-2" data-lucide="history"></i>
+                                    Status
+                                </h5>
+
+                                <button type="button"
+                                        class="btn btn-sm btn-light"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#statusHistory"
+                                        aria-expanded="true"
+                                        aria-controls="statusHistory">
+
+                                    <i class="align-middle" data-lucide="chevron-down"></i>
+
+                                </button>
+
+                            </div>
+
+                            <div id="statusHistory"
+                                 class="collapse show">
+
+                                <div class="card-body">
+
+                                    @foreach (var status in Model.DisposalRequestUpdates.OrderBy(o => o.UpdatedDate))
+                                    {
+                                        <div class="d-flex mb-4">
+
+                                            <img src="@status.UpdatedUser.ProImageName"
+                                                 alt="User Image"
+                                                 class="rounded-circle me-3"
+                                                 width="42"
+                                                 height="42" />
+
+                                            <div class="flex-grow-1">
+
+                                                <div class="d-flex flex-column flex-md-row justify-content-between mb-2">
+
+                                                    <span class="fw-semibold">
+                                                        @status.UpdatedUser.FullName
+                                                    </span>
+
+                                                    <span class="text-muted small">
+
+                                                        <i class="align-middle me-1"
+                                                           data-lucide="calendar"></i>
+
+                                                        @status.UpdatedDate
+
+                                                    </span>
+
+                                                </div>
+
+                                                <div class="border rounded p-3">
+
+                                                    <span class="badge bg-@DisposalRequestService.GetStatusColor(status.Status) me-2">
+                                                        @status.Status.EnumDisplayName()
+                                                    </span>
+
+                                                    <span>
+                                                        @status.Comment
+                                                    </span>
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+                                    }
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="col-lg-4">
+
+                        <div class="card">
+
+                            <div class="card-header d-flex align-items-center justify-content-between">
+
+                                <h5 class="card-title mb-0">
+                                    <i class="align-middle me-2" data-lucide="file-text"></i>
+                                    Ticket Log
+                                </h5>
+
+                                <button type="button"
+                                        class="btn btn-sm btn-light"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#ticketLog"
+                                        aria-expanded="true"
+                                        aria-controls="ticketLog">
+
+                                    <i class="align-middle" data-lucide="chevron-down"></i>
+
+                                </button>
+
+                            </div>
+
+                            <div id="ticketLog"
+                                 class="collapse show">
+
+                                <div class="card-body">
+
+                                    @foreach (var log in Model.DisposalRequestLogs.OrderBy(o => o.UpdatedDate))
+                                    {
+                                        <div class="d-flex mb-4">
+
+                                            <img src="@(log.UpdatedBy != null
+                                                        ? log.UpdatedUser.ProImageName
+                                                        : "/Images/userimage.png")"
+                                                 alt="User Image"
+                                                 class="rounded-circle me-3"
+                                                 width="38"
+                                                 height="38" />
+
+                                            <div class="flex-grow-1">
+
+                                                <div class="d-flex justify-content-between gap-2">
+
+                                                    <span class="fw-semibold">
+
+                                                        @(log.UpdatedBy != null
+                                                            ? log.UpdatedUser.FullName
+                                                            : "N/A")
+
+                                                    </span>
+
+                                                    <span class="text-muted small">
+                                                        @log.UpdatedDate
+                                                    </span>
+
+                                                </div>
+
+                                                <div class="text-muted mt-1">
+                                                    @log.Description
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+                                    }
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<style>
+
+    #assetTable thead th {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: var(--bs-body-bg);
+        box-shadow: inset 0 -1px 0 var(--bs-border-color);
+    }
+
+    #assetTable {
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+</style>

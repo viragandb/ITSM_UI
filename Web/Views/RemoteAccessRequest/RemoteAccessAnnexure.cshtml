@@ -1,0 +1,107 @@
+﻿@model IEnumerable<Domain.RA.RemoteAgreement>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+     
+</head> 
+
+
+<body>
+
+
+
+    <div class="row">
+        <div class="col-lg-12">
+
+            <div class="card card-danger card-outline">
+                <div class="card-header">
+                    <h3 class="card-title m-0">Search Annexure</h3>
+                    <div class="text-right">
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label>Select Request</label>
+                        <select id="requestDropdown" class="form-control select2">
+                            <option value="">-- Select Request --</option>
+                            @foreach (var item in Model)
+                            {
+                                if (item.RemoteAccessRequest.Status == Domain.AR.AccessRequestStatusEnum.Completed)
+                                {
+                                    <option value="@item.RemoteAccessRequestId">Request #@item.RemoteAccessRequestId | @item.RemoteAccessRequest.CreatedBy | @item.RemoteAccessRequest.Status</option>
+
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+
+
+    <div class="row">
+        <div class="col-lg-12">
+
+            <div class="card card-primary card-outline">
+                <div class="card-header">
+                    <h3 class="card-title m-0">File Preview</h3>
+                    <div class="text-right">
+                    </div>
+                </div>
+                <div class="card-body">
+
+                    <div class="text-right mb-2">
+                        <button id="btnPrint" class="btn btn-primary btn-sm" disabled>
+                            <i class="fas fa-print"></i> Print
+                        </button>
+                    </div>
+
+                    <div id="annexureViewer" class="border p-3 bg-white">
+                        <p class="text-muted">Select a request to view annexure</p>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+
+</body>
+</html>
+
+@section scripts
+{
+    <script type="text/javascript">
+
+        $('#requestDropdown').change(function () {
+            const id = $(this).val();
+            console.log(id)
+
+            if (!id) {
+                $('#annexureViewer').html('<p class="text-muted">Select a request to view annexure</p>');
+                $('#btnPrint').prop('disabled', true);
+                return;
+            }
+
+            $.get('/RemoteAccessRequest/GetAnnexure', { RequestId: id }, function (data) {
+                $('#annexureViewer').load('/RemoteAccessRequest/GetAnnexure?requestId=' + id);
+                $('#btnPrint').prop('disabled', false);
+            });
+        });
+
+        $('#btnPrint').click(function () {
+            window.print();
+        });
+
+    </script>
+}

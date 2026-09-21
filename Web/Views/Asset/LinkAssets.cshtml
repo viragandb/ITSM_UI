@@ -1,0 +1,1571 @@
+﻿@model Web.Models.AssetLinkVM
+
+@{
+    ViewBag.Title = "LinkAssets";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("LinkAssets", "Asset", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card">
+
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="align-middle me-2" data-lucide="link"></i>
+                        Link Assets
+                    </h5>
+                </div>
+
+                <div class="card-body">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+
+                            <label for="ParentBranchIdFrom" class="form-label">
+                                Branch
+                                <span class="text-danger">*</span>
+                            </label>
+
+                            <select id="ParentBranchIdFrom"
+                                    name="ParentBranchIdFrom"
+                                    class="form-select select2">
+
+                                <option value="0">-- Select --</option>
+
+                            </select>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <label for="ParentDepartmentIdFrom" class="form-label">
+                                Department
+                                <span class="text-danger">*</span>
+                            </label>
+
+                            <select id="ParentDepartmentIdFrom"
+                                    name="ParentDepartmentIdFrom"
+                                    class="form-select select2">
+
+                                <option value="0">-- Select --</option>
+
+                            </select>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <label for="ParentAssetCategoryId" class="form-label">
+                                Asset Category
+                                <span class="text-danger">*</span>
+                            </label>
+
+                            <select id="ParentAssetCategoryId"
+                                    name="ParentAssetCategoryId"
+                                    class="form-select select2">
+                            </select>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="row g-4 mt-2">
+
+                        <div class="col-md-5">
+
+                            <div class="card h-100">
+
+                                <div class="card-header">
+
+                                    <h5 class="card-title mb-0">
+                                        <i class="align-middle me-2" data-lucide="box"></i>
+                                        Master Asset
+                                    </h5>
+
+                                </div>
+
+                                <div class="card-body">
+
+                                    <div class="row g-3">
+
+                                        <div class="col-md-6">
+
+                                            <label for="ParentAssetTypeId" class="form-label">
+                                                Asset Type
+                                                <span class="text-danger">*</span>
+                                            </label>
+
+                                            <select id="ParentAssetTypeId"
+                                                    name="ParentAssetTypeId"
+                                                    class="form-select select2">
+                                            </select>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="mb-3 mt-3">
+
+                                        <label for="ParentAssetNo" class="form-label">
+                                            Asset No
+                                        </label>
+
+                                        <div class="input-group">
+
+                                            <input id="ParentAssetNo"
+                                                   name="ParentAssetNo"
+                                                   type="text"
+                                                   value="@Model.ParentAssetNo"
+                                                   class="form-control"
+                                                   placeholder="Type Asset No and click search" />
+
+                                            <button id="btnSearchParent"
+                                                    type="button"
+                                                    class="btn btn-primary">
+
+                                                <i class="align-middle me-1" data-lucide="search"></i>
+                                                Search
+
+                                            </button>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div id="loadingSpinnerParent"
+                                         class="text-center my-3"
+                                         style="display:none;">
+
+                                        <div class="spinner-border spinner-border-sm"
+                                             role="status">
+                                        </div>
+
+                                        <span class="ms-2">
+                                            Fetching assets...
+                                        </span>
+
+                                    </div>
+
+                                    <div id="parentContainer"
+                                         class="table-responsive"
+                                         style="max-height:300px; overflow-y:auto;">
+
+                                        <table class="table table-sm table-striped table-hover align-middle">
+
+                                            <thead>
+                                                <tr>
+                                                    <th style="width:80px;">Select</th>
+                                                    <th>Asset No</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody id="ParentAssets">
+                                            </tbody>
+
+                                        </table>
+
+                                    </div>
+
+
+                                    <div class="card mt-4">
+
+                                        <div class="card-header">
+
+                                            <h5 class="card-title mb-0">
+                                                <i class="align-middle me-2" data-lucide="network"></i>
+                                                Sub Assets Already Linked
+                                            </h5>
+
+                                        </div>
+
+                                        <div class="card-body">
+
+                                            <div id="parentAssetName"
+                                                 class="fw-semibold mb-3">
+                                            </div>
+
+                                            <div class="table-responsive"
+                                                 style="max-height:300px; min-height:300px; overflow-y:auto;">
+
+                                                <table class="table table-striped table-hover align-middle mb-0">
+
+                                                    <thead class="sticky-top">
+                                                        <tr>
+                                                            <th>Linked Assets</th>
+                                                        </tr>
+                                                    </thead>
+
+                                                    <tbody id="ParentTblItemsBody">
+                                                    </tbody>
+
+                                                </table>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                    <input type="hidden"
+                                           id="ParentAssetId"
+                                           name="ParentAssetId"
+                                           value="" />
+
+                                    <input type="hidden"
+                                           id="CurrentParentAssetId"
+                                           value="@Model.ParentAssetId" />
+
+                                    <div id="removedAssetsHidden"></div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-md-2 d-flex align-items-center justify-content-center">
+
+                            <button type="submit"
+                                    class="btn btn-primary">
+
+                                <i class="align-middle me-1" data-lucide="link"></i>
+                                Update Links
+
+                            </button>
+
+                        </div>
+
+
+                        <div class="col-md-5">
+
+                            <div class="card h-100">
+
+                                <div class="card-header">
+
+                                    <h5 class="card-title mb-0">
+                                        <i class="align-middle me-2" data-lucide="boxes"></i>
+                                        Sub Assets
+                                    </h5>
+
+                                </div>
+
+                                <div class="card-body">
+
+                                    <div class="row g-3">
+
+                                        <div class="col-md-6">
+
+                                            <label for="ChildAssetTypeId" class="form-label">
+                                                Asset Type
+                                                <span class="text-danger">*</span>
+                                            </label>
+
+                                            <select id="ChildAssetTypeId"
+                                                    name="ChildAssetTypeId"
+                                                    class="form-select select2">
+                                            </select>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="mb-3 mt-3">
+
+                                        <label for="ChildAssetNo" class="form-label">
+                                            Asset No
+                                        </label>
+
+                                        <div class="input-group">
+
+                                            <input id="ChildAssetNo"
+                                                   name="ChildAssetNo"
+                                                   type="text"
+                                                   value="@Model.ChildAssetNo"
+                                                   class="form-control"
+                                                   placeholder="Type Asset No and click search" />
+
+                                            <button id="btnSearchChild"
+                                                    type="button"
+                                                    class="btn btn-primary">
+
+                                                <i class="align-middle me-1" data-lucide="search"></i>
+                                                Search
+
+                                            </button>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div id="loadingSpinnerChild"
+                                         class="text-center my-3"
+                                         style="display:none;">
+
+                                        <div class="spinner-border spinner-border-sm"
+                                             role="status">
+                                        </div>
+
+                                        <span class="ms-2">
+                                            Fetching assets...
+                                        </span>
+
+                                    </div>
+
+                                    <div id="childContainer"
+                                         class="table-responsive"
+                                         style="max-height:300px; overflow-y:auto;">
+
+                                        <table class="table table-sm table-striped table-hover align-middle">
+
+                                            <thead>
+                                                <tr>
+                                                    <th style="width:80px;">Select</th>
+                                                    <th>Asset No</th>
+                                                    <th>Asset Name</th>
+                                                    <th>Serial No</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody id="ChildAssets">
+                                            </tbody>
+
+                                        </table>
+
+                                    </div>
+
+
+                                    <div class="card mt-4">
+
+                                        <div class="card-header">
+
+                                            <div class="d-flex align-items-center justify-content-between">
+
+                                                <h5 class="card-title mb-0">
+                                                    <i class="align-middle me-2" data-lucide="check-circle"></i>
+                                                    Sub Assets Chosen To Link
+                                                </h5>
+
+                                                <span class="badge bg-primary"
+                                                      id="selectedCountContainer">
+
+                                                    <i class="align-middle me-1"
+                                                       data-lucide="check-circle"></i>
+
+                                                    <span id="selectedCount">0</span>
+                                                    Assets Selected
+
+                                                </span>
+
+                                            </div>
+
+                                        </div>
+
+                                        <div class="card-body">
+
+                                            <div class="table-responsive"
+                                                 style="max-height:300px; min-height:300px; overflow-y:auto;">
+
+                                                <table id="newChosenTable"
+                                                       class="table table-striped table-hover align-middle mb-0">
+
+                                                    <thead class="sticky-top">
+                                                        <tr>
+                                                            <th>Selected Assets</th>
+                                                        </tr>
+                                                    </thead>
+
+                                                    <tbody>
+                                                    </tbody>
+
+                                                </table>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div id="selectedAssetsHidden"></div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+}
+
+@section scripts
+{
+    <script type="text/javascript">
+
+        var selectedChildAssets = {};
+        var linkedChildAssets = {};
+        var removedChildAssets = {};
+
+        var CurrentParentAssetId =
+            $("#CurrentParentAssetId").val() || 0;
+
+        var previousSelectedRow = null;
+
+
+        $(document).ready(function () {
+
+            if ($.fn.select2) {
+
+                $(".select2").select2({
+                    width: "100%"
+                });
+
+            }
+
+            ParentloadLocations();
+            ParentloadAssetCategory();
+
+        });
+
+
+        function parseJsonResult(data) {
+
+            if (typeof data === "string") {
+
+                try {
+                    return JSON.parse(data);
+                }
+                catch (e) {
+                    return [];
+                }
+
+            }
+
+            return data || [];
+
+        }
+
+
+        function escapeHtml(value) {
+
+            if (value == null) {
+                return "";
+            }
+
+            return $("<div/>")
+                .text(value)
+                .html();
+
+        }
+
+
+        $(document).on("change", ".Childasset-checkbox", function () {
+
+            var row =
+                $(this).closest("tr");
+
+            var assetId =
+                $(this).val();
+
+            var asset = {
+                AssetId: assetId,
+                AssetNo: $.trim(row.find("td:eq(1)").text()),
+                AssetName: $.trim(row.find("td:eq(2)").text()),
+                ModelName: $.trim(row.find("td:eq(3)").text())
+            };
+
+
+            if ($(this).is(":checked")) {
+
+                if (removedChildAssets[assetId]) {
+
+                    linkedChildAssets[assetId] =
+                        removedChildAssets[assetId];
+
+                    delete removedChildAssets[assetId];
+
+                }
+                else {
+
+                    selectedChildAssets[assetId] =
+                        asset;
+
+                }
+
+            }
+            else {
+
+                delete selectedChildAssets[assetId];
+
+            }
+
+
+            renderSelectedTable();
+
+        });
+
+
+        $(document).on("change", ".Parentasset-radio", function () {
+
+            var tableBody =
+                $("#ParentTblItemsBody");
+
+            var parentAssetIdValue =
+                $(this).val();
+
+            var row =
+                $(this).closest("tr");
+
+            var parentAssetName =
+                $.trim(row.find("td:eq(1)").text());
+
+
+            $("#parentAssetName")
+                .text(parentAssetName);
+
+            $("#ParentAssetId")
+                .val(parentAssetIdValue);
+
+            $("#CurrentParentAssetId")
+                .val(parentAssetIdValue);
+
+            CurrentParentAssetId =
+                parentAssetIdValue;
+
+
+            if (previousSelectedRow != null) {
+
+                previousSelectedRow
+                    .removeClass("table-primary");
+
+            }
+
+
+            row.addClass("table-primary");
+
+            previousSelectedRow =
+                row;
+
+
+            linkedChildAssets = {};
+            removedChildAssets = {};
+
+            tableBody.empty();
+
+
+            $.ajax({
+
+                url: '@Url.Action("GetLinkedChildAssetsJsonResult", "Asset")',
+
+                type: "GET",
+
+                dataType: "json",
+
+                data: {
+                    parentAssetId: parentAssetIdValue
+                },
+
+                success: function (data) {
+
+                    var items =
+                        parseJsonResult(data);
+
+                    if (items.length > 0) {
+
+                        $.each(
+                            items,
+                            function (i, asset) {
+
+                                linkedChildAssets[asset.AssetId] =
+                                    asset;
+
+                                var rowHtml =
+                                    "<tr data-id='" + asset.AssetId + "'>" +
+                                        "<td>" +
+                                            "<div class='d-flex justify-content-between align-items-center gap-2'>" +
+                                                "<span>" +
+                                                    escapeHtml(asset.AssetNo) +
+                                                    " - " +
+                                                    escapeHtml(asset.AssetName) +
+                                                "</span>" +
+
+                                                "<button type='button' " +
+                                                        "class='btn btn-sm btn-danger btnRemoveLinkedAsset'>" +
+
+                                                    "<i data-lucide='unlink'></i> Remove" +
+
+                                                "</button>" +
+                                            "</div>" +
+                                        "</td>" +
+                                    "</tr>";
+
+                                tableBody.append(rowHtml);
+
+                            }
+                        );
+
+                    }
+                    else {
+
+                        tableBody.append(
+                            "<tr>" +
+                                "<td class='text-center text-muted'>" +
+                                    "No items found" +
+                                "</td>" +
+                            "</tr>"
+                        );
+
+                    }
+
+
+                    if (window.lucide) {
+                        lucide.createIcons();
+                    }
+
+                },
+
+                error: function () {
+
+                    Swal.fire(
+                        "Something went wrong!",
+                        "Unable to fetch linked assets.",
+                        "error"
+                    );
+
+                }
+
+            });
+
+        });
+
+
+        $(document).on("click", ".btnRemoveLinkedAsset", function () {
+
+            var button =
+                $(this);
+
+            var row =
+                button.closest("tr");
+
+            var assetId =
+                row.data("id");
+
+
+            removedChildAssets[assetId] =
+                linkedChildAssets[assetId];
+
+            delete linkedChildAssets[assetId];
+
+
+            button
+                .removeClass("btnRemoveLinkedAsset btn-danger")
+                .addClass("btnUndo btn-secondary")
+                .html(
+                    "<i data-lucide='rotate-ccw'></i> Undo"
+                );
+
+
+            if (window.lucide) {
+                lucide.createIcons();
+            }
+
+        });
+
+
+        $(document).on("click", ".btnUndo", function () {
+
+            var button =
+                $(this);
+
+            var row =
+                button.closest("tr");
+
+            var assetId =
+                row.data("id");
+
+
+            linkedChildAssets[assetId] =
+                removedChildAssets[assetId];
+
+            delete removedChildAssets[assetId];
+
+
+            button
+                .removeClass("btnUndo btn-secondary")
+                .addClass("btnRemoveLinkedAsset btn-danger")
+                .html(
+                    "<i data-lucide='unlink'></i> Remove"
+                );
+
+
+            if (window.lucide) {
+                lucide.createIcons();
+            }
+
+        });
+
+
+        function renderSelectedTable() {
+
+            var tbody =
+                $("#newChosenTable tbody");
+
+            var hiddenDiv =
+                $("#selectedAssetsHidden");
+
+            tbody.empty();
+            hiddenDiv.empty();
+
+            var index = 0;
+
+
+            $.each(
+                selectedChildAssets,
+                function (id, asset) {
+
+                    var row =
+                        "<tr>" +
+                            "<td>" +
+
+                                "<div class='d-flex align-items-center gap-2'>" +
+
+                                    "<input type='checkbox' " +
+                                           "class='form-check-input remove-asset' " +
+                                           "value='" + asset.AssetId + "' checked />" +
+
+                                    "<span>" +
+                                        escapeHtml(asset.AssetNo) +
+                                        " - " +
+                                        escapeHtml(asset.AssetName) +
+                                    "</span>" +
+
+                                "</div>" +
+
+                            "</td>" +
+                        "</tr>";
+
+
+                    tbody.append(row);
+
+
+                    hiddenDiv.append(
+
+                        "<input type='hidden' " +
+                               "name='Assets[" + index + "].AssetId' " +
+                               "value='" + asset.AssetId + "' />"
+
+                    );
+
+
+                    index++;
+
+                }
+            );
+
+
+            $("#selectedCount")
+                .text(
+                    Object.keys(selectedChildAssets).length
+                );
+
+        }
+
+
+        $(document).on("change", ".remove-asset", function () {
+
+            var assetId =
+                $(this).val();
+
+
+            delete selectedChildAssets[assetId];
+
+
+            renderSelectedTable();
+
+
+            $(".Childasset-checkbox[value='" + assetId + "']")
+                .prop("checked", false);
+
+        });
+
+
+        $("form").on("submit", function () {
+
+            var parentAssetId =
+                $("#ParentAssetId").val();
+
+            if (!parentAssetId || parentAssetId == "0") {
+
+                Swal.fire(
+                    "Error!",
+                    "Please select a Master Asset.",
+                    "error"
+                );
+
+                return false;
+
+            }
+
+
+            var hiddenDiv =
+                $("#selectedAssetsHidden");
+
+            var removeDiv =
+                $("#removedAssetsHidden");
+
+
+            hiddenDiv.empty();
+            removeDiv.empty();
+
+
+            var index = 0;
+
+
+            $.each(
+                selectedChildAssets,
+                function (id, asset) {
+
+                    hiddenDiv.append(
+
+                        "<input type='hidden' " +
+                               "name='Assets[" + index + "].AssetId' " +
+                               "value='" + asset.AssetId + "' />"
+
+                    );
+
+                    index++;
+
+                }
+            );
+
+
+            var removeIndex = 0;
+
+
+            $.each(
+                removedChildAssets,
+                function (id, asset) {
+
+                    removeDiv.append(
+
+                        "<input type='hidden' " +
+                               "name='RemovedAssets[" + removeIndex + "].AssetId' " +
+                               "value='" + asset.AssetId + "' />"
+
+                    );
+
+                    removeIndex++;
+
+                }
+            );
+
+
+            return true;
+
+        });
+
+
+        function ParentloadLocations() {
+
+            $.getJSON(
+                '@Url.Action("GetItemListJsonResult", "Branch")',
+                function (data) {
+
+                    var dropDown =
+                        $("#ParentBranchIdFrom");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- Select --</option>"
+                    );
+
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+
+                                $("<option/>", {
+                                    value: item.BranchId,
+                                    text: item.Name
+                                })
+
+                            );
+
+                        }
+                    );
+
+
+                    dropDown.val(
+                        '@Model.ParentBranchIdFrom'
+                    );
+
+
+                    if ($.fn.select2) {
+                        dropDown.trigger("change.select2");
+                    }
+
+
+                    ParentloadDepartments();
+
+                }
+            );
+
+        }
+
+
+        function ParentloadDepartments() {
+
+            var branchId =
+                $("#ParentBranchIdFrom").val();
+
+
+            $.getJSON(
+                '@Url.Action("GetDepartmentListBtBranchIdJsonResult", "Department")',
+                {
+                    branchId: branchId
+                },
+                function (data) {
+
+                    var dropDown =
+                        $("#ParentDepartmentIdFrom");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- Select --</option>"
+                    );
+
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+
+                                $("<option/>", {
+                                    value: item.DepartmentId,
+                                    text: item.DepartmentName
+                                })
+
+                            );
+
+                        }
+                    );
+
+
+                    dropDown.val(
+                        '@Model.ParentDepartmentIdFrom'
+                    );
+
+
+                    if ($.fn.select2) {
+                        dropDown.trigger("change.select2");
+                    }
+
+
+                    loadParentAssets();
+                    loadChildAssets();
+
+                }
+            );
+
+        }
+
+
+        function ParentloadAssetCategory() {
+
+            $.getJSON(
+                '@Url.Action("GetAssetCategoryJsonResult", "AssetType")',
+                function (data) {
+
+                    var dropDown =
+                        $("#ParentAssetCategoryId");
+
+                    dropDown.empty();
+
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            if (item.Name === "Hardware") {
+
+                                dropDown.append(
+
+                                    $("<option/>", {
+                                        value: item.Id,
+                                        text: item.Name
+                                    })
+
+                                );
+
+                            }
+
+                        }
+                    );
+
+
+                    if ($.fn.select2) {
+                        dropDown.trigger("change.select2");
+                    }
+
+
+                    ParentloadAssetType();
+                    ChildloadAssetType();
+
+                }
+            );
+
+        }
+
+
+        function ParentloadAssetType() {
+
+            var categoryId =
+                $("#ParentAssetCategoryId").val();
+
+
+            $.getJSON(
+                '@Url.Action("GetAssetTypeByAssetCategoryListJsonResult", "AssetType")',
+                {
+                    assetCategory: categoryId
+                },
+                function (data) {
+
+                    var dropDown =
+                        $("#ParentAssetTypeId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- All --</option>"
+                    );
+
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+
+                                $("<option/>", {
+                                    value: item.AssetTypeId,
+                                    text: item.AssetTypeName
+                                })
+
+                            );
+
+                        }
+                    );
+
+
+                    dropDown.val(
+                        '@Model.ParentAssetTypeId'
+                    );
+
+
+                    if ($.fn.select2) {
+                        dropDown.trigger("change.select2");
+                    }
+
+
+                    loadParentAssets();
+
+                }
+            );
+
+        }
+
+
+        function ChildloadAssetType() {
+
+            var categoryId =
+                $("#ParentAssetCategoryId").val();
+
+
+            $.getJSON(
+                '@Url.Action("GetAssetTypeByAssetCategoryListJsonResult", "AssetType")',
+                {
+                    assetCategory: categoryId
+                },
+                function (data) {
+
+                    var dropDown =
+                        $("#ChildAssetTypeId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- All --</option>"
+                    );
+
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+
+                                $("<option/>", {
+                                    value: item.AssetTypeId,
+                                    text: item.AssetTypeName
+                                })
+
+                            );
+
+                        }
+                    );
+
+
+                    dropDown.val(
+                        '@Model.ChildAssetTypeId'
+                    );
+
+
+                    if ($.fn.select2) {
+                        dropDown.trigger("change.select2");
+                    }
+
+
+                    loadChildAssets();
+
+                }
+            );
+
+        }
+
+
+        $("#ParentBranchIdFrom").on("change", function () {
+
+            ParentloadDepartments();
+
+        });
+
+
+        $("#ParentDepartmentIdFrom").on("change", function () {
+
+            loadParentAssets();
+            loadChildAssets();
+
+        });
+
+
+        $("#ParentAssetTypeId").on("change", function () {
+
+            loadParentAssets();
+
+        });
+
+
+        $("#ChildAssetTypeId").on("change", function () {
+
+            loadChildAssets();
+
+        });
+
+
+        function canLoadParentAssets() {
+
+            var branchId =
+                $("#ParentBranchIdFrom").val();
+
+            var deptId =
+                $("#ParentDepartmentIdFrom").val();
+
+            var categoryId =
+                $("#ParentAssetCategoryId").val();
+
+            var typeId =
+                $("#ParentAssetTypeId").val();
+
+            var assetNo =
+                $.trim($("#ParentAssetNo").val());
+
+
+            if (assetNo !== "") {
+                return true;
+            }
+
+
+            return branchId != "0" &&
+                   deptId != "0" &&
+                   categoryId != "0" &&
+                   typeId != "0";
+
+        }
+
+
+        function canLoadChildAssets() {
+
+            var branchId =
+                $("#ParentBranchIdFrom").val();
+
+            var deptId =
+                $("#ParentDepartmentIdFrom").val();
+
+            var categoryId =
+                $("#ParentAssetCategoryId").val();
+
+            var typeId =
+                $("#ChildAssetTypeId").val();
+
+            var assetNo =
+                $.trim($("#ChildAssetNo").val());
+
+
+            if (assetNo !== "") {
+                return true;
+            }
+
+
+            return branchId != "0" &&
+                   deptId != "0" &&
+                   categoryId != "0" &&
+                   typeId != "0";
+
+        }
+
+
+        function loadParentAssets() {
+
+            if (!canLoadParentAssets()) {
+
+                $("#ParentAssets").html(
+
+                    "<tr>" +
+                        "<td colspan='2' class='text-center text-muted py-3'>" +
+                            "Select Branch, Department, Category and Type first" +
+                        "</td>" +
+                    "</tr>"
+
+                );
+
+                return;
+
+            }
+
+
+            var branchId =
+                $("#ParentBranchIdFrom").val() || 0;
+
+            var deptId =
+                $("#ParentDepartmentIdFrom").val() || 0;
+
+            var categoryId =
+                $("#ParentAssetCategoryId").val() || 1;
+
+            var typeId =
+                $("#ParentAssetTypeId").val() || 0;
+
+            var assetNo =
+                $("#ParentAssetNo").val() || "";
+
+
+            var loader =
+                $("#loadingSpinnerParent");
+
+            loader.show();
+
+
+            $.getJSON(
+                '@Url.Action("GetParentAssetListJsonResult", "Asset")',
+                {
+                    branchId: branchId,
+                    deptId: deptId,
+                    assetCatId: categoryId,
+                    assetTypeId: typeId,
+                    assetNo: assetNo
+                },
+                function (data) {
+
+                    var items =
+                        parseJsonResult(data);
+
+                    var tableBody =
+                        $("#ParentAssets");
+
+                    tableBody.empty();
+
+
+                    if (items.length === 0) {
+
+                        tableBody.append(
+
+                            "<tr>" +
+                                "<td colspan='2' class='text-center text-muted py-3'>" +
+                                    "No assets found" +
+                                "</td>" +
+                            "</tr>"
+
+                        );
+
+                    }
+                    else {
+
+                        $.each(
+                            items,
+                            function (index, asset) {
+
+                                var checked =
+                                    asset.AssetId == CurrentParentAssetId
+                                        ? "checked"
+                                        : "";
+
+
+                                var row =
+                                    "<tr>" +
+
+                                        "<td>" +
+                                            "<input type='radio' " +
+                                                   "class='form-check-input Parentasset-radio' " +
+                                                   "name='selectedParent' " +
+                                                   "value='" + asset.AssetId + "' " +
+                                                   checked + " />" +
+                                        "</td>" +
+
+                                        "<td>" +
+                                            escapeHtml(asset.AssetNo) +
+                                        "</td>" +
+
+                                    "</tr>";
+
+
+                                tableBody.append(row);
+
+                            }
+                        );
+
+                    }
+
+
+                    loader.hide();
+
+
+                    if (CurrentParentAssetId != 0) {
+
+                        var selectedRadio =
+                            $(".Parentasset-radio[value='" + CurrentParentAssetId + "']");
+
+
+                        if (selectedRadio.length) {
+
+                            selectedRadio
+                                .prop("checked", true)
+                                .trigger("change");
+
+
+                            var targetRow =
+                                selectedRadio.closest("tr");
+
+                            var container =
+                                $("#parentContainer");
+
+
+                            container.scrollTop(
+
+                                container.scrollTop() +
+                                targetRow.position().top
+
+                            );
+
+                        }
+
+                    }
+
+                }
+            ).fail(function () {
+
+                loader.hide();
+
+                Swal.fire(
+                    "Something went wrong!",
+                    "Unable to fetch Master Assets.",
+                    "error"
+                );
+
+            });
+
+        }
+
+
+        function loadChildAssets() {
+
+            if (!canLoadChildAssets()) {
+
+                $("#ChildAssets").html(
+
+                    "<tr>" +
+                        "<td colspan='4' class='text-center text-muted py-3'>" +
+                            "Select Branch, Department, Category and Type first" +
+                        "</td>" +
+                    "</tr>"
+
+                );
+
+                return;
+
+            }
+
+
+            var branchId =
+                $("#ParentBranchIdFrom").val() || 0;
+
+            var deptId =
+                $("#ParentDepartmentIdFrom").val() || 0;
+
+            var categoryId =
+                $("#ParentAssetCategoryId").val() || 1;
+
+            var typeId =
+                $("#ChildAssetTypeId").val() || 0;
+
+            var assetNo =
+                $("#ChildAssetNo").val() || "";
+
+
+            var loader =
+                $("#loadingSpinnerChild");
+
+            loader.show();
+
+
+            $.getJSON(
+                '@Url.Action("GetChildAssetListJsonResult", "Asset")',
+                {
+                    branchId: branchId,
+                    deptId: deptId,
+                    assetCatId: categoryId,
+                    assetTypeId: typeId,
+                    assetNo: assetNo
+                },
+                function (data) {
+
+                    var items =
+                        parseJsonResult(data);
+
+                    var tableBody =
+                        $("#ChildAssets");
+
+                    tableBody.empty();
+
+
+                    if (items.length === 0) {
+
+                        tableBody.append(
+
+                            "<tr>" +
+                                "<td colspan='4' class='text-center text-muted py-3'>" +
+                                    "No assets found" +
+                                "</td>" +
+                            "</tr>"
+
+                        );
+
+                    }
+                    else {
+
+                        $.each(
+                            items,
+                            function (index, asset) {
+
+                                var checked =
+                                    selectedChildAssets[asset.AssetId]
+                                        ? "checked"
+                                        : "";
+
+
+                                var row =
+                                    "<tr>" +
+
+                                        "<td>" +
+                                            "<input type='checkbox' " +
+                                                   "class='form-check-input Childasset-checkbox' " +
+                                                   "value='" + asset.AssetId + "' " +
+                                                   checked + " />" +
+                                        "</td>" +
+
+                                        "<td>" +
+                                            escapeHtml(asset.AssetNo) +
+                                        "</td>" +
+
+                                        "<td>" +
+                                            escapeHtml(asset.AssetName) +
+                                        "</td>" +
+
+                                        "<td>" +
+                                            escapeHtml(asset.SerialNo) +
+                                        "</td>" +
+
+                                    "</tr>";
+
+
+                                tableBody.append(row);
+
+                            }
+                        );
+
+                    }
+
+
+                    loader.hide();
+
+                }
+            ).fail(function () {
+
+                loader.hide();
+
+                Swal.fire(
+                    "Something went wrong!",
+                    "Unable to fetch Sub Assets.",
+                    "error"
+                );
+
+            });
+
+        }
+
+
+        $("#btnSearchParent").on("click", function () {
+
+            var assetNo =
+                $.trim($("#ParentAssetNo").val());
+
+
+            if (assetNo.length === 0) {
+
+                $("#ParentTblItemsBody").empty();
+                $("#parentAssetName").text("");
+
+            }
+
+
+            loadParentAssets();
+
+        });
+
+
+        $("#btnSearchChild").on("click", function () {
+
+            loadChildAssets();
+
+        });
+
+    </script>
+}

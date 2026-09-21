@@ -1,0 +1,80 @@
+﻿@model Web.Models.DisposalVM
+
+@{
+    ViewBag.Title = "NewDisposalRequest";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("NewDisposalRequest", "AssetTransaction", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+
+    <div class="row">
+        <div class="col-lg-8">
+
+            <div class="card">
+
+                <div class="card-header">
+
+                    <h5 class="card-title mb-0">
+                        <i class="align-middle me-2" data-lucide="file-text"></i>
+                        New Request - Disposal Request
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+
+                            @Html.LabelFor(model => model.Title)
+
+                            <span class="text-danger">*</span>
+
+                        </label>
+
+                        @Html.TextAreaFor(
+                            model => model.Title,
+                            new
+                            {
+                                @class = "form-control",
+                                rows = "3",
+                                style = "white-space: pre-wrap;"
+                            }
+                        )
+
+                        @Html.ValidationMessageFor(
+                            model => model.Title,
+                            "",
+                            new { @class = "text-danger" }
+                        )
+
+                    </div>
+
+                </div>
+
+                <div class="card-footer">
+
+                    <div class="d-flex justify-content-end">
+
+                        <button type="submit"
+                                id="btnSave"
+                                class="btn btn-primary btnSubmitDisable">
+
+                            <i class="align-middle me-1" data-lucide="send"></i>
+                            Submit
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+}

@@ -1,0 +1,240 @@
+﻿@model Web.Models.WorkTaskVM
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("Create", "WorkTask", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card">
+
+                <div class="card-header">
+
+                    <h5 class="card-title mb-0">
+                        <i class="align-middle me-2" data-lucide="file-text"></i>
+                        New Work Note
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-4">
+
+                            @Html.LabelFor(
+                                model => model.TaskDate,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.TextBoxFor(
+                                model => model.TaskDate,
+                                "{0:yyyy-MM-dd}",
+                                new
+                                {
+                                    @class = "form-control",
+                                    type = "date"
+                                }
+                            )
+
+                            @Html.ValidationMessageFor(
+                                model => model.TaskDate,
+                                "",
+                                new { @class = "text-danger" }
+                            )
+
+                        </div>
+
+                        <div class="col-md-4">
+
+                            @Html.LabelFor(
+                                model => model.StartTime,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.TextBoxFor(
+                                model => model.StartTime,
+                                new
+                                {
+                                    @class = "form-control",
+                                    type = "time"
+                                }
+                            )
+
+                            @Html.ValidationMessageFor(
+                                model => model.StartTime,
+                                "",
+                                new { @class = "text-danger" }
+                            )
+
+                        </div>
+
+                        <div class="col-md-4">
+
+                            @Html.LabelFor(
+                                model => model.EndTime,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.TextBoxFor(
+                                model => model.EndTime,
+                                new
+                                {
+                                    @class = "form-control",
+                                    type = "time"
+                                }
+                            )
+
+                            @Html.ValidationMessageFor(
+                                model => model.EndTime,
+                                "",
+                                new { @class = "text-danger" }
+                            )
+
+                        </div>
+
+                        <div class="col-12">
+
+                            @Html.LabelFor(
+                                model => model.Subject,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.TextBoxFor(
+                                model => model.Subject,
+                                new { @class = "form-control" }
+                            )
+
+                            @Html.ValidationMessageFor(
+                                model => model.Subject,
+                                "",
+                                new { @class = "text-danger" }
+                            )
+
+                        </div>
+
+                        <div class="col-12">
+
+                            @Html.LabelFor(
+                                model => model.Description,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.TextAreaFor(
+                                model => model.Description,
+                                new
+                                {
+                                    @class = "form-control",
+                                    rows = "4"
+                                }
+                            )
+
+                            @Html.ValidationMessageFor(
+                                model => model.Description,
+                                "",
+                                new { @class = "text-danger" }
+                            )
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="card-footer">
+
+                    <div class="d-flex justify-content-end">
+
+                        <button type="submit"
+                                class="btn btn-sm btn-primary btnSumbitDisable">
+
+                            <i class="align-middle me-1" data-lucide="save"></i>
+                            Save
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+}
+
+
+@section scripts {
+
+    <script src="~/Scripts/jquery.validate.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+
+    <script type="text/javascript">
+
+        function parseJsonResult(data) {
+            if (typeof data === "string") {
+                try {
+                    return JSON.parse(data);
+                }
+                catch (e) {
+                    return [];
+                }
+            }
+
+            return data || [];
+        }
+
+
+        function loadCategory() {
+
+            var valId = '2';
+
+            $.getJSON(
+                '@Url.Action("GetCategoryByTicketTypeListJsonResult", "Category")',
+                {
+                    ticketType: valId
+                },
+                function (data) {
+
+                    var dropDown = $("#CategoryId");
+
+                    dropDown.empty();
+                    dropDown.append("<option value='0'>-- Select --</option>");
+
+                    $.each(parseJsonResult(data), function (index, item) {
+
+                        dropDown.append(
+                            $("<option/>", {
+                                value: item.CategoryId,
+                                text: item.CategoryName
+                            })
+                        );
+
+                    });
+
+                    var selectedCategoryId = '@ViewBag.CategoryId';
+
+                    if (selectedCategoryId) {
+                        $("#CategoryId").val(selectedCategoryId);
+                    }
+
+                }
+            );
+
+            loadAssetType();
+        }
+
+
+        $("select#CategoryId").on("change", function () {
+            loadAssetType();
+        });
+
+    </script>
+}

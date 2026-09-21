@@ -1,0 +1,289 @@
+﻿@model Web.Models.DocUploadVM
+@using Service
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="card">
+
+            <div class="card-header d-flex justify-content-between align-items-center">
+
+                <h5 class="card-title mb-0">
+                    <i class="align-middle me-2" data-lucide="file-text"></i>
+                    Change Documents
+                </h5>
+
+                <a href="@Url.Action("AssignItems", "Change")"
+                   class="btn btn-sm btn-light">
+
+                    <i class="align-middle me-1" data-lucide="arrow-left"></i>
+                    Back
+
+                </a>
+
+            </div>
+
+            <div class="card-body">
+
+                <div class="row g-4">
+
+                    <div class="col-md-7">
+
+                        @Html.Partial("_ChangeMin", Model.Change)
+
+                    </div>
+
+                    <div class="col-md-5">
+
+                        <div class="card">
+
+                            <div class="card-header">
+
+                                <h5 class="card-title mb-0">
+                                    <i class="align-middle me-2" data-lucide="files"></i>
+                                    Documents
+                                </h5>
+
+                            </div>
+
+                            <div class="card-body">
+
+                                @if (Model.ItemDocs != null)
+                                {
+                                    foreach (var item in Model.ItemDocs)
+                                    {
+                                        <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+
+                                            <div class="text-truncate me-2">
+
+                                                <a href="@item.FileUrl"
+                                                   target="_blank"
+                                                   class="text-decoration-none">
+
+                                                    <i class="align-middle me-1" data-lucide="file-text"></i>
+                                                    @item.FileName
+
+                                                </a>
+
+                                            </div>
+
+                                            <button type="button"
+                                                    class="btn btn-sm btn-danger"
+                                                    onclick="deleteItem('@item.ItemDocId', '@HttpUtility.JavaScriptStringEncode(item.FileName)')">
+
+                                                <i class="align-middle" data-lucide="trash-2"></i>
+
+                                            </button>
+
+                                        </div>
+                                    }
+                                }
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="row mt-4">
+
+                    <div class="col-12">
+
+                        @using (Html.BeginForm("DocUpload", "Change", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                        {
+                            @Html.HiddenFor(model => model.Change.ChangeId)
+
+                            <div class="card">
+
+                                <div class="card-header d-flex justify-content-between align-items-center">
+
+                                    <h5 class="card-title mb-0">
+                                        <i class="align-middle me-2" data-lucide="upload"></i>
+                                        Upload Documents
+                                    </h5>
+
+                                    <button type="button"
+                                            class="btn btn-sm btn-light"
+                                            data-bs-toggle="collapse"
+                                            data-bs-target="#uploadDocumentBody"
+                                            aria-expanded="true"
+                                            aria-controls="uploadDocumentBody">
+
+                                        <i class="align-middle" data-lucide="chevron-down"></i>
+
+                                    </button>
+
+                                </div>
+
+                                <div id="uploadDocumentBody"
+                                     class="collapse show">
+
+                                    <div class="card-body">
+
+                                        <div class="row g-3">
+
+                                            <div class="col-md-6">
+
+                                                @Html.LabelFor(
+                                                    model => model.FileName,
+                                                    new { @class = "form-label" }
+                                                )
+
+                                                @Html.TextBoxFor(
+                                                    model => model.FileName,
+                                                    new { @class = "form-control" }
+                                                )
+
+                                                @Html.ValidationMessageFor(
+                                                    model => model.FileName,
+                                                    "",
+                                                    new { @class = "text-danger" }
+                                                )
+
+                                            </div>
+
+                                            <div class="col-md-6">
+
+                                                <label for="itemFile" class="form-label">
+                                                    Select File
+                                                </label>
+
+                                                <input type="file"
+                                                       name="itemFile"
+                                                       id="itemFile"
+                                                       class="form-control" />
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="card-footer">
+
+                                        <div class="d-flex justify-content-end">
+
+                                            <button type="submit"
+                                                    class="btn btn-primary btn-sm">
+
+                                                <i class="align-middle me-1" data-lucide="upload"></i>
+                                                Upload
+
+                                            </button>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        }
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        function deleteItem(itemId, itemName) {
+
+            Swal.fire({
+
+                title: "Are you sure?",
+                text: "Do you want to delete: " + itemName + "?",
+                icon: "warning",
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                showCancelButton: true,
+                reverseButtons: true
+
+            }).then(function (result) {
+
+                if (result.isConfirmed || result.value) {
+
+                    $.ajax({
+
+                        url: '@Url.Action("Delete", "ItemDoc")',
+
+                        type: "GET",
+
+                        dataType: "json",
+
+                        data: {
+                            id: itemId
+                        },
+
+                        success: function (data) {
+
+                            if (data == "1" || data == 1) {
+
+                                Swal.fire(
+                                    "Deleted!",
+                                    "Record has been deleted",
+                                    "success"
+                                );
+
+                                setTimeout(function () {
+                                    window.location.reload();
+                                }, 500);
+
+                            }
+                            else if (data == "2" || data == 2) {
+
+                                Swal.fire(
+                                    "Data in use!",
+                                    "Data is currently in use and can not be deleted",
+                                    "error"
+                                );
+
+                            }
+                            else {
+
+                                Swal.fire(
+                                    "Something went wrong!",
+                                    "Data is not deleted, Please try again",
+                                    "error"
+                                );
+
+                            }
+
+                        },
+
+                        error: function () {
+
+                            Swal.fire(
+                                "Something went wrong!",
+                                "Data is not deleted, Please try again",
+                                "error"
+                            );
+
+                        }
+
+                    });
+
+                }
+
+            });
+
+        }
+
+    </script>
+}

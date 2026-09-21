@@ -1,0 +1,839 @@
+﻿@model Domain.Ticket
+@using Service
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var ticketColor = TicketService.GetTicketTypeColor(
+        Model.RequestType.TicketType
+    );
+}
+
+
+@using (Html.BeginForm(
+    "Create",
+    "ServiceDesk",
+    FormMethod.Post,
+    new { @class = "" }))
+{
+    @Html.AntiForgeryToken()
+
+    @Html.ValidationSummary(
+        true,
+        "",
+        new { @class = "alert alert-danger" }
+    )
+
+
+    @Html.HiddenFor(model => model.RequestTypeId)
+
+    @Html.HiddenFor(model => model.RequestType.TicketType)
+
+
+    <div class="row">
+
+        <div class="col-12">
+
+
+            <!-- ================================================== -->
+            <!-- MAIN CARD -->
+            <!-- ================================================== -->
+
+            <div class="card border-top border-4 border-@ticketColor">
+
+
+                <!-- ============================================== -->
+                <!-- CARD HEADER -->
+                <!-- ============================================== -->
+
+                <div class="card-header">
+
+                    <h5 class="card-title mb-0">
+
+                        New @Model.RequestType.TicketType.EnumDisplayName()
+
+                    </h5>
+
+                </div>
+
+
+                <!-- ============================================== -->
+                <!-- CARD BODY -->
+                <!-- ============================================== -->
+
+                <div class="card-body">
+
+
+                    <!-- ========================================== -->
+                    <!-- REQUEST CATEGORY PATH -->
+                    <!-- ========================================== -->
+
+                    <div class="mb-4">
+
+                        <div class="d-flex flex-wrap align-items-center gap-2">
+
+                            <span>
+
+                                <i class="fa fa-@Model.RequestType.Category.Icon me-1"></i>
+
+                                @Model.RequestType.Category.CategoryName
+
+                            </span>
+
+
+                            <i class="fas fa-angle-double-right text-muted"></i>
+
+
+                            <span>
+
+                                <i class="fa fa-@Model.RequestType.AssetType.Icon me-1"></i>
+
+                                @Model.RequestType.AssetType.AssetTypeName
+
+                            </span>
+
+
+                            <i class="fas fa-angle-double-right text-muted"></i>
+
+
+                            <span class="fw-semibold">
+
+                                <i class="fa fa-@Model.RequestType.SubCategory.Icon me-1"></i>
+
+                                @Model.RequestType.SubCategory.SubCategoryName
+
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <hr />
+
+
+                    <!-- ========================================== -->
+                    <!-- LOCATION -->
+                    <!-- ========================================== -->
+
+                    <div class="row mb-3">
+
+                        <div class="col-md-2">
+
+                            @Html.LabelFor(
+                                model => model.BranchId,
+                                new { @class = "form-label" }
+                            )
+
+                        </div>
+
+                        <div class="col-md-5">
+
+                            <select id="LocationId"
+                                    name="LocationId"
+                                    class="form-select">
+
+                                <option value="">
+                                    -- Select Location --
+                                </option>
+
+                            </select>
+
+                            <span class="field-validation-error"
+                                  data-valmsg-for="LocationId"
+                                  data-valmsg-replace="true">
+                            </span>
+
+                            @Html.Hidden("LocationName")
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ========================================== -->
+                    <!-- DEPARTMENT -->
+                    <!-- ========================================== -->
+
+                    <div class="row mb-3">
+
+                        <div class="col-md-2">
+
+                            @Html.LabelFor(
+                                model => model.DepartmentName,
+                                new { @class = "form-label" }
+                            )
+
+                        </div>
+
+                        <div class="col-md-5">
+
+                            <select id="DepartmentId"
+                                    name="DepartmentId"
+                                    class="form-select">
+
+                                <option value="">
+                                    -- Select Department --
+                                </option>
+
+                            </select>
+
+                            <span class="field-validation-error"
+                                  data-valmsg-for="DepartmentId"
+                                  data-valmsg-replace="true">
+                            </span>
+
+                            @Html.Hidden("DepartmentName")
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ========================================== -->
+                    <!-- SUBJECT -->
+                    <!-- ========================================== -->
+
+                    <div class="row mb-3">
+
+                        <div class="col-md-2">
+
+                            @Html.LabelFor(
+                                model => model.Subject,
+                                new { @class = "form-label" }
+                            )
+
+                        </div>
+
+                        <div class="col-md-9">
+
+                            @Html.TextBoxFor(
+                                model => model.Subject,
+                                new
+                                {
+                                    @class = "form-control",
+                                    @placeholder = "Enter subject"
+                                }
+                            )
+
+                            @Html.ValidationMessageFor(
+                                model => model.Subject,
+                                "",
+                                new { @class = "field-validation-error" }
+                            )
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ========================================== -->
+                    <!-- DESCRIPTION -->
+                    <!-- ========================================== -->
+
+                    <div class="row mb-3">
+
+                        <div class="col-md-2">
+
+                            @Html.LabelFor(
+                                model => model.Description,
+                                new { @class = "form-label" }
+                            )
+
+                        </div>
+
+                        <div class="col-md-9">
+
+                            @Html.TextAreaFor(
+                                model => model.Description,
+                                new
+                                {
+                                    @class = "form-control",
+                                    rows = "4",
+                                    @placeholder = "Enter description"
+                                }
+                            )
+
+                            @Html.ValidationMessageFor(
+                                model => model.Description,
+                                "",
+                                new { @class = "field-validation-error" }
+                            )
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ========================================== -->
+                    <!-- INCIDENT PRIORITY -->
+                    <!-- ========================================== -->
+
+                    <div id="In_Priority">
+
+
+                        <hr class="my-4" />
+
+
+                        <h6 class="mb-3">
+                            Priority
+                        </h6>
+
+
+                        <!-- Urgency -->
+
+                        <div class="row mb-3">
+
+                            <div class="col-md-2">
+
+                                @Html.LabelFor(
+                                    model => model.Urgency,
+                                    new { @class = "form-label" }
+                                )
+
+                            </div>
+
+                            <div class="col-md-3">
+
+                                @Html.EnumDropDownListFor(
+                                    model => model.Urgency,
+                                    "-- Select --",
+                                    new { @class = "form-select" }
+                                )
+
+                                @Html.ValidationMessageFor(
+                                    model => model.Urgency,
+                                    "",
+                                    new { @class = "field-validation-error" }
+                                )
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Impact -->
+
+                        <div class="row mb-3">
+
+                            <div class="col-md-2">
+
+                                @Html.LabelFor(
+                                    model => model.Impact,
+                                    new { @class = "form-label" }
+                                )
+
+                            </div>
+
+                            <div class="col-md-3">
+
+                                @Html.EnumDropDownListFor(
+                                    model => model.Impact,
+                                    "-- Select --",
+                                    new { @class = "form-select" }
+                                )
+
+                                @Html.ValidationMessageFor(
+                                    model => model.Impact,
+                                    "",
+                                    new { @class = "field-validation-error" }
+                                )
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Calculated Priority -->
+
+                        <div class="row mb-3">
+
+                            <div class="col-md-2">
+
+                                @Html.LabelFor(
+                                    model => model.TicketPriorityId,
+                                    new { @class = "form-label" }
+                                )
+
+                            </div>
+
+                            <div class="col-md-3">
+
+                                <div class="form-control bg-body-tertiary">
+
+                                    <span id="TicketPriority"
+                                          class="fw-semibold">
+                                    </span>
+
+                                </div>
+
+                                @Html.HiddenFor(
+                                    model => model.TicketPriorityId
+                                )
+
+                            </div>
+
+                        </div>
+
+
+                    </div>
+
+                </div>
+
+
+                <!-- ============================================== -->
+                <!-- CARD FOOTER -->
+                <!-- ============================================== -->
+
+                <div class="card-footer">
+
+                    <div class="d-flex justify-content-end">
+
+                        <button type="submit"
+                                class="btn btn-primary btnSubmitDisable">
+
+                            <i class="fas fa-save me-1"></i>
+
+                            Save
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+    </div>
+}
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            loadPriority();
+
+            getPrioritySection();
+
+            loadCompanies();
+
+            loadDepartment();
+
+        });
+
+
+        // ======================================================
+        // URGENCY
+        // ======================================================
+
+        $("select#Urgency").on("change", function () {
+
+            loadPriority();
+
+        });
+
+
+        // ======================================================
+        // IMPACT
+        // ======================================================
+
+        $("select#Impact").on("change", function () {
+
+            loadPriority();
+
+        });
+
+
+        // ======================================================
+        // LOAD PRIORITY
+        // ======================================================
+
+        function loadPriority() {
+
+            var urgencyId = $('#Urgency').val();
+
+            var impactId = $('#Impact').val();
+
+
+            $("#TicketPriority").text("");
+
+            $("#TicketPriorityId").val("");
+
+
+            if (!urgencyId || !impactId) {
+
+                return;
+
+            }
+
+
+            $.getJSON(
+                '@Url.Action("GetTicketPriorityListJsonResult", "TicketPriority")',
+                {
+                    urgency: urgencyId,
+                    impact: impactId
+                },
+                function (data) {
+
+                    var items = parseJsonResult(data);
+
+
+                    $.each(
+                        items,
+                        function (index, item) {
+
+                            $("#TicketPriority").text(
+                                item.TicketPriorityName
+                            );
+
+                            $("#TicketPriorityId").val(
+                                item.TicketPriorityId
+                            );
+
+                        }
+                    );
+
+                }
+            );
+
+        }
+
+
+        // ======================================================
+        // SHOW/HIDE INCIDENT PRIORITY
+        // ======================================================
+
+        function getPrioritySection() {
+
+            var ticketType =
+                $("#RequestType_TicketType").val();
+
+
+            if (ticketType === 'IN') {
+
+                $("#In_Priority").show();
+
+            }
+            else {
+
+                $("#In_Priority").hide();
+
+            }
+
+        }
+
+
+        // ======================================================
+        // COMPANY
+        // ======================================================
+
+        function loadCompanies() {
+
+            $.getJSON(
+                '@Url.Action("GetCompanyListJsonResult", "Company")',
+                function (data) {
+
+                    var companyDropDown =
+                        $("#CompanyId");
+
+
+                    /*
+                     * Some versions of this view may not contain
+                     * CompanyId. Keep the existing method safe.
+                     */
+
+                    if (companyDropDown.length) {
+
+                        companyDropDown.empty();
+
+                        companyDropDown.append(
+                            "<option value='0'>-- Select --</option>"
+                        );
+
+
+                        var items =
+                            parseJsonResult(data);
+
+
+                        $.each(
+                            items,
+                            function (index, item) {
+
+                                companyDropDown.append(
+                                    $('<option/>', {
+                                        value: item.CompanyId,
+                                        text: item.CompanyName
+                                    })
+                                );
+
+                            }
+                        );
+
+
+                        var companyId =
+                            '@ViewBag.CompanyId';
+
+
+                        if (companyId &&
+                            companyId !== '0') {
+
+                            companyDropDown.val(
+                                companyId
+                            );
+
+                        }
+
+                    }
+
+
+                    loadLocation();
+
+                }
+            );
+
+        }
+
+
+        // ======================================================
+        // COMPANY CHANGE
+        // ======================================================
+
+        $(document).on(
+            "change",
+            "select#CompanyId",
+            function () {
+
+                $('#Company').val(
+                    $("#CompanyId option:selected").text()
+                );
+
+                loadLocation();
+
+            }
+        );
+
+
+        // ======================================================
+        // LOCATION
+        // ======================================================
+
+        function loadLocation() {
+
+            var companyId =
+                $('#CompanyId').val();
+
+
+            var viewBagCompanyId =
+                '@ViewBag.CompanyId';
+
+
+            if (viewBagCompanyId &&
+                viewBagCompanyId !== '0') {
+
+                companyId =
+                    viewBagCompanyId;
+
+            }
+
+
+            $.getJSON(
+                '@Url.Action("GetLocationListJsonResult", "Location")',
+                {
+                    CompanyId: companyId
+                },
+                function (data) {
+
+                    var dropDown =
+                        $("#LocationId");
+
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- Select Location --</option>"
+                    );
+
+
+                    var items =
+                        parseJsonResult(data);
+
+
+                    $.each(
+                        items,
+                        function (index, item) {
+
+                            dropDown.append(
+                                $('<option/>', {
+                                    value: item.LocationId,
+                                    text: item.LocationName
+                                })
+                            );
+
+                        }
+                    );
+
+
+                    var locationId =
+                        '@ViewBag.LocationId';
+
+
+                    if (locationId &&
+                        locationId !== '0') {
+
+                        dropDown.val(
+                            locationId
+                        );
+
+                        $('#LocationName').val(
+                            dropDown
+                                .find("option:selected")
+                                .text()
+                        );
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        // ======================================================
+        // LOCATION CHANGE
+        // ======================================================
+
+        $("select#LocationId").on(
+            "change",
+            function () {
+
+                $('#LocationName').val(
+                    $("#LocationId option:selected").text()
+                );
+
+            }
+        );
+
+
+        // ======================================================
+        // DEPARTMENT
+        // ======================================================
+
+        function loadDepartment() {
+
+            $.getJSON(
+                '@Url.Action("GetDepartmentListJsonResult", "Department")',
+                function (data) {
+
+                    var dropDown =
+                        $("#DepartmentId");
+
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- Select Department --</option>"
+                    );
+
+
+                    var items =
+                        parseJsonResult(data);
+
+
+                    $.each(
+                        items,
+                        function (index, item) {
+
+                            dropDown.append(
+                                $('<option/>', {
+                                    value: item.DepartmentId,
+                                    text: item.DepartmentName
+                                })
+                            );
+
+                        }
+                    );
+
+
+                    var departmentId =
+                        '@ViewBag.DepartmentId';
+
+
+                    if (departmentId &&
+                        departmentId !== '0') {
+
+                        dropDown.val(
+                            departmentId
+                        );
+
+                        $('#DepartmentName').val(
+                            dropDown
+                                .find("option:selected")
+                                .text()
+                        );
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        // ======================================================
+        // DEPARTMENT CHANGE
+        // ======================================================
+
+        $("select#DepartmentId").on(
+            "change",
+            function () {
+
+                $('#DepartmentName').val(
+                    $("#DepartmentId option:selected").text()
+                );
+
+            }
+        );
+
+
+        // ======================================================
+        // SAFE JSON RESULT PARSER
+        //
+        // Your controller currently appears to return serialized
+        // JSON inside JsonResult, so some endpoints return a
+        // string while others may eventually return an object.
+        //
+        // This supports both without changing the controller.
+        // ======================================================
+
+        function parseJsonResult(data) {
+
+            if (typeof data === "string") {
+
+                try {
+
+                    return JSON.parse(data);
+
+                }
+                catch (e) {
+
+                    return [];
+
+                }
+
+            }
+
+
+            return data || [];
+
+        }
+
+    </script>
+
+}
+

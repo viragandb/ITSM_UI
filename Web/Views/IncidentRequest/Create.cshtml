@@ -1,0 +1,918 @@
+﻿@model Web.Models.NewIncidentRequestVM
+@using Service
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("Create", "IncidentRequest", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card">
+
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="align-middle me-2" data-lucide="plus"></i>
+                        New Request
+                    </h5>
+                </div>
+
+                <div class="card-body">
+
+                    <div class="mb-3">
+
+                        @Html.LabelFor(
+                            model => model.Subject,
+                            new { @class = "form-label" }
+                        )
+
+                        @Html.TextBoxFor(
+                            model => model.Subject,
+                            new { @class = "form-control" }
+                        )
+
+                        @Html.ValidationMessageFor(
+                            model => model.Subject,
+                            "",
+                            new { @class = "text-danger" }
+                        )
+
+                    </div>
+
+
+                    <div class="mb-3">
+
+                        @Html.LabelFor(
+                            model => model.Description,
+                            new { @class = "form-label" }
+                        )
+
+                        @Html.TextAreaFor(
+                            model => model.Description,
+                            new
+                            {
+                                @class = "form-control",
+                                rows = "3",
+                                style = "white-space: pre-wrap;"
+                            }
+                        )
+
+                        @Html.ValidationMessageFor(
+                            model => model.Description,
+                            "",
+                            new { @class = "text-danger" }
+                        )
+
+                    </div>
+
+
+                    <div class="row g-3">
+
+                        <div class="col-md-4">
+
+                            @Html.LabelFor(
+                                model => model.OccurredDate,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.TextBoxFor(
+                                model => model.OccurredDate,
+                                "{0:yyyy-MM-dd}",
+                                new
+                                {
+                                    @class = "form-control",
+                                    type = "date"
+                                }
+                            )
+
+                            @Html.ValidationMessageFor(
+                                model => model.OccurredDate,
+                                "",
+                                new { @class = "text-danger" }
+                            )
+
+                        </div>
+
+
+                        <div class="col-md-4">
+
+                            @Html.LabelFor(
+                                model => model.OccurredTime,
+                                new { @class = "form-label" }
+                            )
+
+                            <input type="time"
+                                   id="Occurred_Time"
+                                   name="Occurred_Time"
+                                   value="@ViewBag.OccurredTime"
+                                   class="form-control" />
+
+                        </div>
+
+
+                        <div class="col-md-4">
+
+                            @Html.LabelFor(
+                                model => model.Impact,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.EnumDropDownListFor(
+                                model => model.Impact,
+                                "-- Select --",
+                                new { @class = "form-select" }
+                            )
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="mb-3 mt-3">
+
+                        @Html.LabelFor(
+                            model => model.BusinessImpact,
+                            new { @class = "form-label" }
+                        )
+
+                        @Html.TextAreaFor(
+                            model => model.BusinessImpact,
+                            new
+                            {
+                                @class = "form-control",
+                                rows = "3",
+                                style = "white-space: pre-wrap;"
+                            }
+                        )
+
+                        @Html.ValidationMessageFor(
+                            model => model.BusinessImpact,
+                            "",
+                            new { @class = "text-danger" }
+                        )
+
+                    </div>
+
+
+                    <div class="row g-3">
+
+                        <div class="col-md-4">
+
+                            @Html.LabelFor(
+                                model => model.TeamId,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.DropDownListFor(
+                                model => model.TeamId,
+                                new List<SelectListItem>(),
+                                new { @class = "form-select" }
+                            )
+
+                            @Html.ValidationMessageFor(
+                                model => model.TeamId,
+                                "",
+                                new { @class = "text-danger" }
+                            )
+
+                        </div>
+
+
+                        <div class="col-md-8">
+
+                            <label for="fileInput" class="form-label">
+                                Upload Files
+                            </label>
+
+                            <div class="input-group">
+
+                                <input type="file"
+                                       id="fileInput"
+                                       multiple
+                                       class="form-control" />
+
+                                <button type="button"
+                                        id="fileButton"
+                                        class="btn btn-info">
+
+                                    <i class="align-middle me-1" data-lucide="upload"></i>
+                                    Upload Files
+
+                                </button>
+
+                            </div>
+
+                            <div id="uploadedFiles" class="mt-3"></div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="card mt-4 mb-0">
+
+                        <div class="card-header">
+
+                            <h5 class="card-title mb-0">
+                                <i class="align-middle me-2" data-lucide="link"></i>
+                                Assign Tickets
+                            </h5>
+
+                        </div>
+
+                        <div class="card-body">
+
+                            <div class="row g-3 align-items-end">
+
+                                <div class="col-md-4">
+
+                                    <label for="textTicketNo"
+                                           class="form-label">
+                                        Ticket #
+                                    </label>
+
+                                    <input type="text"
+                                           id="textTicketNo"
+                                           name="textTicketNo"
+                                           class="form-control" />
+
+                                </div>
+
+                                <div class="col-md-2">
+
+                                    <button type="button"
+                                            class="btn btn-sm btn-info w-100"
+                                            id="btnAddTicket"
+                                            onclick="addTicket()">
+
+                                        <i class="align-middle me-1" data-lucide="plus"></i>
+                                        Add
+
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="table-responsive mt-3">
+
+                                <table id="ticketTable"
+                                       class="table table-striped table-hover align-middle mb-0">
+
+                                    <thead>
+                                        <tr>
+                                            <th>Ticket #</th>
+                                            <th>Category</th>
+                                            <th>SubCategory</th>
+                                            <th>Asset Type</th>
+                                            <th class="text-end">Action</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody id="ticketdata">
+
+                                        @if (Model.Tickets != null)
+                                        {
+                                            for (var i = 0; i < Model.Tickets.Count; i++)
+                                            {
+                                                <tr id="@i">
+
+                                                    <td>
+
+                                                        @Html.HiddenFor(
+                                                            m => Model.Tickets[i].TicketId,
+                                                            new { @class = "iHidden" }
+                                                        )
+
+                                                        @Html.HiddenFor(
+                                                            m => Model.Tickets[i].Code
+                                                        )
+
+                                                        @Model.Tickets[i].Code
+
+                                                    </td>
+
+                                                    <td>
+                                                        @Model.Tickets[i].CategoryName
+                                                    </td>
+
+                                                    <td>
+                                                        @Model.Tickets[i].SubCategoryName
+                                                    </td>
+
+                                                    <td>
+                                                        @Model.Tickets[i].AssetTypeName
+                                                    </td>
+
+                                                    <td class="text-end">
+
+                                                        <button type="button"
+                                                                id="btnRemove@i"
+                                                                name="btnRemove@i"
+                                                                onclick="deleteRow(@i)"
+                                                                class="btn btn-sm btn-danger"
+                                                                title="Remove">
+
+                                                            <i class="align-middle"
+                                                               data-lucide="trash-2"></i>
+
+                                                        </button>
+
+                                                    </td>
+
+                                                </tr>
+                                            }
+                                        }
+
+                                    </tbody>
+
+                                </table>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="card-footer">
+
+                    <div class="d-flex justify-content-end">
+
+                        <button type="submit"
+                                id="btnSave"
+                                class="btn btn-sm btn-primary btnSubmitDisable">
+
+                            <i class="align-middle me-1" data-lucide="send"></i>
+                            Submit
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+}
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            loadIncidentRequestCategories();
+            loadTempDocs();
+
+
+            $("#fileButton").on("click", function () {
+
+                var files = $("#fileInput").get(0).files;
+
+                if (!files || files.length === 0) {
+
+                    Swal.fire(
+                        "No files selected",
+                        "Please select at least one file.",
+                        "warning"
+                    );
+
+                    return;
+                }
+
+
+                var button = $(this);
+                var fileData = new FormData();
+
+
+                for (var i = 0; i < files.length; i++) {
+                    fileData.append("fileInput", files[i]);
+                }
+
+
+                button.prop("disabled", true);
+
+
+                $.ajax({
+
+                    type: "POST",
+
+                    url: '@Url.Action("UploadFiles", "Ticket")',
+
+                    dataType: "json",
+
+                    contentType: false,
+
+                    processData: false,
+
+                    data: fileData,
+
+                    success: function (result) {
+
+                        button.prop("disabled", false);
+
+                        $("#fileInput").val("");
+
+                        Swal.fire(
+                            "Completed",
+                            result,
+                            "success"
+                        );
+
+                        loadTempDocs();
+
+                    },
+
+                    error: function () {
+
+                        button.prop("disabled", false);
+
+                        Swal.fire(
+                            "Something went wrong!",
+                            "Please try again",
+                            "error"
+                        );
+
+                    }
+
+                });
+
+            });
+
+        });
+
+
+        function parseJsonResult(data) {
+
+            if (typeof data === "string") {
+
+                try {
+                    return JSON.parse(data);
+                }
+                catch (e) {
+                    return [];
+                }
+
+            }
+
+            return data || [];
+        }
+
+
+        function escapeHtml(value) {
+
+            if (value == null) {
+                return "";
+            }
+
+            return $("<div/>").text(value).html();
+
+        }
+
+
+        function loadIncidentRequestCategories() {
+
+            $.getJSON(
+                '@Url.Action("GetTeamListJsonResult", "Team")',
+                function (data) {
+
+                    var dropDown = $("#TeamId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- Select --</option>"
+                    );
+
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.TeamId,
+                                    text: item.TeamName
+                                })
+                            );
+
+                        }
+                    );
+
+
+                    var selectedId = '@ViewBag.TeamId';
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+                }
+            );
+
+        }
+
+
+        function addTicket() {
+
+            var ticketNo =
+                $("#textTicketNo").val().trim();
+
+
+            if (!ticketNo) {
+
+                Swal.fire(
+                    "Invalid Ticket #.",
+                    "",
+                    "error"
+                );
+
+                return;
+            }
+
+
+            var exists = false;
+
+
+            $("#ticketdata input[name$='.Code']").each(function () {
+
+                if ($(this).val().toLowerCase() === ticketNo.toLowerCase()) {
+                    exists = true;
+                    return false;
+                }
+
+            });
+
+
+            if (exists) {
+
+                Swal.fire(
+                    "Ticket already added",
+                    "The selected ticket is already in the list.",
+                    "warning"
+                );
+
+                return;
+            }
+
+
+            var button = $("#btnAddTicket");
+
+            button.prop("disabled", true);
+
+            button.html(
+                '<span class="spinner-border spinner-border-sm me-1"></span>Please Wait...'
+            );
+
+            $("#preloader1").show();
+
+
+            $.getJSON(
+                '@Url.Action("GetTicketByCode", "Ticket")',
+                {
+                    code: ticketNo
+                },
+                function (data) {
+
+                    var result =
+                        parseJsonResult(data);
+
+
+                    if (result && result.Code) {
+
+                        var itemIndex =
+                            $("#ticketdata tr").length;
+
+
+                        var newItem =
+                            "<tr id='" + itemIndex + "'>" +
+
+                                "<td>" +
+
+                                    "<input id='Tickets_" + itemIndex + "__TicketId'" +
+                                    " class='iHidden'" +
+                                    " name='Tickets[" + itemIndex + "].TicketId'" +
+                                    " type='hidden'" +
+                                    " value='" + escapeHtml(result.TicketId) + "' />" +
+
+                                    "<input id='Tickets_" + itemIndex + "__Code'" +
+                                    " name='Tickets[" + itemIndex + "].Code'" +
+                                    " type='hidden'" +
+                                    " value='" + escapeHtml(result.Code) + "' />" +
+
+                                    escapeHtml(result.Code) +
+
+                                "</td>" +
+
+                                "<td>" +
+                                    escapeHtml(result.CategoryName) +
+                                "</td>" +
+
+                                "<td>" +
+                                    escapeHtml(result.SubCategoryName) +
+                                "</td>" +
+
+                                "<td>" +
+                                    escapeHtml(result.AssetTypeName) +
+                                "</td>" +
+
+                                "<td class='text-end'>" +
+
+                                    "<button type='button'" +
+                                    " id='btnRemove" + itemIndex + "'" +
+                                    " name='btnRemove" + itemIndex + "'" +
+                                    " onclick='deleteRow(" + itemIndex + ")'" +
+                                    " class='btn btn-sm btn-danger'" +
+                                    " title='Remove'>" +
+
+                                        "<i data-lucide='trash-2'></i>" +
+
+                                    "</button>" +
+
+                                "</td>" +
+
+                            "</tr>";
+
+
+                        $("#ticketdata").append(newItem);
+
+                        $("#textTicketNo").val("");
+
+
+                        if (window.lucide) {
+                            lucide.createIcons();
+                        }
+
+                    }
+                    else {
+
+                        Swal.fire(
+                            "Invalid Ticket #.",
+                            "",
+                            "error"
+                        );
+
+                    }
+
+                }
+            )
+            .fail(function () {
+
+                Swal.fire(
+                    "Something went wrong!",
+                    "Please try again",
+                    "error"
+                );
+
+            })
+            .always(function () {
+
+                $("#preloader1").hide();
+
+                button.prop("disabled", false);
+
+                button.html(
+                    '<i data-lucide="plus"></i> Add'
+                );
+
+
+                if (window.lucide) {
+                    lucide.createIcons();
+                }
+
+            });
+
+        }
+
+
+        function deleteRow(index) {
+
+            $("#ticketdata #" + index).remove();
+
+            UpdateIndexes(index);
+
+        }
+
+
+        function UpdateIndexes() {
+
+            $("#ticketdata tr").each(function (index) {
+
+                var row =
+                    $(this);
+
+
+                row.attr("id", index);
+
+
+                var ticketIdInput =
+                    row.find("input[name$='.TicketId']");
+
+                var codeInput =
+                    row.find("input[name$='.Code']");
+
+
+                ticketIdInput.attr({
+                    id: "Tickets_" + index + "__TicketId",
+                    name: "Tickets[" + index + "].TicketId"
+                });
+
+
+                codeInput.attr({
+                    id: "Tickets_" + index + "__Code",
+                    name: "Tickets[" + index + "].Code"
+                });
+
+
+                var removeButton =
+                    row.find("button");
+
+
+                removeButton.attr({
+                    id: "btnRemove" + index,
+                    name: "btnRemove" + index,
+                    onclick: "deleteRow(" + index + ")"
+                });
+
+            });
+
+        }
+
+
+        function removeItems() {
+
+            $("#ticketdata").empty();
+
+        }
+
+
+        function loadTempDocs() {
+
+            $.getJSON(
+                '@Url.Action("GetTempDocListJsonResult", "Ticket")',
+                function (data) {
+
+                    var tempDocDiv =
+                        $("#uploadedFiles");
+
+
+                    tempDocDiv.empty();
+
+
+                    var items =
+                        parseJsonResult(data);
+
+
+                    if (!items || items.length === 0) {
+
+                        tempDocDiv.html(
+                            '<div class="text-muted small">No files uploaded.</div>'
+                        );
+
+                        return;
+                    }
+
+
+                    var list =
+                        $('<div class="list-group list-group-flush"></div>');
+
+
+                    $.each(items, function (index, item) {
+
+                        var row =
+                            $('<div class="list-group-item px-0 d-flex justify-content-between align-items-center gap-2"></div>');
+
+
+                        var link =
+                            $("<a/>", {
+                                href: item.FileUrl,
+                                target: "_blank",
+                                text: item.DocumentName,
+                                class: "text-break"
+                            });
+
+
+                        var deleteButton =
+                            $("<button/>", {
+                                type: "button",
+                                class: "btn btn-sm btn-danger",
+                                title: "Delete"
+                            });
+
+
+                        deleteButton.attr(
+                            "onclick",
+                            "deleteDoc(" + item.TempDocId + ")"
+                        );
+
+
+                        deleteButton.html(
+                            '<i data-lucide="trash-2"></i>'
+                        );
+
+
+                        row.append(link);
+                        row.append(deleteButton);
+
+                        list.append(row);
+
+                    });
+
+
+                    tempDocDiv.append(list);
+
+
+                    if (window.lucide) {
+                        lucide.createIcons();
+                    }
+
+                }
+            );
+
+        }
+
+
+        function deleteDoc(itemId) {
+
+            Swal.fire({
+
+                title: "Are you sure?",
+                text: "Do you want to delete?",
+                icon: "warning",
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                showCancelButton: true,
+                reverseButtons: true
+
+            }).then(function (result) {
+
+                if (result.isConfirmed || result.value) {
+
+                    $.ajax({
+
+                        url: '@Url.Action("DeleteTempDoc", "Ticket")',
+
+                        type: "GET",
+
+                        dataType: "json",
+
+                        data: {
+                            id: itemId
+                        },
+
+                        success: function (data) {
+
+                            if (data == "1" || data == 1) {
+
+                                Swal.fire(
+                                    "Deleted!",
+                                    "Record has been deleted",
+                                    "success"
+                                );
+
+                                loadTempDocs();
+
+                            }
+                            else {
+
+                                Swal.fire(
+                                    "Something went wrong!",
+                                    "Data is not deleted, Please try again",
+                                    "error"
+                                );
+
+                            }
+
+                        },
+
+                        error: function () {
+
+                            Swal.fire(
+                                "Something went wrong!",
+                                "Data is not deleted, Please try again",
+                                "error"
+                            );
+
+                        }
+
+                    });
+
+                }
+
+            });
+
+        }
+
+    </script>
+}

@@ -1,0 +1,328 @@
+﻿@model Domain.Category
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="card">
+
+            <div class="card-header d-flex justify-content-between align-items-center">
+
+                <h5 class="card-title mb-0">
+                    <i class="align-middle me-2" data-lucide="plus"></i>
+                    Create New
+                </h5>
+
+                <a href="@Url.Action("Index", "Category")"
+                   class="btn btn-sm btn-light">
+
+                    <i class="align-middle me-1" data-lucide="arrow-left"></i>
+                    Back
+
+                </a>
+
+            </div>
+
+            @using (Html.BeginForm("Create", "Category", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true)
+
+                <div class="card-body">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+
+                            @Html.LabelFor(
+                                model => model.CategoryName,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.TextBoxFor(
+                                model => model.CategoryName,
+                                new { @class = "form-control" }
+                            )
+
+                            @Html.ValidationMessageFor(
+                                model => model.CategoryName,
+                                "",
+                                new { @class = "text-danger" }
+                            )
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            @Html.LabelFor(
+                                model => model.Icon,
+                                new { @class = "form-label" }
+                            )
+
+                            <div class="input-group">
+
+                                @Html.DropDownListFor(
+                                    model => model.Icon,
+                                    new List<SelectListItem>(),
+                                    new { @class = "form-select" }
+                                )
+
+                                <span class="input-group-text"
+                                      id="IconName">
+                                </span>
+
+                            </div>
+
+                            @Html.ValidationMessageFor(
+                                model => model.Icon,
+                                "",
+                                new { @class = "text-danger" }
+                            )
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            @Html.LabelFor(
+                                model => model.Color,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.DropDownListFor(
+                                model => model.Color,
+                                new List<SelectListItem>(),
+                                new { @class = "form-select" }
+                            )
+
+                            @Html.ValidationMessageFor(
+                                model => model.Color,
+                                "",
+                                new { @class = "text-danger" }
+                            )
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+                                Color Preview
+                            </label>
+
+                            <div id="ColorName"></div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="card-footer">
+
+                    <div class="d-flex justify-content-end gap-2">
+
+                        <button type="reset"
+                                class="btn btn-danger btn-sm">
+
+                            <i class="align-middle me-1" data-lucide="rotate-ccw"></i>
+                            Cancel
+
+                        </button>
+
+                        <button type="submit"
+                                class="btn btn-primary btn-sm">
+
+                            <i class="align-middle me-1" data-lucide="save"></i>
+                            Save
+
+                        </button>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+</div>
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            loadIcons();
+            loadColors();
+
+        });
+
+
+        function parseJsonResult(data) {
+
+            if (typeof data === "string") {
+
+                try {
+                    return JSON.parse(data);
+                }
+                catch (e) {
+                    return [];
+                }
+
+            }
+
+            return data || [];
+
+        }
+
+
+        function loadIcons() {
+
+            $.getJSON(
+                '@Url.Action("GetIconJsonResult", "Ticket")',
+                function (data) {
+
+                    var dropDown =
+                        $("#Icon");
+
+                    dropDown.empty();
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.Value,
+                                    text: item.Text
+                                })
+                            );
+
+                        }
+                    );
+
+                    displayIcon();
+
+                }
+            );
+
+        }
+
+
+        $("#Icon").on("change", function () {
+
+            displayIcon();
+
+        });
+
+
+        function displayIcon() {
+
+            var icon =
+                $("#Icon").val();
+
+            var container =
+                $("#IconName");
+
+            container.empty();
+
+            if (icon) {
+
+                container.html(
+                    '<i class="align-middle" data-lucide="' +
+                    escapeHtml(icon) +
+                    '"></i>'
+                );
+
+                if (window.lucide) {
+                    lucide.createIcons();
+                }
+
+            }
+
+        }
+
+
+        function loadColors() {
+
+            $.getJSON(
+                '@Url.Action("GetColorJsonResult", "Ticket")',
+                function (data) {
+
+                    var dropDown =
+                        $("#Color");
+
+                    dropDown.empty();
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.Value,
+                                    text: item.Text
+                                })
+                            );
+
+                        }
+                    );
+
+                    displayColor();
+
+                }
+            );
+
+        }
+
+
+        $("#Color").on("change", function () {
+
+            displayColor();
+
+        });
+
+
+        function displayColor() {
+
+            var color =
+                $("#Color").val();
+
+            var container =
+                $("#ColorName");
+
+            container.empty();
+
+            if (color) {
+
+                container.html(
+                    '<span class="badge bg-' +
+                    escapeHtml(color) +
+                    '">' +
+                    escapeHtml(color) +
+                    '</span>'
+                );
+
+            }
+
+        }
+
+
+        function escapeHtml(value) {
+
+            if (value == null) {
+                return "";
+            }
+
+            return $("<div/>")
+                .text(value)
+                .html();
+
+        }
+
+    </script>
+}

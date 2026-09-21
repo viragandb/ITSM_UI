@@ -1,0 +1,60 @@
+﻿@model Domain.MenuItemFunction
+
+@if (Model != null)
+{
+    <div class="row mb-2 mb-xl-3 align-items-center">
+
+        <div class="col-sm-6">
+
+            <h3 class="mb-0">
+
+                <i class="fa @Model.MenuItem.Menu.IconName me-2"></i>
+
+                <span>
+                    @Model.MenuItem.Menu.MenuName
+                </span>
+
+                <small class="text-muted ms-2">
+
+                    <i class="fa @Model.MenuItem.IconName me-1"></i>
+
+                    @Model.MenuItem.MenuItemName
+
+                </small>
+
+            </h3>
+
+        </div>
+
+
+        <div class="col-sm-6">
+
+            <ol class="breadcrumb justify-content-sm-end mb-0">
+
+                <li class="breadcrumb-item">
+
+                    <a href="@Url.Action("Index", "Home")">
+                        Home
+                    </a>
+
+                </li>
+
+                <li class="breadcrumb-item">
+
+                    @Model.MenuItem.Menu.MenuName
+
+                </li>
+
+                <li class="breadcrumb-item active"
+                    aria-current="page">
+
+                    @Model.MenuItem.MenuItemName
+
+                </li>
+
+            </ol>
+
+        </div>
+
+    </div>
+}

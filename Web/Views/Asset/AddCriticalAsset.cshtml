@@ -1,0 +1,265 @@
+﻿@model Domain.Asset
+@using Service
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .ui-autocomplete {
+        z-index: 2000 !important;
+        max-height: 300px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        background: var(--bs-body-bg);
+        border: 1px solid var(--bs-border-color);
+        border-radius: .375rem;
+        padding: .25rem;
+        list-style: none;
+    }
+
+    .ui-menu .ui-menu-item {
+        width: 100%;
+    }
+
+    .ui-menu .ui-menu-item-wrapper {
+        display: block;
+        padding: .5rem .75rem;
+        cursor: pointer;
+        border-radius: .25rem;
+    }
+
+        .ui-menu .ui-menu-item-wrapper.ui-state-active {
+            background: var(--bs-primary);
+            color: #fff;
+            border: 0;
+            margin: 0;
+        }
+</style>
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="card">
+
+            <div class="card-header d-flex align-items-center justify-content-between">
+
+                <h5 class="card-title mb-0">
+                    <i class="align-middle me-2" data-lucide="shield-plus"></i>
+                    Add Critical Asset
+                </h5>
+
+                <a href="@Url.Action("AssetCritical", "Asset")"
+                   class="btn btn-sm btn-light">
+
+                    <i class="align-middle me-1" data-lucide="arrow-left"></i>
+                    Back
+
+                </a>
+
+            </div>
+
+            @using (Html.BeginForm("AddCriticalAsset", "Asset", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+
+                <div class="card-body">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+
+                            <div class="mb-3">
+
+                                @Html.LabelFor(
+                                    model => model.AssetCategory,
+                                    new { @class = "form-label" }
+                                )
+
+                                @Html.EnumDropDownListFor(
+                                    model => model.AssetCategory,
+                                    "-- Select --",
+                                    new { @class = "form-select" }
+                                )
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="row g-3">
+
+                        <div class="col-md-3">
+
+                            <div class="mb-3">
+
+                                @Html.LabelFor(
+                                    model => model.AssetCode,
+                                    new { @class = "form-label" }
+                                )
+
+                                @Html.TextBoxFor(
+                                    model => model.AssetCode,
+                                    new
+                                    {
+                                        @class = "form-control",
+                                        @readonly = "readonly"
+                                    }
+                                )
+
+                                @Html.ValidationMessageFor(
+                                    model => model.AssetCode,
+                                    "",
+                                    new { @class = "text-danger" }
+                                )
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-9">
+
+                            <div class="mb-3">
+
+                                <label for="ItemSearch"
+                                       class="form-label">
+                                    Search Asset
+                                </label>
+
+                                <div class="input-group">
+
+                                    <span class="input-group-text">
+                                        <i class="align-middle" data-lucide="search"></i>
+                                    </span>
+
+                                    <input type="text"
+                                           name="ItemSearch"
+                                           id="ItemSearch"
+                                           class="form-control"
+                                           placeholder="Search Item by Name / Description / Serial # / Model / Phone #" />
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="card-footer">
+
+                    <div class="d-flex justify-content-end">
+
+                        <button type="submit"
+                                class="btn btn-primary btnSumbitDisable">
+
+                            <i class="align-middle me-1" data-lucide="plug"></i>
+                            Assign
+
+                        </button>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+</div>
+
+@section scripts {
+
+    <script src="~/Scripts/jquery.validate.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $("#AssetCategory").val("1");
+
+            SearchIMSItem();
+
+        });
+
+
+        $("select#AssetCategory").on("change", function () {
+
+            $("#AssetCode").val("");
+            $("#ItemSearch").val("");
+
+        });
+
+
+        function SearchIMSItem() {
+
+            $("#ItemSearch").autocomplete({
+
+                source: function (request, response) {
+
+                    $.ajax({
+
+                        url: '@Url.Action("GetIMSItemListJsonResult", "ItemAsset")',
+
+                        dataType: "json",
+
+                        data: {
+                            term: request.term,
+                            assetCatId: $("#AssetCategory").val()
+                        },
+
+                        success: function (data) {
+
+                            response(
+                                $.map(
+                                    data,
+                                    function (val) {
+
+                                        return {
+                                            label:
+                                                val.ItemName +
+                                                " - " +
+                                                val.Description +
+                                                " - " +
+                                                val.ModelNo +
+                                                " - " +
+                                                val.Company +
+                                                " - " +
+                                                val.Location +
+                                                " - " +
+                                                val.EmpNo,
+
+                                            value: val.Description,
+                                            assetId: val.IMSCode
+                                        };
+
+                                    }
+                                )
+                            );
+
+                        }
+
+                    });
+
+                },
+
+                minLength: 4,
+
+                select: function (event, ui) {
+
+                    $("#AssetCode").val(
+                        ui.item.assetId
+                    );
+
+                }
+
+            });
+
+        }
+
+    </script>
+}

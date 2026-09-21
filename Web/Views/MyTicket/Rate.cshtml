@@ -1,0 +1,214 @@
+﻿@model Web.Models.TicketRateVM
+@using Service
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="card">
+
+            <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+
+                <h5 class="card-title mb-0">
+                    <i class="align-middle me-2" data-lucide="check-circle"></i>
+                    Ticket Close | Ticket # @Model.Ticket.Code
+                </h5>
+
+                <a href="@Url.Action("Complete", "MyTicket")"
+                   class="btn btn-sm btn-light">
+
+                    <i class="align-middle me-1" data-lucide="arrow-left"></i>
+                    Back
+
+                </a>
+
+            </div>
+
+            @using (Html.BeginForm("Rate", "MyTicket", FormMethod.Post))
+            {
+                @Html.HiddenFor(model => model.Ticket.TicketId)
+                @Html.HiddenFor(model => model.TicketId)
+                @Html.HiddenFor(model => model.Ticket.RequestType.TeamId)
+                @Html.HiddenFor(model => model.Ticket.RequestType.TicketType)
+                @Html.HiddenFor(model => model.Ticket.UpdatedDate)
+
+                <div class="card-body">
+
+                    <div class="row g-3">
+
+                        <div class="col-lg-5">
+
+                            @Html.Partial(
+                                "~/Views/Ticket/_TicketMin.cshtml",
+                                Model.Ticket
+                            )
+
+                        </div>
+
+                        <div class="col-lg-7">
+
+                            <div class="card">
+
+                                <div class="card-header">
+
+                                    <h5 class="card-title mb-0">
+                                        <i class="align-middle me-2" data-lucide="star"></i>
+                                        Rate &amp; Close
+                                    </h5>
+
+                                </div>
+
+                                <div class="card-body">
+
+                                    <div class="row g-3">
+
+                                        <div class="col-md-6">
+
+                                            @Html.LabelFor(
+                                                model => model.Rate,
+                                                new { @class = "form-label" }
+                                            )
+
+                                            @Html.EnumDropDownListFor(
+                                                model => model.Rate,
+                                                "-- Select --",
+                                                new { @class = "form-select" }
+                                            )
+
+                                        </div>
+
+                                        <div class="col-md-6">
+
+                                            <label class="form-label">
+                                                Rating
+                                            </label>
+
+                                            <div id="divRate"
+                                                 class="d-flex align-items-center gap-1 pt-2">
+                                            </div>
+
+                                        </div>
+
+                                        <div class="col-12">
+
+                                            @Html.LabelFor(
+                                                model => model.Comment,
+                                                new { @class = "form-label" }
+                                            )
+
+                                            @Html.TextAreaFor(
+                                                model => model.Comment,
+                                                new
+                                                {
+                                                    @class = "form-control",
+                                                    rows = "4"
+                                                }
+                                            )
+
+                                            @Html.ValidationMessageFor(
+                                                model => model.Comment,
+                                                "",
+                                                new { @class = "text-danger" }
+                                            )
+
+                                        </div>
+
+                                        <div class="col-12">
+
+                                            <div class="form-check form-switch">
+
+                                                <input type="checkbox"
+                                                       class="form-check-input"
+                                                       id="switchReopen"
+                                                       name="switchReopen" />
+
+                                                <label class="form-check-label"
+                                                       for="switchReopen">
+
+                                                    Reopen
+
+                                                </label>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="card-footer">
+
+                                    <div class="d-flex justify-content-end">
+
+                                        <button type="submit"
+                                                class="btn btn-sm btn-primary">
+
+                                            <i class="align-middle me-1" data-lucide="save"></i>
+                                            Save
+
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+</div>
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            getRateStars();
+
+            $("#Rate").on("change", function () {
+                getRateStars();
+            });
+
+        });
+
+
+        function getRateStars() {
+
+            var rate =
+                parseInt($("#Rate").val()) || 0;
+
+            var rateHtml = "";
+
+            for (var i = 0; i < rate; i++) {
+
+                rateHtml +=
+                    '<i class="align-middle" data-lucide="star"></i>';
+
+            }
+
+            $("#divRate").html(rateHtml);
+
+
+            if (window.lucide) {
+                lucide.createIcons();
+            }
+
+        }
+
+    </script>
+
+}

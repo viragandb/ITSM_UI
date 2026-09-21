@@ -1,0 +1,247 @@
+﻿@model Domain.BranchDepartment
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="card">
+
+            <div class="card-header d-flex justify-content-between align-items-center">
+
+                <h5 class="card-title mb-0">
+                    <i class="align-middle me-2" data-lucide="building-2"></i>
+                    Assign Department
+                </h5>
+
+                <a href="@Url.Action("BranchDept", "Branch")"
+                   class="btn btn-sm btn-light">
+
+                    <i class="align-middle me-1" data-lucide="arrow-left"></i>
+                    Back
+
+                </a>
+
+            </div>
+
+            @using (Html.BeginForm("AssignDept", "Branch", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true)
+
+                <div class="card-body">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+
+                            @Html.LabelFor(
+                                model => model.BranchId,
+                                new { @class = "form-label" }
+                            )
+
+                            <select id="BranchId"
+                                    name="BranchId"
+                                    class="form-select select2">
+                            </select>
+
+                            <span class="text-danger"
+                                  data-valmsg-for="BranchId"
+                                  data-valmsg-replace="true">
+                            </span>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            @Html.LabelFor(
+                                model => model.DepartmentId,
+                                new { @class = "form-label" }
+                            )
+
+                            <select id="DepartmentId"
+                                    name="DepartmentId"
+                                    class="form-select select2">
+                            </select>
+
+                            <span class="text-danger"
+                                  data-valmsg-for="DepartmentId"
+                                  data-valmsg-replace="true">
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="card-footer">
+
+                    <div class="d-flex justify-content-end gap-2">
+
+                        <button type="reset"
+                                class="btn btn-danger btn-sm">
+
+                            <i class="align-middle me-1" data-lucide="rotate-ccw"></i>
+                            Cancel
+
+                        </button>
+
+                        <button type="submit"
+                                class="btn btn-primary btn-sm">
+
+                            <i class="align-middle me-1" data-lucide="save"></i>
+                            Save
+
+                        </button>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+</div>
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            if ($.fn.select2) {
+                $(".select2").select2({
+                    width: "100%"
+                });
+            }
+
+            loadDepts();
+            loadBranch();
+
+        });
+
+
+        function parseJsonResult(data) {
+
+            if (typeof data === "string") {
+
+                try {
+                    return JSON.parse(data);
+                }
+                catch (e) {
+                    return [];
+                }
+
+            }
+
+            return data || [];
+
+        }
+
+
+        function loadDepts() {
+
+            $.getJSON(
+                '@Url.Action("GetDepartmentListJsonResult", "Department")',
+                function (data) {
+
+                    var dropDown =
+                        $("#DepartmentId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- Select --</option>"
+                    );
+
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.DepartmentId,
+                                    text: item.DepartmentName
+                                })
+                            );
+
+                        }
+                    );
+
+
+                    var selectedId =
+                        '@ViewBag.DepartmentId';
+
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+
+                    if ($.fn.select2) {
+                        dropDown.trigger("change.select2");
+                    }
+
+                }
+            );
+
+        }
+
+
+        function loadBranch() {
+
+            $.getJSON(
+                '@Url.Action("GetItemListJsonResult", "Branch")',
+                function (data) {
+
+                    var dropDown =
+                        $("#BranchId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- Select --</option>"
+                    );
+
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.BranchId,
+                                    text: item.Name
+                                })
+                            );
+
+                        }
+                    );
+
+
+                    var selectedId =
+                        '@ViewBag.BranchId';
+
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+
+                    if ($.fn.select2) {
+                        dropDown.trigger("change.select2");
+                    }
+
+                }
+            );
+
+        }
+
+    </script>
+}

@@ -1,0 +1,75 @@
+﻿<nav id="sidebar" class="sidebar">
+
+    <div class="sidebar-content js-simplebar">
+
+        <!-- Brand -->
+        <a href="@Url.Action("Index", "Home")"
+           class="sidebar-brand">
+
+            <span class="align-middle">
+                IT Service Management
+            </span>
+
+        </a>
+
+
+        <!-- User Profile -->
+        @*<div class="px-3 py-3 border-bottom">
+
+            <div class="d-flex align-items-center">
+
+                <div class="me-3">
+
+                    <img src="@Session["ProfileImage"]"
+                         alt="User Image"
+                         class="rounded-circle"
+                         width="44"
+                         height="44" />
+
+                </div>
+
+                <div class="flex-grow-1">
+
+                    <a href="@Url.Action("Index", "MyProfile")"
+                       class="text-decoration-none fw-semibold d-block">
+
+                        @Session["UserName"]
+
+                    </a>
+
+                    <small class="text-muted d-block">
+                        @Session["Designation"]
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="mt-3">
+
+                <small class="text-muted d-block">
+                    @Session["Department"]
+                </small>
+
+                <small class="text-muted d-block">
+                    @Session["Branch"]
+                </small>
+
+            </div>
+
+        </div>*@
+
+        <li class="sidebar-header">
+            Navigation
+        </li>
+        <!-- Dynamic Menu -->
+        @Html.Action(
+            "AdminMenuLayout",
+            "Home",
+            new { Area = "" }
+        )
+
+    </div>
+
+</nav>

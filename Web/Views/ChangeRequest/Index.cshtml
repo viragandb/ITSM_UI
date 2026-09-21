@@ -1,0 +1,714 @@
+﻿@using Service
+@using Service.CM
+@model IEnumerable<Domain.CM.ChangeRequest>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("Index", "ChangeRequest", FormMethod.Get))
+{
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card">
+
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="align-middle me-2" data-lucide="search"></i>
+                        Access Request
+                    </h5>
+                </div>
+
+                <div class="card-body">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+                            <label for="TeamId" class="form-label">
+                                Team
+                            </label>
+
+                            <select id="TeamId"
+                                    name="TeamId"
+                                    class="form-select">
+
+                                <option value=""></option>
+
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="RequestCategoryId" class="form-label">
+                                Request Category
+                            </label>
+
+                            <select id="RequestCategoryId"
+                                    name="RequestCategoryId"
+                                    class="form-select">
+
+                                <option value=""></option>
+
+                            </select>
+                        </div>
+
+
+                        <div class="col-md-6">
+                            <label for="DurationTypeId" class="form-label">
+                                Duration Type
+                            </label>
+
+                            <select id="DurationTypeId"
+                                    name="DurationTypeId"
+                                    class="form-select">
+
+                                <option value=""></option>
+
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="ChangeAreaId" class="form-label">
+                                Change Area
+                            </label>
+
+                            <select id="ChangeAreaId"
+                                    name="ChangeAreaId"
+                                    class="form-select">
+
+                                <option value=""></option>
+
+                            </select>
+                        </div>
+
+
+                        <div class="col-md-6">
+                            <label for="ChangeCategoryId" class="form-label">
+                                Change Category
+                            </label>
+
+                            <select id="ChangeCategoryId"
+                                    name="ChangeCategoryId"
+                                    class="form-select">
+
+                                <option value=""></option>
+
+                            </select>
+                        </div>
+
+
+                        <div class="col-md-3">
+
+                            <label for="StartDate" class="form-label">
+                                Requested Date From
+                            </label>
+
+                            <input type="date"
+                                   name="StartDate"
+                                   id="StartDate"
+                                   value="@ViewBag.StartDate"
+                                   class="form-control" />
+
+                        </div>
+
+                        <div class="col-md-3">
+
+                            <label for="EndDate" class="form-label">
+                                Requested Date To
+                            </label>
+
+                            <input type="date"
+                                   name="EndDate"
+                                   id="EndDate"
+                                   value="@ViewBag.EndDate"
+                                   class="form-control" />
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <label for="RequestId" class="form-label">
+                                Request #
+                            </label>
+
+                            <input type="text"
+                                   id="RequestId"
+                                   name="RequestId"
+                                   value="@ViewBag.RequestId"
+                                   class="form-control" />
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <label for="StatusId" class="form-label">
+                                Status
+                            </label>
+
+                            <select id="StatusId"
+                                    name="StatusId"
+                                    class="form-select">
+
+                                <option value=""></option>
+
+                            </select>
+
+                            <span class="text-danger"
+                                  data-valmsg-for="StatusId"
+                                  data-valmsg-replace="true">
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="card-footer">
+
+                    <div class="d-flex justify-content-end">
+
+                        <button type="submit"
+                                class="btn btn-sm btn-primary">
+
+                            <i class="align-middle me-1" data-lucide="search"></i>
+                            Search
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card">
+
+                <div class="card-header">
+
+                    <h5 class="card-title mb-0">
+                        <i class="align-middle me-2" data-lucide="list"></i>
+                        Change Requests
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="table-responsive">
+
+                        <table id="dataTable"
+                               class="table table-striped table-hover align-middle w-100">
+
+                            <thead>
+                                <tr>
+                                    <th>Request #</th>
+                                    <th>Request Category</th>
+                                    <th>Duration Type</th>
+                                    <th>Requester</th>
+                                    <th>Requested Date</th>
+                                    <th>Status</th>
+                                    <th>Team</th>
+                                    <th>Subject</th>
+                                    <th>Description</th>
+                                    <th>Justification</th>
+                                    <th>Change Area</th>
+                                    <th>Change Impact</th>
+                                    <th>Priority</th>
+                                    <th>Planned Change</th>
+                                    <th>Downtime Required</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                @foreach (var item in Model.OrderBy(o => o.RequestedDate).ToList())
+                                {
+                                    <tr>
+
+                                        <td>
+
+                                            <a href="@Html.EncodedActionLink("", "Info", "ChangeRequest", "", new { id = item.ChangeRequestId }, null)"
+                                               target="_blank">
+
+                                                @item.ChangeRequestId
+
+                                            </a>
+
+                                        </td>
+
+                                        <td>
+
+                                            <span class="badge bg-@item.ChangeRequestCategory.Color">
+                                                @item.ChangeRequestCategory.Name
+                                            </span>
+
+                                        </td>
+
+                                        <td>
+                                            @item.DurationType.EnumDisplayName()
+                                        </td>
+
+                                        <td>
+                                            @item.RequestedUser.FullName
+                                        </td>
+
+                                        <td>
+                                            @item.RequestedDate
+                                        </td>
+
+                                        <td>
+
+                                            <span class="badge bg-@ChangeRequestService.GetStatusColor(item.Status)">
+                                                @item.Status.EnumDisplayName()
+                                            </span>
+
+                                        </td>
+
+                                        <td>
+                                            @(item.Team != null ? item.Team.TeamName : "N/A")
+                                        </td>
+
+                                        <td>
+                                            @item.Subject
+                                        </td>
+
+                                        <td>
+                                            @item.Description
+                                        </td>
+
+                                        <td>
+                                            @item.Justification
+                                        </td>
+
+                                        @if (item.ChangeImplementData != null)
+                                        {
+                                            <td>
+                                                @item.ChangeImplementData.ChangeArea.Name
+                                            </td>
+
+                                            <td>
+                                                @item.ChangeImplementData.ChangeCategory.EnumDisplayName()
+                                            </td>
+
+                                            <td>
+                                                @item.ChangeImplementData.ChangePriority.EnumDisplayName()
+                                            </td>
+
+                                            <td>
+                                                @item.ChangeImplementData.PlannedChange
+                                            </td>
+
+                                            <td>
+
+                                                @if (item.ChangeImplementData.IsDowntimeRequired)
+                                                {
+                                                    <span class="badge bg-warning">
+                                                        Yes
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary">
+                                                        No
+                                                    </span>
+                                                }
+
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                            <td>N/A</td>
+                                            <td>N/A</td>
+                                            <td>N/A</td>
+                                            <td>N/A</td>
+                                            <td>N/A</td>
+                                        }
+
+                                    </tr>
+                                }
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+}
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $("#dataTable").DataTable({
+
+                responsive: true,
+                lengthChange: false,
+                autoWidth: false,
+                paging: false,
+
+                buttons: [
+
+                    {
+                        extend: "excelHtml5",
+                        text: "Excel",
+                        title: "Change Requests",
+                        exportOptions: {
+                            modifier: {
+                                page: "current"
+                            }
+                        }
+                    },
+
+                    {
+                        extend: "pdfHtml5",
+                        text: "PDF",
+                        title: "Change Requests",
+                        orientation: "landscape",
+                        exportOptions: {
+                            modifier: {
+                                page: "current"
+                            }
+                        }
+                    },
+
+                    {
+                        extend: "print",
+                        text: "Print",
+                        title: "Change Requests",
+                        autoPrint: true
+                    },
+
+                    "colvis"
+
+                ]
+
+            }).buttons().container()
+                .appendTo("#dataTable_wrapper .col-md-6:eq(0)");
+
+
+            loadTeams();
+            loadStatus();
+            loadDurationTypes();
+            loadChangeCategories();
+            loadRequestCategories();
+
+        });
+
+
+        $("#RequestCategoryId").on("change", function () {
+            loadChangeAreas();
+        });
+
+
+        function parseJsonResult(data) {
+
+            if (typeof data === "string") {
+
+                try {
+                    return JSON.parse(data);
+                }
+                catch (e) {
+                    return [];
+                }
+
+            }
+
+            return data || [];
+
+        }
+
+
+        function loadTeams() {
+
+            $.getJSON(
+                '@Url.Action("GetTeamListJsonResult", "Team")',
+                function (data) {
+
+                    var dropDown = $("#TeamId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- All --</option>"
+                    );
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.TeamId,
+                                    text: item.TeamName
+                                })
+                            );
+
+                        }
+                    );
+
+
+                    var selectedId =
+                        '@ViewBag.TeamId';
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+                }
+            );
+
+        }
+
+
+        function loadRequestCategories() {
+
+            $.getJSON(
+                '@Url.Action("GetItemsJsonResult", "ChangeRequestCategory")',
+                function (data) {
+
+                    var dropDown =
+                        $("#RequestCategoryId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- All --</option>"
+                    );
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.ChangeRequestCategoryId,
+                                    text: item.Name
+                                })
+                            );
+
+                        }
+                    );
+
+
+                    var selectedId =
+                        '@ViewBag.RequestCategoryId';
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+
+                    loadChangeAreas();
+
+                }
+            );
+
+        }
+
+
+        function loadChangeAreas() {
+
+            var categoryId =
+                $("#RequestCategoryId").val();
+
+
+            $.getJSON(
+
+                '@Url.Action("GetItemsByRequestCategoryJsonResult", "ChangeArea")',
+
+                {
+                    changeRequestCategoryId: categoryId
+                },
+
+                function (data) {
+
+                    var dropDown =
+                        $("#ChangeAreaId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- All --</option>"
+                    );
+
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.ChangeAreaId,
+                                    text: item.Name
+                                })
+                            );
+
+                        }
+                    );
+
+
+                    var selectedId =
+                        '@ViewBag.ChangeAreaId';
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+                }
+            );
+
+        }
+
+
+        function loadChangeCategories() {
+
+            $.getJSON(
+                '@Url.Action("GetChangeCategoriesJsonResult", "ChangeRequest")',
+                function (data) {
+
+                    var dropDown =
+                        $("#ChangeCategoryId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- All --</option>"
+                    );
+
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.Id,
+                                    text: item.Name
+                                })
+                            );
+
+                        }
+                    );
+
+
+                    var selectedId =
+                        '@ViewBag.ChangeCategoryId';
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+                }
+            );
+
+        }
+
+
+        function loadDurationTypes() {
+
+            $.getJSON(
+                '@Url.Action("GetDurationTypesJsonResult", "AccessRequest")',
+                function (data) {
+
+                    var dropDown =
+                        $("#DurationTypeId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- All --</option>"
+                    );
+
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.Id,
+                                    text: item.Name
+                                })
+                            );
+
+                        }
+                    );
+
+
+                    var selectedId =
+                        '@ViewBag.DurationTypeId';
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+                }
+            );
+
+        }
+
+
+        function loadStatus() {
+
+            $.getJSON(
+                '@Url.Action("GetStatusJsonResult", "ChangeRequest")',
+                function (data) {
+
+                    var dropDown =
+                        $("#StatusId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- All --</option>"
+                    );
+
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.Id,
+                                    text: item.Name
+                                })
+                            );
+
+                        }
+                    );
+
+
+                    var selectedId =
+                        '@ViewBag.StatusId';
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+                }
+            );
+
+        }
+
+    </script>
+}

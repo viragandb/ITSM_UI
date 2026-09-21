@@ -1,0 +1,207 @@
+﻿
+@model Web.Models.ProblemVM
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+}
+
+
+@using (Html.BeginForm("Create", "Problem", FormMethod.Post, new { @class = "form-horizontal" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card box-danger">
+                <div class="card-header with-border">
+                    <h3 class="card-title">New Problem</h3>
+                    <div class="card-tools pull-right">
+
+                    </div>
+                </div>
+                <div class="card-body">
+
+                    <div class="form-group ">
+                        @Html.LabelFor(model => model.CategoryId, new { @class = "col-md-2 control-label" })
+                        <div class="col-md-4">
+                            @Html.DropDownListFor(model => model.CategoryId, new List<SelectListItem>(), new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.CategoryId, null, new { @class = "help-block" })
+                            
+                        </div>
+                    </div>
+
+                    <div class="form-group ">
+                        @Html.LabelFor(model => model.AssetTypeId, new { @class = "col-md-2 control-label" })
+                        <div class="col-md-4">
+                            @Html.DropDownListFor(model => model.AssetTypeId, new List<SelectListItem>(), new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.AssetTypeId, null, new { @class = "help-block" })
+
+                        </div>
+                    </div>
+
+                    <div class="form-group ">
+                        @Html.LabelFor(model => model.SubCategoryId, new { @class = "col-md-2 control-label" })
+                        <div class="col-md-4">
+                            @Html.DropDownListFor(model => model.SubCategoryId, new List<SelectListItem>(), new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.SubCategoryId, null, new { @class = "help-block" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Subject, new { @class = "col-md-2 control-label" })
+                        <div class="col-md-10">
+                            @Html.TextBoxFor(model => model.Subject, new { @class = "form-control", rows = "2" })
+                            @Html.ValidationMessageFor(model => model.Subject, null, new { @class = "help-block" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Description, new { @class = "col-md-2 control-label" })
+                        <div class="col-md-10">
+                            @Html.TextBoxFor(model => model.Description, new { @class = "form-control", rows = "4" })
+                            @Html.ValidationMessageFor(model => model.Description, null, new { @class = "help-block" })
+                        </div>
+                    </div>
+                    <div class="form-group ">
+                        @Html.LabelFor(model => model.Priority, new { @class = "col-md-2 control-label" })
+                        <div class="col-md-4">
+                            @Html.EnumDropDownListFor(model => model.Priority, "--Select--", new { @class = "form-control" })
+                        </div>
+                    </div>
+
+                </div>
+                <!-- /.box-body -->
+                <div class="card-footer">
+                    <div class="text-right">
+                        @*<button type="reset" class="btn btn-social btn-danger"><i class="fa fa-undo"></i>Cancel</button>
+                            <button type="submit" class="btn btn-social btn-default"><i class="fa fa-floppy-o"></i>Save</button>*@
+                        <button type="submit" name="action:Save" class="btn btn-social btn-default"><i class="fa fa-floppy-o"></i>Save</button>
+                    </div>
+                </div>
+                <!-- /.box-footer -->
+            </div>
+            <!-- /.box -->
+        </div>
+
+      
+
+    </div>
+
+
+}
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            loadCategory();
+            loadAssetType();
+            loadSubCategory();
+        });
+
+             
+
+        function loadCategory() {
+
+            var valId = '2';
+            $.getJSON("@Url.Action("GetCategoryByTicketTypeListJsonResult", "Category")",
+                {
+                    ticketType: valId
+                },function(data) {
+                var dropDown = $("#CategoryId");
+                dropDown.empty();
+                dropDown.append("<option value='0'>-- Select --</option>");
+                $.each(JSON.parse(data), function (index, optionaldata) {
+                    dropDown.append($('<option />', { value: optionaldata.CategoryId }).html(optionaldata.CategoryName));
+                });
+
+                 if ('@ViewBag.CategoryId') {
+                     $('#CategoryId').val('@ViewBag.CategoryId').attr("selected", "selected");
+                }
+               
+
+                });
+
+            loadAssetType();
+
+         }
+
+        $("select#CategoryId").change(function (evt) {
+            loadAssetType();
+
+        });
+
+        function loadAssetType() {
+            var valId = '2';
+            var catId = $('#CategoryId').val();
+            if ('@ViewBag.CategoryId' && '@ViewBag.CategoryId'!=0 ) {
+                catId = '@ViewBag.CategoryId';
+
+            }
+
+            $.getJSON("@Url.Action("GetAssetTypeByTicketTypeListJsonResult", "AssetType")",
+                {
+                    ticketType: valId,
+                    categoryId: catId
+                }, function (data) {
+                var dropDown = $("#AssetTypeId");
+                dropDown.empty();
+                dropDown.append("<option value='0'>-- Select --</option>");
+                $.each(JSON.parse(data), function (index, optionaldata) {
+                    dropDown.append($('<option />', { value: optionaldata.AssetTypeId }).html(optionaldata.AssetTypeName));
+                });
+
+                 if ('@ViewBag.AssetTypeId') {
+                     $('#AssetTypeId').val('@ViewBag.AssetTypeId').attr("selected", "selected");
+                }
+               
+
+                });
+
+            loadSubCategory();
+
+         }
+
+        $("select#AssetTypeId").change(function (evt) {
+            loadSubCategory();
+
+        });
+
+        function loadSubCategory() {
+            var valId = '2';
+            var catId = $('#CategoryId').val();
+            var assetTId = $('#AssetTypeId').val();
+
+            if ('@ViewBag.CategoryId' && '@ViewBag.CategoryId'!=0 ) {
+                catId = '@ViewBag.CategoryId';
+            }
+
+            if ('@ViewBag.AssetTypeId' && '@ViewBag.AssetTypeId'!=0 ) {
+                assetTId = '@ViewBag.AssetTypeId';
+            }
+            $.getJSON("@Url.Action("GetSubCategoryByTicketTypeListJsonResult", "SubCategory")",
+                {
+                    ticketType: valId,
+                    categoryId: catId,
+                    assetTypeId: assetTId
+                }, function (data) {
+                var dropDown = $("#SubCategoryId");
+                dropDown.empty();
+                dropDown.append("<option value='0'>-- Select --</option>");
+                $.each(JSON.parse(data), function (index, optionaldata) {
+                    dropDown.append($('<option />', { value: optionaldata.SubCategoryId }).html(optionaldata.SubCategoryName));
+                });
+
+                 if ('@ViewBag.SubCategoryId') {
+                     $('#SubCategoryId').val('@ViewBag.SubCategoryId').attr("selected", "selected");
+                }
+
+            });
+         }
+
+
+    </script>
+
+}
+

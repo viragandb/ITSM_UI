@@ -1,0 +1,461 @@
+﻿@model ICollection<Domain.CM.ChangeRequest>
+@using Service.CM
+@using Service
+@using Domain.CM
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="card">
+
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="align-middle me-2" data-lucide="clock"></i>
+                    Pending
+                </h5>
+            </div>
+
+            <div class="card-body">
+
+                <div class="accordion" id="changeRequestAccordion">
+
+                    @foreach (var item in Model)
+                    {
+                        var collapseId = "request_" + item.ChangeRequestId;
+                        var headingId = "heading_" + item.ChangeRequestId;
+
+                        <div class="accordion-item mb-3">
+
+                            <h2 class="accordion-header" id="@headingId">
+
+                                <button class="accordion-button collapsed"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#@collapseId"
+                                        aria-expanded="false"
+                                        aria-controls="@collapseId">
+
+                                    <div class="d-flex flex-wrap align-items-center gap-2">
+
+                                        <strong>
+                                            Request #@item.ChangeRequestId
+                                        </strong>
+
+                                        <span class="text-muted">|</span>
+
+                                        <i class="align-middle" data-lucide="layers"></i>
+
+                                        <span>
+                                            @item.ChangeRequestCategory.Name
+                                        </span>
+
+                                    </div>
+
+                                </button>
+
+                            </h2>
+
+                            <div id="@collapseId"
+                                 class="accordion-collapse collapse"
+                                 aria-labelledby="@headingId"
+                                 data-bs-parent="#changeRequestAccordion">
+
+                                <div class="accordion-body">
+
+                                    @Html.Partial("_RequestMin", item)
+
+                                </div>
+
+                                <div class="border-top p-3">
+
+                                    <div class="d-flex justify-content-end flex-wrap gap-2">
+
+                                        <a href="@Html.EncodedActionLink("", "Info", "ChangeRequest", "", new { id = item.ChangeRequestId }, null)"
+                                           target="_blank"
+                                           class="btn btn-sm btn-light">
+
+                                            <i class="align-middle me-1" data-lucide="info"></i>
+                                            More
+
+                                        </a>
+
+                                        <button type="button"
+                                                data-id="@item.ChangeRequestId"
+                                                class="openModalUpdateReject btn btn-sm btn-danger"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#modalUpdateReject">
+
+                                            <i class="align-middle me-1" data-lucide="thumbs-down"></i>
+                                            Reject
+
+                                        </button>
+
+                                        <button type="button"
+                                                data-id="@item.ChangeRequestId"
+                                                class="openModalUpdateApprove btn btn-sm btn-primary"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#modalUpdateApprove">
+
+                                            <i class="align-middle me-1" data-lucide="thumbs-up"></i>
+                                            Approve
+
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+<div class="modal fade"
+     id="modalUpdateApprove"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title">
+                    Request #
+                    <span id="approveRequestLabel"></span>
+                    Approve
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <input type="hidden"
+                       id="approveRequestId"
+                       value="" />
+
+                <div class="mb-3">
+
+                    <label for="approveComment"
+                           class="form-label">
+                        Comment
+                    </label>
+
+                    <input type="text"
+                           id="approveComment"
+                           placeholder="Enter Comment"
+                           class="form-control" />
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn btn-sm btn-light"
+                        data-bs-dismiss="modal">
+
+                    <i class="align-middle me-1" data-lucide="x"></i>
+                    Cancel
+
+                </button>
+
+                <button type="button"
+                        id="btnApprove"
+                        class="btn btn-sm btn-primary"
+                        onclick="approve()">
+
+                    <i class="align-middle me-1" data-lucide="thumbs-up"></i>
+                    Approve
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<div class="modal fade"
+     id="modalUpdateReject"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title">
+                    Request #
+                    <span id="rejectRequestLabel"></span>
+                    Reject
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <input type="hidden"
+                       id="rejectRequestId"
+                       value="" />
+
+                <div class="mb-3">
+
+                    <label for="rejectComment"
+                           class="form-label">
+                        Comment
+                    </label>
+
+                    <input type="text"
+                           id="rejectComment"
+                           placeholder="Enter Comment"
+                           class="form-control" />
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn btn-sm btn-light"
+                        data-bs-dismiss="modal">
+
+                    <i class="align-middle me-1" data-lucide="x"></i>
+                    Cancel
+
+                </button>
+
+                <button type="button"
+                        id="btnReject"
+                        class="btn btn-sm btn-danger"
+                        onclick="reject()">
+
+                    <i class="align-middle me-1" data-lucide="thumbs-down"></i>
+                    Reject
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).on("click", ".openModalUpdateApprove", function () {
+
+            var requestId = $(this).data("id");
+
+            $("#approveRequestId").val(requestId);
+            $("#approveRequestLabel").text(requestId);
+            $("#approveComment").val("");
+            $("#btnApprove").prop("disabled", false);
+
+        });
+
+
+        $(document).on("click", ".openModalUpdateReject", function () {
+
+            var requestId = $(this).data("id");
+
+            $("#rejectRequestId").val(requestId);
+            $("#rejectRequestLabel").text(requestId);
+            $("#rejectComment").val("");
+            $("#btnReject").prop("disabled", false);
+
+        });
+
+
+        function approve() {
+
+            var requestId = $("#approveRequestId").val();
+            var comment = $("#approveComment").val();
+
+            if (!comment || !comment.trim()) {
+
+                Swal.fire(
+                    "Error!",
+                    "Please enter a comment",
+                    "error"
+                );
+
+                return;
+            }
+
+            $("#btnApprove").prop("disabled", true);
+
+            $.ajax({
+
+                url: '@Url.Action("VPApprove", "ChangeRequest")',
+
+                type: "GET",
+                dataType: "json",
+
+                data: {
+                    requestId: requestId,
+                    comment: comment
+                },
+
+                success: function (data) {
+
+                    if (data == "1" || data == 1) {
+
+                        Swal.fire(
+                            "Completed",
+                            "Request has been approved",
+                            "success"
+                        );
+
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 300);
+
+                    }
+                    else {
+
+                        $("#btnApprove").prop("disabled", false);
+
+                        Swal.fire(
+                            "Something went wrong!",
+                            "Please try again",
+                            "error"
+                        );
+
+                    }
+
+                },
+
+                error: function () {
+
+                    $("#btnApprove").prop("disabled", false);
+
+                    Swal.fire(
+                        "Something went wrong!",
+                        "Please try again",
+                        "error"
+                    );
+
+                }
+
+            });
+
+        }
+
+
+        function reject() {
+
+            var requestId = $("#rejectRequestId").val();
+            var comment = $("#rejectComment").val();
+
+            if (!comment || !comment.trim()) {
+
+                Swal.fire(
+                    "Error!",
+                    "Please enter a comment",
+                    "error"
+                );
+
+                return;
+            }
+
+            $("#btnReject").prop("disabled", true);
+
+            $.ajax({
+
+                url: '@Url.Action("VPReject", "ChangeRequest")',
+
+                type: "GET",
+                dataType: "json",
+
+                data: {
+                    requestId: requestId,
+                    comment: comment
+                },
+
+                success: function (data) {
+
+                    if (data == "1" || data == 1) {
+
+                        Swal.fire(
+                            "Completed",
+                            "Request has been rejected",
+                            "success"
+                        );
+
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 100);
+
+                    }
+                    else {
+
+                        $("#btnReject").prop("disabled", false);
+
+                        Swal.fire(
+                            "Something went wrong!",
+                            "Please try again",
+                            "error"
+                        );
+
+                    }
+
+                },
+
+                error: function () {
+
+                    $("#btnReject").prop("disabled", false);
+
+                    Swal.fire(
+                        "Something went wrong!",
+                        "Please try again",
+                        "error"
+                    );
+
+                }
+
+            });
+
+        }
+
+    </script>
+}

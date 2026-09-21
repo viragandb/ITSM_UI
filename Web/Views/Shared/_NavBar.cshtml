@@ -1,0 +1,203 @@
+﻿<nav class="navbar navbar-expand navbar-bg">
+
+    <!-- Sidebar Toggle -->
+    <a class="sidebar-toggle">
+        <i class="hamburger align-self-center"></i>
+    </a>
+
+    <!-- Left Links -->
+    <ul class="navbar-nav">
+
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="@Url.Action("Index", "Home")"
+               class="nav-link">
+                Home
+            </a>
+        </li>
+
+        <li class="nav-item d-none d-sm-inline-block">
+
+            <img src="~/Images/app-logo.png"  style="width:132px;"/>
+        </li>
+
+    </ul>
+
+    <!-- Right Links -->
+    <div class="navbar-collapse collapse">
+
+        <ul class="navbar-nav navbar-align">
+
+            <!-- Notifications -->
+            @Html.Action(
+                "NoticationPanel",
+                "Home",
+                new { Area = "" }
+            )
+
+            @Html.Action(
+                "IMNotification",
+                "Home",
+                new { Area = "" }
+            )
+
+            @Html.Action(
+                "CRNotification",
+                "Home",
+                new { Area = "" }
+            )
+
+            @Html.Action(
+                "ARNotification",
+                "Home",
+                new { Area = "" }
+            )
+
+            @Html.Action(
+                "RANotification",
+                "Home",
+                new { Area = "" }
+            )
+
+            <!-- Theme Toggle -->
+            <li class="nav-item nav-theme-toggle dropdown d-none">
+
+                <a class="nav-icon js-theme-toggle"
+                   href="#"
+                   title="Change theme">
+
+                    <div class="position-relative">
+
+                        <i class="align-middle text-body nav-theme-toggle-light"
+                           data-lucide="sun"></i>
+
+                        <i class="align-middle text-body nav-theme-toggle-dark"
+                           data-lucide="moon"></i>
+
+                    </div>
+
+                </a>
+
+            </li>
+
+            <!-- User / Logout -->
+            <li class="nav-item dropdown">
+
+                <!-- Mobile -->
+                <a class="nav-icon dropdown-toggle d-inline-block d-sm-none"
+                   href="#"
+                   data-bs-toggle="dropdown"
+                   aria-expanded="false">
+
+                    <i class="align-middle"
+                       data-lucide="user"></i>
+
+                </a>
+
+                <!-- Desktop -->
+                <a class="nav-link dropdown-toggle d-none d-sm-inline-block"
+                   href="#"
+                   data-bs-toggle="dropdown"
+                   aria-expanded="false">
+
+                    <span class="text-dark">
+
+                        <span class="fw-semibold">
+                            @(Session["UserName"] != null
+                                ? Session["UserName"].ToString()
+                                : "User")
+                        </span>
+
+                        @if (Session["Designation"] != null)
+                        {
+                            <small class="text-muted ms-1">
+                                @Session["Designation"]
+                            </small>
+                        }
+
+                    </span>
+
+                </a>
+
+                <div class="dropdown-menu dropdown-menu-end">
+
+                    <div class="dropdown-header">
+
+                        <div class="fw-semibold mb-2">
+
+                            @(Session["UserName"] != null
+                                ? Session["UserName"].ToString()
+                                : "User")
+
+                        </div>
+
+                        @if (Session["Designation"] != null)
+                        {
+                            <div class="small text-muted mb-1">
+
+                                <i class="align-middle me-1"
+                                   data-lucide="briefcase"></i>
+
+                                @Session["Designation"]
+
+                            </div>
+                        }
+
+                        @if (Session["Department"] != null)
+                        {
+                            <div class="small text-muted mb-1">
+
+                                <i class="align-middle me-1"
+                                   data-lucide="building"></i>
+
+                                @Session["Department"]
+
+                            </div>
+                        }
+
+                        @if (Session["Branch"] != null)
+                        {
+                            <div class="small text-muted">
+
+                                <i class="align-middle me-1"
+                                   data-lucide="map-pin"></i>
+
+                                @Session["Branch"]
+
+                            </div>
+                        }
+
+                    </div>
+
+                    <div class="dropdown-divider"></div>
+
+                    <a class="dropdown-item"
+                       href="@Url.Action("Index", "Home")">
+
+                        <i class="align-middle me-2"
+                           data-lucide="home"></i>
+
+                        Home
+
+                    </a>
+
+                    <div class="dropdown-divider"></div>
+
+                    <a class="dropdown-item"
+                       href="@Url.Action("LogOut", "Login")">
+
+                        <i class="align-middle me-2"
+                           data-lucide="log-out"></i>
+
+                        Sign Out
+
+                    </a>
+
+                </div>
+
+            </li>
+
+        </ul>
+
+    </div>
+
+</nav>

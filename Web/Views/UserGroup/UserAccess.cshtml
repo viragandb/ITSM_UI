@@ -1,0 +1,463 @@
+﻿@using Service
+@model IEnumerable<Domain.UserGroup>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("UserAccess", "UserGroup", FormMethod.Get))
+{
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card">
+
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="align-middle me-2" data-lucide="shield-check"></i>
+                        User Access
+                    </h5>
+                </div>
+
+                <div class="card-body">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-4">
+
+                            <label for="BranchId" class="form-label">
+                                Location
+                            </label>
+
+                            <select id="BranchId"
+                                    name="BranchId"
+                                    class="form-select select2">
+                                <option value="0">-- All --</option>
+                            </select>
+
+                        </div>
+
+                        <div class="col-md-4">
+
+                            <label for="DepartmentId" class="form-label">
+                                Department
+                            </label>
+
+                            <select id="DepartmentId"
+                                    name="DepartmentId"
+                                    class="form-select select2">
+                                <option value="0">-- All --</option>
+                            </select>
+
+                        </div>
+
+                        <div class="col-md-4">
+
+                            <label for="GroupId" class="form-label">
+                                Access Group
+                            </label>
+
+                            <select id="GroupId"
+                                    name="GroupId"
+                                    class="form-select select2">
+                                <option value="0">-- All --</option>
+                            </select>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="card-footer">
+
+                    <div class="d-flex justify-content-end">
+
+                        <button type="submit"
+                                class="btn btn-sm btn-primary">
+
+                            <i class="align-middle me-1" data-lucide="search"></i>
+                            Search
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card">
+
+                <div class="card-body">
+
+                    <div class="table-responsive">
+
+                        <table id="dataTable"
+                               class="table table-striped table-hover align-middle">
+
+                            <thead>
+                                <tr>
+                                    <th>User Id</th>
+                                    <th>Name</th>
+                                    <th>User Branch</th>
+                                    <th>User Department</th>
+                                    <th>Access Branches</th>
+                                    <th>Access Departments</th>
+                                    <th>Updated By</th>
+                                    <th>Updated Date</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+
+                                        <td>
+                                            @item.EmpNo
+                                        </td>
+
+                                        <td>
+                                            @(item.User != null
+                                                ? item.User.FullName
+                                                : "N/A")
+                                        </td>
+
+                                        <td>
+                                            @(item.User != null &&
+                                              item.User.Branch != null
+                                                ? item.User.Branch.Name
+                                                : "N/A")
+                                        </td>
+
+                                        <td>
+                                            @(item.User != null &&
+                                              item.User.Department != null
+                                                ? item.User.Department.DepartmentName
+                                                : "N/A")
+                                        </td>
+
+                                        <td>
+
+                                            @if (item.User != null &&
+                                                 item.User.UserBranches != null &&
+                                                 item.User.UserBranches.Any())
+                                            {
+                                                foreach (var branch in item.User.UserBranches)
+                                                {
+                                                    if (branch.Branch != null)
+                                                    {
+                                                        <div>
+                                                            @branch.Branch.Name
+                                                        </div>
+                                                    }
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">
+                                                    N/A
+                                                </span>
+                                            }
+
+                                        </td>
+
+                                        <td>
+
+                                            @if (item.User != null &&
+                                                 item.User.UserDepartments != null &&
+                                                 item.User.UserDepartments.Any())
+                                            {
+                                                foreach (var department in item.User.UserDepartments)
+                                                {
+                                                    if (department.Department != null)
+                                                    {
+                                                        <div>
+                                                            @department.Department.DepartmentName
+                                                        </div>
+                                                    }
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">
+                                                    N/A
+                                                </span>
+                                            }
+
+                                        </td>
+
+                                        <td>
+                                            @item.UpdatedBy
+                                        </td>
+
+                                        <td>
+                                            @item.UpdatedDate
+                                        </td>
+
+                                    </tr>
+                                }
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+}
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $(".select2").select2({
+                width: "100%"
+            });
+
+
+            $("#dataTable").DataTable({
+
+                responsive: true,
+                lengthChange: false,
+                autoWidth: false,
+                paging: false,
+
+                buttons: [
+                    {
+                        extend: "excelHtml5",
+                        text: "Excel",
+                        title: "ITSM - User Access",
+                        exportOptions: {
+                            modifier: {
+                                page: "current"
+                            }
+                        }
+                    },
+                    {
+                        extend: "pdfHtml5",
+                        text: "PDF",
+                        title: "ITSM - User Access",
+                        orientation: "landscape",
+                        exportOptions: {
+                            modifier: {
+                                page: "current"
+                            }
+                        }
+                    },
+                    {
+                        extend: "print",
+                        text: "Print",
+                        title: "ITSM - User Access",
+                        autoPrint: true
+                    },
+                    "colvis"
+                ]
+
+            })
+            .buttons()
+            .container()
+            .appendTo("#dataTable_wrapper .col-md-6:eq(0)");
+
+
+            loadUserGroup();
+            loadLocations();
+
+
+            $("#BranchId").on("change", function () {
+                loadDepartments();
+            });
+
+        });
+
+
+        function parseJsonResult(data) {
+
+            if (typeof data === "string") {
+
+                try {
+                    return JSON.parse(data);
+                }
+                catch (e) {
+                    return [];
+                }
+
+            }
+
+            return data || [];
+        }
+
+
+        function loadLocations() {
+
+            var dropDown =
+                $("#BranchId");
+
+            dropDown.empty();
+
+            dropDown.append(
+                "<option value='0'>-- All --</option>"
+            );
+
+
+            $.getJSON(
+                '@Url.Action("GetItemListJsonResult", "Branch")',
+                function (data) {
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.BranchId,
+                                    text: item.Name
+                                })
+                            );
+
+                        }
+                    );
+
+
+                    var selectedId =
+                        '@ViewBag.BranchId';
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+                    dropDown.trigger("change.select2");
+
+                    loadDepartments();
+
+                }
+            );
+
+        }
+
+
+        function loadDepartments() {
+
+            var branchId =
+                $("#BranchId").val();
+
+            var dropDown =
+                $("#DepartmentId");
+
+            dropDown.empty();
+
+            dropDown.append(
+                "<option value='0'>-- All --</option>"
+            );
+
+
+            if (!branchId) {
+                dropDown.trigger("change.select2");
+                return;
+            }
+
+
+            $.getJSON(
+                '@Url.Action("GetDepartmentListBtBranchIdJsonResult", "Department")',
+                {
+                    branchId: branchId
+                },
+                function (data) {
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.DepartmentId,
+                                    text: item.DepartmentName
+                                })
+                            );
+
+                        }
+                    );
+
+
+                    var selectedId =
+                        '@ViewBag.DepartmentId';
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+                    dropDown.trigger("change.select2");
+
+                }
+            );
+
+        }
+
+
+        function loadUserGroup() {
+
+            var dropDown =
+                $("#GroupId");
+
+            dropDown.empty();
+
+            dropDown.append(
+                "<option value='0'>-- All --</option>"
+            );
+
+
+            $.getJSON(
+                '@Url.Action("GetGroup", "AccessControl")',
+                {
+                    accountId: $("#AccountId").val()
+                },
+                function (data) {
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.GroupId,
+                                    text: item.GroupName
+                                })
+                            );
+
+                        }
+                    );
+
+
+                    var selectedId =
+                        '@ViewBag.GroupId';
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+                    dropDown.trigger("change.select2");
+
+                }
+            );
+
+        }
+
+    </script>
+}

@@ -1,0 +1,619 @@
+﻿@model Web.Models.WorkflowVM
+@using Service
+@using Domain
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("Edit", "Workflow", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+
+    @Html.HiddenFor(m => Model.WorkflowId)
+    @Html.HiddenFor(m => Model.WorkflowType)
+
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card">
+
+                <div class="card-header d-flex justify-content-between align-items-center">
+
+                    <h5 class="card-title mb-0">
+                        <i class="align-middle me-2" data-lucide="git-branch"></i>
+                        Workflow
+                    </h5>
+
+                    <a href="@Url.Action("Index", "Workflow")"
+                       class="btn btn-sm btn-light">
+
+                        <i class="align-middle me-1" data-lucide="arrow-left"></i>
+                        Back
+
+                    </a>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+
+                            @Html.LabelFor(
+                                model => model.Name,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.TextBoxFor(
+                                model => model.Name,
+                                new { @class = "form-control" }
+                            )
+
+                            @Html.ValidationMessageFor(
+                                model => model.Name,
+                                "",
+                                new { @class = "text-danger" }
+                            )
+
+                        </div>
+
+                        <div class="col-md-4">
+
+                            <label class="form-label">
+                                @Html.DisplayNameFor(model => model.WorkflowType)
+                            </label>
+
+                            <div class="form-control bg-body-tertiary">
+                                @Model.WorkflowType.EnumDisplayName()
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="card mt-4">
+
+                        <div class="card-header">
+
+                            <h5 class="card-title mb-0">
+                                <i class="align-middle me-2" data-lucide="layers"></i>
+                                Workflow Levels
+                            </h5>
+
+                        </div>
+
+                        <div class="card-body">
+
+                            <div class="row g-3 align-items-end">
+
+                                <div class="col-md-2">
+
+                                    <label for="LevelId"
+                                           class="form-label">
+                                        Level #
+                                    </label>
+
+                                    <select id="LevelId"
+                                            name="LevelId"
+                                            class="form-select">
+
+                                        <option value="0">-- Select --</option>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                        <option value="6">6</option>
+                                        <option value="7">7</option>
+                                        <option value="8">8</option>
+                                        <option value="9">9</option>
+                                        <option value="10">10</option>
+
+                                    </select>
+
+                                </div>
+
+                                <div class="col-md-3">
+
+                                    <label for="WorkflowLevelTypeId"
+                                           class="form-label">
+                                        Level Type
+                                    </label>
+
+                                    <select id="WorkflowLevelTypeId"
+                                            name="WorkflowLevelTypeId"
+                                            class="form-select">
+
+                                        <option value="0">-- Select --</option>
+
+                                    </select>
+
+                                </div>
+
+                                <div class="col-md-4">
+
+                                    <label for="TeamId"
+                                           class="form-label">
+                                        Team
+                                    </label>
+
+                                    <select id="TeamId"
+                                            name="TeamId"
+                                            class="form-select">
+
+                                        <option value="0">-- Select --</option>
+
+                                    </select>
+
+                                </div>
+
+                                <div class="col-md-3">
+
+                                    <button type="button"
+                                            class="btn btn-info w-100 btnSubmitAdd"
+                                            onclick="addItem()">
+
+                                        <i class="align-middle me-1" data-lucide="plus"></i>
+                                        Add
+
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="table-responsive mt-4">
+
+                                <table id="dataTable"
+                                       class="table table-striped table-hover align-middle">
+
+                                    <thead>
+                                        <tr>
+                                            <th>Level #</th>
+                                            <th>Level Type</th>
+                                            <th>Team</th>
+                                            <th class="text-end">Action</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody id="workflowdata">
+
+                                        @if (Model.WorkflowLevels != null)
+                                        {
+                                            for (var i = 0; i < Model.WorkflowLevels.Count; i++)
+                                            {
+                                                <tr id="workflowRow_@i">
+
+                                                    <td>
+
+                                                        @Html.HiddenFor(
+                                                            m => Model.WorkflowLevels[i].TeamId
+                                                        )
+
+                                                        @Html.HiddenFor(
+                                                            m => Model.WorkflowLevels[i].LevelNo,
+                                                            new { @class = "iHidden" }
+                                                        )
+
+                                                        @Html.HiddenFor(
+                                                            m => Model.WorkflowLevels[i].WorkflowLevelType
+                                                        )
+
+                                                        @if (Model.WorkflowLevels[i].Team != null)
+                                                        {
+                                                            @Html.HiddenFor(
+                                                                m => Model.WorkflowLevels[i].Team.TeamName
+                                                            )
+                                                        }
+
+                                                        @Model.WorkflowLevels[i].LevelNo
+
+                                                    </td>
+
+                                                    <td>
+                                                        @Model.WorkflowLevels[i].WorkflowLevelType.EnumDisplayName()
+                                                    </td>
+
+                                                    <td>
+                                                        @(Model.WorkflowLevels[i].Team != null
+                                                            ? Model.WorkflowLevels[i].Team.TeamName
+                                                            : "N/A")
+                                                    </td>
+
+                                                    <td class="text-end">
+
+                                                        <button type="button"
+                                                                id="btnRemove@i"
+                                                                name="btnRemove@i"
+                                                                onclick="deleteRow(@i)"
+                                                                class="btn btn-sm btn-danger">
+
+                                                            <i class="align-middle"
+                                                               data-lucide="trash-2"></i>
+
+                                                        </button>
+
+                                                    </td>
+
+                                                </tr>
+                                            }
+                                        }
+
+                                    </tbody>
+
+                                </table>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="card-footer">
+
+                    <div class="d-flex justify-content-end gap-2">
+
+                        <button type="reset"
+                                class="btn btn-sm btn-danger">
+
+                            <i class="align-middle me-1" data-lucide="rotate-ccw"></i>
+                            Cancel
+
+                        </button>
+
+                        <button type="submit"
+                                class="btn btn-sm btn-primary btnSubmitDisable">
+
+                            <i class="align-middle me-1" data-lucide="save"></i>
+                            Save
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+}
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            loadWorkflowTypes();
+            loadTeams();
+
+        });
+
+
+        function parseJsonResult(data) {
+
+            if (typeof data === "string") {
+
+                try {
+                    return JSON.parse(data);
+                }
+                catch (e) {
+                    return [];
+                }
+
+            }
+
+            return data || [];
+        }
+
+
+        function escapeHtml(value) {
+
+            if (value == null) {
+                return "";
+            }
+
+            return $("<div/>").text(value).html();
+        }
+
+
+        function loadTeams() {
+
+            var dropDown = $("#TeamId");
+
+            dropDown.empty();
+
+            dropDown.append(
+                "<option value='0'>-- Select --</option>"
+            );
+
+
+            $.getJSON(
+                '@Url.Action("GetTeamListJsonResult", "Team")',
+                function (data) {
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.TeamId,
+                                    text: item.TeamName
+                                })
+                            );
+
+                        }
+                    );
+
+
+                    var selectedTeamId = '@ViewBag.TeamId';
+
+                    if (selectedTeamId) {
+                        dropDown.val(selectedTeamId);
+                    }
+
+                }
+            );
+
+        }
+
+
+        function loadWorkflowTypes() {
+
+            var dropDown = $("#WorkflowLevelTypeId");
+
+            dropDown.empty();
+
+            dropDown.append(
+                "<option value='0'>-- Select --</option>"
+            );
+
+
+            $.getJSON(
+                '@Url.Action("GetLevelTypesJsonResult", "Workflow")',
+                function (data) {
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.Id,
+                                    text: item.Name
+                                })
+                            );
+
+                        }
+                    );
+
+                }
+            );
+
+        }
+
+
+        function addItem() {
+
+            var levelNo = $("#LevelId").val();
+
+            var typeId = $("#WorkflowLevelTypeId").val();
+            var typeName = $("#WorkflowLevelTypeId option:selected").text();
+
+            var teamId = $("#TeamId").val();
+            var teamName = $("#TeamId option:selected").text();
+
+
+            if (!levelNo ||
+                levelNo == "0" ||
+                !typeId ||
+                typeId == "0" ||
+                !teamId ||
+                teamId == "0") {
+
+                Swal.fire(
+                    "Error!",
+                    "Please enter valid details",
+                    "error"
+                );
+
+                return;
+            }
+
+
+            var duplicateLevel = false;
+
+            $("#workflowdata input.iHidden").each(function () {
+
+                if ($(this).val() == levelNo) {
+
+                    duplicateLevel = true;
+
+                    return false;
+
+                }
+
+            });
+
+
+            if (duplicateLevel) {
+
+                Swal.fire(
+                    "Error!",
+                    "This workflow level already exists",
+                    "error"
+                );
+
+                return;
+            }
+
+
+            var itemIndex =
+                $("#workflowdata input.iHidden").length;
+
+
+            var newRow =
+
+                "<tr id='workflowRow_" + itemIndex + "'>" +
+
+                    "<td>" +
+
+                        "<input type='hidden' " +
+                               "id='WorkflowLevels_" + itemIndex + "__LevelNo' " +
+                               "class='iHidden' " +
+                               "name='WorkflowLevels[" + itemIndex + "].LevelNo' " +
+                               "value='" + escapeHtml(levelNo) + "' />" +
+
+                        "<input type='hidden' " +
+                               "id='WorkflowLevels_" + itemIndex + "__WorkflowLevelType' " +
+                               "name='WorkflowLevels[" + itemIndex + "].WorkflowLevelType' " +
+                               "value='" + escapeHtml(typeId) + "' />" +
+
+                        "<input type='hidden' " +
+                               "id='WorkflowLevels_" + itemIndex + "__TeamId' " +
+                               "name='WorkflowLevels[" + itemIndex + "].TeamId' " +
+                               "value='" + escapeHtml(teamId) + "' />" +
+
+                        "<input type='hidden' " +
+                               "id='WorkflowLevels_" + itemIndex + "__Team_TeamName' " +
+                               "name='WorkflowLevels[" + itemIndex + "].Team.TeamName' " +
+                               "value='" + escapeHtml(teamName) + "' />" +
+
+                        escapeHtml(levelNo) +
+
+                    "</td>" +
+
+                    "<td>" +
+                        escapeHtml(typeName) +
+                    "</td>" +
+
+                    "<td>" +
+                        escapeHtml(teamName) +
+                    "</td>" +
+
+                    "<td class='text-end'>" +
+
+                        "<button type='button' " +
+                                "id='btnRemove" + itemIndex + "' " +
+                                "name='btnRemove" + itemIndex + "' " +
+                                "onclick='deleteRow(" + itemIndex + ")' " +
+                                "class='btn btn-sm btn-danger'>" +
+
+                            "<i data-lucide='trash-2'></i>" +
+
+                        "</button>" +
+
+                    "</td>" +
+
+                "</tr>";
+
+
+            $("#workflowdata").append(newRow);
+
+
+            if (window.lucide) {
+                lucide.createIcons();
+            }
+
+        }
+
+
+        function deleteRow(index) {
+
+            $("#workflowRow_" + index).remove();
+
+            reindexWorkflowRows();
+
+        }
+
+
+        function reindexWorkflowRows() {
+
+            $("#workflowdata tr").each(function (newIndex) {
+
+                var row = $(this);
+
+
+                row.attr(
+                    "id",
+                    "workflowRow_" + newIndex
+                );
+
+
+                row.find("input").each(function () {
+
+                    var input = $(this);
+
+                    var oldName = input.attr("name");
+                    var oldId = input.attr("id");
+
+
+                    if (oldName) {
+
+                        input.attr(
+                            "name",
+                            oldName.replace(
+                                /WorkflowLevels\[\d+\]/,
+                                "WorkflowLevels[" + newIndex + "]"
+                            )
+                        );
+
+                    }
+
+
+                    if (oldId) {
+
+                        input.attr(
+                            "id",
+                            oldId.replace(
+                                /WorkflowLevels_\d+__/,
+                                "WorkflowLevels_" + newIndex + "__"
+                            )
+                        );
+
+                    }
+
+                });
+
+
+                var removeButton =
+                    row.find("button[id^='btnRemove']");
+
+
+                removeButton
+                    .attr(
+                        "id",
+                        "btnRemove" + newIndex
+                    )
+                    .attr(
+                        "name",
+                        "btnRemove" + newIndex
+                    )
+                    .attr(
+                        "onclick",
+                        "deleteRow(" + newIndex + ")"
+                    );
+
+            });
+
+        }
+
+
+        function removeItems() {
+
+            $("#workflowdata").empty();
+
+        }
+
+    </script>
+}

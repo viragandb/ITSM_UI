@@ -1,0 +1,209 @@
+﻿@model Domain.ScheduledTask
+@using Service
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card ">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <b>Task # @Model.ScheduledTaskId</b> | @Model.TaskName
+
+                </h3>
+                <div class="card-tools pull-right">
+                    <i class="fa fa-user"></i>&nbsp;&nbsp;
+                    @Model.UpdatedBy &nbsp;&nbsp;|&nbsp;&nbsp;
+                    <i class="fa fa-calendar"></i>&nbsp;&nbsp;
+                    @Model.UpdatedDate
+                    @*<span class="label text- label-@ScheduledTaskService.GetTaskRepeatTypeColor(Model.RepeatType)">
+            Repeat : @Model.RepeatType.EnumDisplayName()
+        </span>*@
+
+
+                    @*<span class="label text- label-@TicketService.GetTicketStatusColor(Model.Status)">
+            @Model.Status.EnumDisplayName()
+        </span>
+        &nbsp;&nbsp;
+
+        <span class="label text- label-@TicketService.GetTicketMediumColor(Model.TicketMedium)">
+            @Model.TicketMedium.EnumDisplayName()
+        </span>
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <span class="label text- label-@TicketService.GetTicketTypeColor(Model.RequestType.TicketType)">
+            @Model.RequestType.TicketType.EnumDisplayName()
+        </span>*@
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="col-md-9">
+                    <div class="form-group row">
+                        @Html.LabelFor(model => Model.TaskName, new { @class = "col-md-2 text-right" })
+                        <div class="col-md-10">
+                            @Model.TaskName
+                        </div>
+
+                    </div>
+                    <div class="form-group row">
+                        @Html.LabelFor(model => Model.Description, new { @class = "col-md-2 text-right" })
+                        <div class="col-md-10">
+                            @Model.Description
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        @Html.LabelFor(model => Model.TaskCategoryId, new { @class = "col-md-2 text-right" })
+                        <div class="col-md-6">
+                            @Model.TaskCategory.TaskCategoryName
+                        </div>
+
+
+                    </div>
+
+                    <div class="form-group row">
+                        @Html.LabelFor(model => Model.StartDate, new { @class = "col-md-2 text-right" })
+                        <div class="col-md-2">
+                            @Model.StartDate.ToShortDateString()
+                        </div>
+                        @Html.LabelFor(model => Model.EndDate, new { @class = "col-md-2 text-right" })
+                        <div class="col-md-2">
+                            @Model.EndDate.ToShortDateString()
+                        </div>
+                        @*@Html.LabelFor(model => Model.Score, new { @class = "col-md-2 text-right" })
+                        <div class="col-md-2">
+                            @Model.Score
+                        </div>*@
+                    </div>
+
+                    <div class="form-group row">
+                        @Html.LabelFor(model => Model.RepeatType, new { @class = "col-md-2 text-right" })
+                        <div class="col-md-2">
+                            @Model.RepeatType
+                        </div>
+                        @Html.LabelFor(model => Model.IsKPI, new { @class = "col-md-2 text-right" })
+                        <div class="col-md-2">
+                            @Model.IsKPI
+                        </div>
+                        @Html.LabelFor(model => Model.Score, new { @class = "col-md-2 text-right" })
+                        <div class="col-md-2">
+                            @Model.Score
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-md-2 text-right">Scheduled Date/s</label>
+                        <div class="col-md-10">
+
+                            @{
+                                if (Model.RepeatType == Domain.RepeatTypeEnum.Never)
+                                {
+                                    @Model.StartDate.ToShortDateString()
+
+                                }
+                                else if (Model.RepeatType == Domain.RepeatTypeEnum.Week)
+                                {
+                                    foreach (var item in Model.ScheduledDates)
+                                    {
+
+                                        @item.TaskDay <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                    }
+                                }
+                                else if (Model.RepeatType == Domain.RepeatTypeEnum.Month)
+                                {
+                                    foreach (var item in Model.ScheduledDates)
+                                    {
+                                        @item.TaskDayNo <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                    }
+                                }
+                                else if (Model.RepeatType == Domain.RepeatTypeEnum.Year)
+                                {
+                                    foreach (var item in Model.ScheduledDates)
+                                    {
+                                        @item.TaskDate.ToString("MMM/dd/yyyy") <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                    }
+                                }
+                            }
+                        </div>
+                        @*<label class="col-md-2 text-right">Updated Date</label>
+                        <div class="col-md-4">
+                            @Model.UpdatedDate
+                        </div>*@
+
+                    </div>
+
+
+                </div>
+                <div class="col-md-3">
+
+                    @if (Model.User != null)
+                    {
+                        <div class="card box-widget widget-user-2">
+                            <div class="widget-user-header bg-primary">
+                                <div class="widget-user-image">
+                                    <img class="img-circle" src="@Model.User.ProImageName" alt="User Avatar">
+                                </div>
+                                <h5 class="widget-user-desc">@Model.AssignedTo @Model.User.FullName</h5>
+                                <h5 class="widget-user-desc">@Model.User.DesignationName</h5>
+                                <h5 class="widget-user-desc">Assigned To </h5>
+                            </div>
+                        </div>
+                    }
+
+                    @if (Model.Reviewer != null)
+                    {
+                        <div class="card box-widget widget-user-2">
+                            <div class="widget-user-header bg-red-active">
+                                <div class="widget-user-image">
+                                    <img class="img-circle" src="@Model.Reviewer.ProImageName" alt="User Avatar">
+                                </div>
+                                <h5 class="widget-user-desc">@Model.ReviewBy @Model.Reviewer.FullName</h5>
+                                <h5 class="widget-user-desc">@Model.Reviewer.DesignationName</h5>
+                                <h5 class="widget-user-desc">Review By </h5>
+                            </div>
+                        </div>
+                    }
+
+                    @*<div class="form-group row">
+                            <div class="col-md-12">
+                                <i class="fa fa-ticket"></i>&nbsp;&nbsp; @Model.Code
+                            </div>
+
+                        </div>*@
+
+                    @*<div class="form-group row">
+                            <div class="col-md-12">
+                                <i class="fa fa-@Model.RequestType.Category.Icon"></i> &nbsp;&nbsp; @Model.RequestType.Category.CategoryName
+                            </div>
+
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-md-12">
+                                <i class="fa fa-@Model.RequestType.AssetType.Icon"></i> &nbsp;&nbsp; @Model.RequestType.AssetType.AssetTypeName
+                            </div>
+
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-md-12">
+                                <i class="fa fa-@Model.RequestType.SubCategory.Icon"></i> &nbsp;&nbsp; @Model.RequestType.SubCategory.SubCategoryName
+                            </div>
+
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-md-12">
+                                <i class="fa fa-calendar"></i> &nbsp;&nbsp; @Model.RequestedDate
+                            </div>
+
+                        </div>*@
+
+                </div>
+
+
+            </div>
+        </div>
+
+
+    </div>
+</div>
+
+

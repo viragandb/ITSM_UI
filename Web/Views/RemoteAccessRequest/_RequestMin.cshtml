@@ -1,0 +1,142 @@
+﻿@model Domain.RA.RemoteAccessRequest
+@using Service.CM
+@using Service
+
+@{
+    var latestClarificationRequest = Model.RemoteAccessRequestUpdates
+        .Where(u =>
+            u.Status == Domain.AR.AccessRequestStatusEnum.ClarificationRequested)
+        .OrderByDescending(u => u.UpdatedDate)
+        .FirstOrDefault();
+
+    Domain.RA.RemoteAccessRequestUpdate latestClarificationReply = null;
+
+    if (latestClarificationRequest != null)
+    {
+        latestClarificationReply = Model.RemoteAccessRequestUpdates
+            .Where(u =>
+                u.Status == Domain.AR.AccessRequestStatusEnum.ClarificationProvided &&
+                u.UpdatedDate > latestClarificationRequest.UpdatedDate)
+            .OrderBy(u => u.UpdatedDate)
+            .FirstOrDefault();
+    }
+
+
+
+
+
+}
+
+
+<div class="row">
+
+    <div class="col-sm-8">
+
+        <strong>@Html.LabelFor(model => Model.BusinessJustification)</strong>
+        <p class="text-muted"> @Model.BusinessJustification </p>
+        <hr />
+        <strong>@Html.LabelFor(model => Model.BusinessImpact)</strong>
+        <p class="text-muted"> @Model.BusinessImpact </p>
+        <hr />
+        @if (latestClarificationRequest != null)
+        {
+            <div class="alert alert-default-warning">
+                <div class="row">
+
+                    <div class="col-md-8">
+                        <strong>Clarification Requested</strong>
+                        <br />
+                        @latestClarificationRequest.Comment
+                    </div>
+
+                    <div class="col-md-4 text-right">
+                        <strong>@latestClarificationRequest.UpdatedUser.FullName</strong>
+                        <br />
+                        <span class="font-weight-bold text-muted" style="font-size: 0.95rem;">
+                            @latestClarificationRequest.UpdatedUser.DesignationName — @latestClarificationRequest.UpdatedUser.DepartmentName
+                        </span>
+                    </div>
+
+                </div>
+            </div>
+
+            if (latestClarificationReply != null)
+            {
+                <div class="alert alert-default-success mt-2">
+                    <div class="row">
+
+                        <div class="col-md-8">
+                            <strong>Clarification Provided</strong>
+                            <br />
+                            @latestClarificationReply.Comment
+                        </div>
+
+                        <div class="col-md-4 text-right">
+                            <strong>@latestClarificationReply.UpdatedUser.FullName</strong>
+                            <br />
+                            <span class="font-weight-bold text-muted" style="font-size: 0.95rem;">
+                                @latestClarificationRequest.UpdatedUser.DesignationName — @latestClarificationRequest.UpdatedUser.DepartmentName
+                            </span>
+                        </div>
+
+                    </div>
+                </div>
+            }
+
+            <hr />
+        }
+
+
+
+
+
+        <dl class="row">
+            <dt class="col-sm-2">Start Date</dt>
+            <dd class="col-sm-4">@Model.StartDate.ToShortDateString()</dd>
+            <dt class="col-sm-2">End Date</dt>
+            <dd class="col-sm-4">@Model.EndDate.ToShortDateString()</dd>
+            <dt class="col-sm-2">Access Type</dt>
+            <dd class="col-sm-4">@Model.RemoteAccessType</dd>
+            <dt class="col-sm-2">Remote Work Location</dt>
+            <dd class="col-sm-4">@Model.RemoteWorkLocation </dd>
+        </dl>
+        <hr />
+        <dl class="row">
+            <dt class="col-sm-2">Created By</dt>
+            <dd class="col-sm-4">@Model.CreatedBy </dd>
+            <dt class="col-sm-2">Requested Date</dt>
+            <dd class="col-sm-4">@Model.RequestedDate.ToShortDateString() </dd>
+        </dl>
+
+
+
+    </div>
+
+    <div class="col-sm-4">
+
+        <div class="callout callout-gray card-outline">
+            <strong><i class="fas fa-user-circle mr-1"></i>Requester</strong>
+            <p class="text-muted">  @Model.RequestedBy - @Model.RequestedUser.FullName </p>
+            <strong><i class="fas fa-briefcase mr-1"></i>@Model.RequestedUser.DesignationName </strong><p></p>
+            <strong><i class="fas fa-phone mr-1"></i>@Model.RequestedUser.ContactNo </strong><p></p>
+            <strong><i class="fas fa-envelope mr-1"></i>@Model.RequestedUser.Email </strong><p></p>
+            <strong><i class="fa fa-university mr-1"></i> @Model.Department.DepartmentName</strong>
+
+        </div>
+
+        @if (Model.TeamId == null)
+        {
+            <div class="callout callout-success card-outline">
+                <strong><i class="fas fa-user-circle mr-1"></i>Approver</strong>
+                <p class="text-muted">@Model.FinalApprovalBy - @Model.FinalApprovalByUser.FullName </p>
+                <strong><i class="fas fa-briefcase mr-1"></i>@Model.FinalApprovalByUser.DesignationName </strong><p></p>
+                <strong><i class="fas fa-phone mr-1"></i>@Model.FinalApprovalByUser.ContactNo </strong><p></p>
+                <strong><i class="fas fa-envelope mr-1"></i>@Model.FinalApprovalByUser.Email </strong><p></p>
+            </div>
+        }
+
+    </div>
+
+
+</div>
+

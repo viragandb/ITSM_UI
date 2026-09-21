@@ -1,0 +1,104 @@
+﻿@model Domain.TaskUpdate
+@using Service
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card box-danger">
+            <div class="card-header with-border">
+                <h3 class="card-title">Complete Task </h3>
+                <div class="card-tools pull-right">
+                    <a href="@Url.Action("TaskPending", "ScheduledTask")" class="btn btn-social btn-cancel">
+                        <i class="fa fa-arrow-left"></i>Back
+                    </a>
+                </div>
+            </div>
+
+            @using (Html.BeginForm("TaskUpdate", "ScheduledTask", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+
+                @Html.HiddenFor(model => model.TaskUpdateId)
+
+                <div class="card-body">
+
+                    <div class="row">
+                        <div class="col-lg-12">
+                            @Html.Partial("_ScheduledTask", Model.ScheduledTask)
+
+                        </div>
+                    </div>
+                        <div class="row">
+
+                            <div class="col-lg-12 ">
+                                <div class="card">
+                                    <div class="card-header with-border">
+                                        <h3 class="card-title">Complete </h3>
+                                        <div class="card-tools pull-right">
+
+                                            <button type="button" class="btn btn-box-tool" data-widget="collapse" data-bs-toggle="tooltip" title="" data-original-title="Collapse">
+                                                <i class="fa fa-minus"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="card-body">
+                                        <div class="form-group ">
+                                            @Html.LabelFor(model => model.Comment, new { @class = "col-md-2 control-label" })
+                                            <div class="col-md-10">
+                                                @Html.TextAreaFor(model => model.Comment, new { @class = "form-control", rows = "2" })
+                                                @Html.ValidationMessageFor(model => model.Comment, null, new { @class = "help-block" })
+                                            </div>
+                                        </div>
+                                        @*<div class="form-group row">
+                            <label class="col-md-3 control-label">
+                                Comment
+                            </label>
+                            <div class="col-md-9">
+                                <input type="text" id="textComment" name="textComment" placeholder="Enter Comment" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="col-md-3 control-label">
+
+                            </label>
+
+                            <div class="col-md-3">
+
+                                <input type="checkbox" id="checkboxApprove" name="checkboxApprove" checked data-bs-toggle="toggle" class="form-control" data-on="Approve" data-off="Reject">
+                            </div>
+                        </div>*@
+
+                                    </div>
+                                    <div class="card-footer">
+                                        <div class="text-right">
+                                            <button type="submit" class="btn btn-sm btn-social btn-default btnSumbitDisable"><i class="fa fa-floppy-o"></i>Update</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+
+
+
+                    </div>
+
+            }
+        </div>
+        <!-- /.box -->
+    </div>
+</div>
+
+
+
+@section scripts {
+    <script src="~/Scripts/jquery.validate.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
+
+}

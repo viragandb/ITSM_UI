@@ -1,0 +1,1560 @@
+﻿@model Web.Models.StockInAssetVM
+@using Service
+@using Domain
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("StockIn", "Asset", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card">
+
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="align-middle me-2" data-lucide="package-plus"></i>
+                        Stock In
+                    </h5>
+                </div>
+
+                <div class="card-body">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-3">
+
+                            <div class="mb-3">
+
+                                @Html.LabelFor(
+                                    model => model.PONumber,
+                                    new { @class = "form-label" }
+                                )
+
+                                @Html.TextBoxFor(
+                                    model => model.PONumber,
+                                    new { @class = "form-control" }
+                                )
+
+                                @Html.ValidationMessageFor(
+                                    model => model.PONumber,
+                                    "",
+                                    new { @class = "text-danger" }
+                                )
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-3">
+
+                            <div class="mb-3">
+
+                                @Html.LabelFor(
+                                    model => model.PurchaseDate,
+                                    new { @class = "form-label" }
+                                )
+
+                                <div class="input-group">
+
+                                    <span class="input-group-text">
+                                        <i class="align-middle" data-lucide="calendar"></i>
+                                    </span>
+
+                                    <input type="date"
+                                           name="PurchaseDate"
+                                           id="PurchaseDate"
+                                           value="@ViewBag.PurchaseDate"
+                                           class="form-control" />
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-3">
+
+                            <div class="mb-3">
+
+                                @Html.LabelFor(
+                                    model => model.GRNNumber,
+                                    new { @class = "form-label" }
+                                )
+
+                                @Html.TextBoxFor(
+                                    model => model.GRNNumber,
+                                    new { @class = "form-control" }
+                                )
+
+                                @Html.ValidationMessageFor(
+                                    model => model.GRNNumber,
+                                    "",
+                                    new { @class = "text-danger" }
+                                )
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-3">
+
+                            <div class="mb-3">
+
+                                @Html.LabelFor(
+                                    model => model.ReceivedDate,
+                                    new { @class = "form-label" }
+                                )
+
+                                <div class="input-group">
+
+                                    <span class="input-group-text">
+                                        <i class="align-middle" data-lucide="calendar"></i>
+                                    </span>
+
+                                    <input type="date"
+                                           name="ReceivedDate"
+                                           id="ReceivedDate"
+                                           value="@ViewBag.ReceivedDate"
+                                           class="form-control" />
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="row g-3">
+
+                        <div class="col-md-3">
+
+                            <div class="mb-3">
+
+                                @Html.LabelFor(
+                                    model => model.InvoiceNumber,
+                                    new { @class = "form-label" }
+                                )
+
+                                @Html.TextBoxFor(
+                                    model => model.InvoiceNumber,
+                                    new { @class = "form-control" }
+                                )
+
+                                @Html.ValidationMessageFor(
+                                    model => model.InvoiceNumber,
+                                    "",
+                                    new { @class = "text-danger" }
+                                )
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <div class="mb-3">
+
+                                @Html.LabelFor(
+                                    model => model.VendorId,
+                                    new { @class = "form-label" }
+                                )
+
+                                @Html.DropDownListFor(
+                                    model => model.VendorId,
+                                    new List<SelectListItem>(),
+                                    new { @class = "form-select" }
+                                )
+
+                                @Html.ValidationMessageFor(
+                                    model => model.VendorId,
+                                    "",
+                                    new { @class = "text-danger" }
+                                )
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-3">
+
+                            <div class="mb-3">
+
+                                @Html.LabelFor(
+                                    model => model.AllocatedType,
+                                    new { @class = "form-label" }
+                                )
+
+                                @Html.EnumDropDownListFor(
+                                    model => model.AllocatedType,
+                                    "-- Select --",
+                                    new { @class = "form-select" }
+                                )
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="card mt-3">
+
+                        <div class="card-header">
+
+                            <h5 class="card-title mb-0">
+                                <i class="align-middle me-2" data-lucide="boxes"></i>
+                                Add Assets
+                            </h5>
+
+                        </div>
+
+                        <div class="card-body">
+
+                            <div class="row g-3">
+
+                                <div class="col-md-3">
+
+                                    <label for="AssetCategoryId" class="form-label">
+                                        Asset Category
+                                    </label>
+
+                                    <select id="AssetCategoryId"
+                                            name="AssetCategoryId"
+                                            class="form-select">
+                                    </select>
+
+                                </div>
+
+                                <div class="col-md-3">
+
+                                    <label for="AssetTypeId" class="form-label">
+                                        Asset Type
+                                    </label>
+
+                                    <select id="AssetTypeId"
+                                            name="AssetTypeId"
+                                            class="form-select select2">
+                                    </select>
+
+                                </div>
+
+                                <div class="col-md-3">
+
+                                    <label for="AssetMakeId" class="form-label">
+                                        Make
+                                    </label>
+
+                                    <select id="AssetMakeId"
+                                            name="AssetMakeId"
+                                            class="form-select select2">
+                                    </select>
+
+                                </div>
+
+                                <div class="col-md-3">
+
+                                    <label for="textModel" class="form-label">
+                                        Model
+                                    </label>
+
+                                    <input type="text"
+                                           id="textModel"
+                                           name="textModel"
+                                           class="form-control" />
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="row g-3 mt-1">
+
+                                <div class="col-md-3">
+
+                                    <label for="textWarranty" class="form-label">
+                                        Warranty (Months)
+                                    </label>
+
+                                    <input type="number"
+                                           id="textWarranty"
+                                           name="textWarranty"
+                                           class="form-control" />
+
+                                </div>
+
+                                <div class="col-md-3">
+
+                                    <label for="textToBeReturned" class="form-label">
+                                        To Be Returned (Months)
+                                    </label>
+
+                                    <input type="number"
+                                           id="textToBeReturned"
+                                           name="textToBeReturned"
+                                           class="form-control" />
+
+                                </div>
+
+                                <div class="col-md-3">
+
+                                    <label for="textPurchasedPrice" class="form-label">
+                                        Purchased Price
+                                    </label>
+
+                                    <input type="number"
+                                           id="textPurchasedPrice"
+                                           name="textPurchasedPrice"
+                                           class="form-control" />
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="row g-3 mt-1">
+
+                                <div class="col-md-6">
+
+                                    <label for="textDescription" class="form-label">
+                                        Description
+                                    </label>
+
+                                    <input type="text"
+                                           id="textDescription"
+                                           name="textDescription"
+                                           class="form-control" />
+
+                                </div>
+
+                                <div class="col-md-3">
+
+                                    <label for="fileInputAsset" class="form-label">
+                                        Asset File
+                                    </label>
+
+                                    <input type="file"
+                                           id="fileInputAsset"
+                                           class="form-control" />
+
+                                </div>
+
+                                <div class="col-md-3 d-flex align-items-end">
+
+                                    <button type="button"
+                                            id="fileButtonAsset"
+                                            class="btn btn-info w-100">
+
+                                        <i class="align-middle me-1" data-lucide="upload"></i>
+                                        Upload Assets
+
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="row g-3 mt-1">
+
+                                <div class="col-md-3">
+
+                                    <label for="textAssetNo" class="form-label">
+                                        Asset #
+                                    </label>
+
+                                    <input type="text"
+                                           id="textAssetNo"
+                                           name="textAssetNo"
+                                           class="form-control" />
+
+                                </div>
+
+                                <div class="col-md-3">
+
+                                    <label for="textSerialNo" class="form-label">
+                                        Serial #
+                                    </label>
+
+                                    <input type="text"
+                                           id="textSerialNo"
+                                           name="textSerialNo"
+                                           class="form-control" />
+
+                                </div>
+
+                                <div class="col-md-3">
+
+                                    <label for="textBarcode" class="form-label">
+                                        Barcode
+                                    </label>
+
+                                    <input type="text"
+                                           id="textBarcode"
+                                           name="textBarcode"
+                                           class="form-control" />
+
+                                </div>
+
+                                <div class="col-md-3 d-flex align-items-end">
+
+                                    <button type="button"
+                                            class="btn btn-primary w-100 btnSubmitAdd"
+                                            onclick="addAsset()">
+
+                                        <i class="align-middle me-1" data-lucide="plus"></i>
+                                        Add
+
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="table-responsive mt-4">
+
+                                <table id="dataTable"
+                                       class="table table-striped table-hover align-middle w-100">
+
+                                    <thead>
+                                        <tr>
+                                            <th>Category</th>
+                                            <th>Type</th>
+                                            <th>Make</th>
+                                            <th>Model</th>
+                                            <th>Asset #</th>
+                                            <th>Serial #</th>
+                                            <th>Barcode</th>
+                                            <th>Warranty</th>
+                                            <th>To Be Returned</th>
+                                            <th>Purchased Price</th>
+                                            <th>Description</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody id="assetdata">
+                                    </tbody>
+
+                                </table>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="mt-4">
+
+                        @Html.LabelFor(
+                            model => model.Description,
+                            new { @class = "form-label" }
+                        )
+
+                        @Html.TextAreaFor(
+                            model => model.Description,
+                            new
+                            {
+                                @class = "form-control",
+                                rows = "2",
+                                style = "white-space: pre-wrap;"
+                            }
+                        )
+
+                        @Html.ValidationMessageFor(
+                            model => model.Description,
+                            "",
+                            new { @class = "text-danger" }
+                        )
+
+                    </div>
+
+
+                    <div class="row mt-4">
+
+                        <div class="col-md-6">
+
+                            <label for="fileInput" class="form-label">
+                                Upload Files
+                            </label>
+
+                            <div class="input-group">
+
+                                <input type="file"
+                                       id="fileInput"
+                                       multiple
+                                       class="form-control" />
+
+                                <button type="button"
+                                        id="fileButton"
+                                        class="btn btn-info">
+
+                                    <i class="align-middle me-1" data-lucide="upload"></i>
+                                    Upload Files
+
+                                </button>
+
+                            </div>
+
+                            <div id="uploadedFiles" class="mt-3">
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="card-footer">
+
+                    <div class="d-flex justify-content-end gap-2">
+
+                        <button type="reset"
+                                class="btn btn-danger">
+
+                            <i class="align-middle me-1" data-lucide="rotate-ccw"></i>
+                            Cancel
+
+                        </button>
+
+                        <button type="submit"
+                                class="btn btn-primary btnSubmitDisable">
+
+                            <i class="align-middle me-1" data-lucide="save"></i>
+                            Save
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+}
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            loadVendor();
+            loadAssetCategory();
+            loadMake();
+
+            loadAssets();
+            loadTempDocs();
+
+            if ($.fn.select2) {
+                $(".select2").select2({
+                    width: "100%"
+                });
+            }
+
+        });
+
+
+        function parseJsonResult(data) {
+
+            if (typeof data === "string") {
+
+                try {
+                    return JSON.parse(data);
+                }
+                catch (e) {
+                    return [];
+                }
+
+            }
+
+            return data || [];
+
+        }
+
+
+        function escapeHtml(value) {
+
+            if (value == null) {
+                return "";
+            }
+
+            return $("<div/>")
+                .text(value)
+                .html();
+
+        }
+
+
+        function loadVendor() {
+
+            $.getJSON(
+                '@Url.Action("GetVendorListJsonResult", "Vendor")',
+                function (data) {
+
+                    var dropDown =
+                        $("#VendorId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- Select --</option>"
+                    );
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.VendorId,
+                                    text: item.VendorName
+                                })
+                            );
+
+                        }
+                    );
+
+                    var selectedId =
+                        '@ViewBag.VendorId';
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+                }
+            );
+
+        }
+
+
+        function loadAssetCategory() {
+
+            $.getJSON(
+                '@Url.Action("GetAssetCategoryJsonResult", "AssetType")',
+                function (data) {
+
+                    var dropDown =
+                        $("#AssetCategoryId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- Select --</option>"
+                    );
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.Id,
+                                    text: item.Name
+                                })
+                            );
+
+                        }
+                    );
+
+                    loadAssetType();
+
+                }
+            );
+
+        }
+
+
+        $("#AssetCategoryId").on("change", function () {
+            loadAssetType();
+        });
+
+
+        function loadAssetType() {
+
+            var categoryId =
+                $("#AssetCategoryId").val();
+
+            $.getJSON(
+                '@Url.Action("GetAssetTypeByAssetCategoryListJsonResult", "AssetType")',
+                {
+                    assetCategory: categoryId
+                },
+                function (data) {
+
+                    var dropDown =
+                        $("#AssetTypeId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- Select --</option>"
+                    );
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.AssetTypeId,
+                                    text: item.AssetTypeName
+                                })
+                            );
+
+                        }
+                    );
+
+                    var selectedId =
+                        '@ViewBag.AssetTypeId';
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+                    if ($.fn.select2) {
+                        dropDown.trigger("change.select2");
+                    }
+
+                }
+            );
+
+        }
+
+
+        function loadMake() {
+
+            $.getJSON(
+                '@Url.Action("GetAssetMakeListJsonResult", "AssetMake")',
+                function (data) {
+
+                    var dropDown =
+                        $("#AssetMakeId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- Select --</option>"
+                    );
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.AssetMakeId,
+                                    text: item.Name
+                                })
+                            );
+
+                        }
+                    );
+
+                    if ($.fn.select2) {
+                        dropDown.trigger("change.select2");
+                    }
+
+                }
+            );
+
+        }
+
+
+        $("#fileButton").on("click", function () {
+
+            var files =
+                $("#fileInput").get(0).files;
+
+            if (!files || files.length === 0) {
+
+                Swal.fire(
+                    "Error!",
+                    "Please select at least one file",
+                    "error"
+                );
+
+                return;
+
+            }
+
+            var fileData =
+                new FormData();
+
+            for (var i = 0; i < files.length; i++) {
+
+                fileData.append(
+                    "fileInput",
+                    files[i]
+                );
+
+            }
+
+
+            $.ajax({
+
+                type: "POST",
+
+                url: '@Url.Action("UploadFiles", "ItemDoc")',
+
+                dataType: "json",
+
+                contentType: false,
+
+                processData: false,
+
+                data: fileData,
+
+                success: function (result) {
+
+                    Swal.fire(
+                        "Completed",
+                        result,
+                        "success"
+                    );
+
+                    $("#fileInput").val("");
+
+                    loadTempDocs();
+
+                },
+
+                error: function () {
+
+                    Swal.fire(
+                        "Something went wrong!",
+                        "Please try again",
+                        "error"
+                    );
+
+                }
+
+            });
+
+        });
+
+
+        $("#fileButtonAsset").on("click", function () {
+
+            var assetCategoryId =
+                $("#AssetCategoryId").val();
+
+            var assetCategoryName =
+                $("#AssetCategoryId option:selected").text();
+
+            var assetTypeId =
+                $("#AssetTypeId").val();
+
+            var assetTypeName =
+                $("#AssetTypeId option:selected").text();
+
+            var assetMakeId =
+                $("#AssetMakeId").val();
+
+            var assetMakeName =
+                $("#AssetMakeId option:selected").text();
+
+            var modelName =
+                $("#textModel").val();
+
+            var warranty =
+                $("#textWarranty").val();
+
+            var toBeReturned =
+                $("#textToBeReturned").val();
+
+            var purchasedPrice =
+                $("#textPurchasedPrice").val();
+
+            var description =
+                $("#textDescription").val();
+
+
+            if (!assetCategoryId ||
+                assetCategoryId === "0" ||
+                !assetTypeId ||
+                assetTypeId === "0" ||
+                !assetMakeId ||
+                assetMakeId === "0" ||
+                !modelName ||
+                warranty === "" ||
+                toBeReturned === "" ||
+                purchasedPrice === "" ||
+                !description) {
+
+                Swal.fire(
+                    "Error!",
+                    "Please enter the valid details",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            var files =
+                $("#fileInputAsset").get(0).files;
+
+            if (!files || files.length === 0) {
+
+                Swal.fire(
+                    "Error!",
+                    "Please select the asset file",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            var fileData =
+                new FormData();
+
+            for (var i = 0; i < files.length; i++) {
+
+                fileData.append(
+                    "fileInputAsset",
+                    files[i]
+                );
+
+            }
+
+            fileData.append("assetCategoryId", assetCategoryId);
+            fileData.append("assetCategoryName", assetCategoryName);
+            fileData.append("assetTypeId", assetTypeId);
+            fileData.append("assetTypeName", assetTypeName);
+            fileData.append("assetMakeId", assetMakeId);
+            fileData.append("assetMakeName", assetMakeName);
+            fileData.append("modelName", modelName);
+            fileData.append("warranty", warranty);
+            fileData.append("toBeReturned", toBeReturned);
+            fileData.append("purchasedPrice", purchasedPrice);
+            fileData.append("description", description);
+
+
+            $("#fileButtonAsset")
+                .prop("disabled", true)
+                .html(
+                    "<span class='spinner-border spinner-border-sm me-1'></span> Uploading..."
+                );
+
+
+            $.ajax({
+
+                type: "POST",
+
+                url: '@Url.Action("UploadFilesTempAssets", "Asset")',
+
+                dataType: "json",
+
+                contentType: false,
+
+                processData: false,
+
+                data: fileData,
+
+                success: function (result) {
+
+                    Swal.fire(
+                        "Completed",
+                        result,
+                        "success"
+                    );
+
+                    $("#fileInputAsset").val("");
+
+                    loadAssets();
+
+                },
+
+                error: function () {
+
+                    Swal.fire(
+                        "Something went wrong!",
+                        "Please try again",
+                        "error"
+                    );
+
+                },
+
+                complete: function () {
+
+                    $("#fileButtonAsset")
+                        .prop("disabled", false)
+                        .html(
+                            "<i data-lucide='upload'></i> Upload Assets"
+                        );
+
+                    if (window.lucide) {
+                        lucide.createIcons();
+                    }
+
+                }
+
+            });
+
+        });
+
+
+        function loadTempDocs() {
+
+            $.getJSON(
+                '@Url.Action("GetTempDocListJsonResult", "ItemDoc")',
+                function (data) {
+
+                    var tempDocDiv =
+                        $("#uploadedFiles");
+
+                    tempDocDiv.empty();
+
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            var row =
+                                "<div class='d-flex align-items-center gap-2 mb-2'>" +
+
+                                    "<button type='button' " +
+                                            "class='btn btn-sm btn-danger' " +
+                                            "onclick='deleteDoc(" + item.TempDocId + ")'>" +
+
+                                        "<i data-lucide='trash-2'></i>" +
+
+                                    "</button>" +
+
+                                    "<a href='" + escapeHtml(item.FileUrl) + "' " +
+                                       "target='_blank'>" +
+
+                                        "<i data-lucide='file-text'></i> " +
+                                        escapeHtml(item.DocumentName) +
+
+                                    "</a>" +
+
+                                "</div>";
+
+
+                            tempDocDiv.append(row);
+
+                        }
+                    );
+
+
+                    if (window.lucide) {
+                        lucide.createIcons();
+                    }
+
+                }
+            );
+
+        }
+
+
+        function deleteDoc(itemId) {
+
+            Swal.fire({
+                title: "Are you sure?",
+                text: "Do you want to delete?",
+                icon: "warning",
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                showCancelButton: true,
+                reverseButtons: true
+            }).then(function (result) {
+
+                if (result.isConfirmed || result.value) {
+
+                    $.ajax({
+
+                        url: '@Url.Action("DeleteTempDoc", "ItemDoc")',
+
+                        type: "GET",
+
+                        dataType: "json",
+
+                        data: {
+                            id: itemId
+                        },
+
+                        success: function (data) {
+
+                            if (data == "1" || data == 1) {
+
+                                Swal.fire(
+                                    "Deleted!",
+                                    "Record has been deleted",
+                                    "success"
+                                );
+
+                                loadTempDocs();
+
+                            }
+                            else {
+
+                                Swal.fire(
+                                    "Something went wrong!",
+                                    "Data is not deleted, Please try again",
+                                    "error"
+                                );
+
+                            }
+
+                        },
+
+                        error: function () {
+
+                            Swal.fire(
+                                "Something went wrong!",
+                                "Data is not deleted, Please try again",
+                                "error"
+                            );
+
+                        }
+
+                    });
+
+                }
+
+            });
+
+        }
+
+
+        function addAsset() {
+
+            var assetCategoryId =
+                $("#AssetCategoryId").val();
+
+            var assetCategoryName =
+                $("#AssetCategoryId option:selected").text();
+
+            var assetTypeId =
+                $("#AssetTypeId").val();
+
+            var assetTypeName =
+                $("#AssetTypeId option:selected").text();
+
+            var assetMakeId =
+                $("#AssetMakeId").val();
+
+            var assetMakeName =
+                $("#AssetMakeId option:selected").text();
+
+            var modelName =
+                $("#textModel").val();
+
+            var assetNo =
+                $("#textAssetNo").val();
+
+            var serialNo =
+                $("#textSerialNo").val();
+
+            var barcode =
+                $("#textBarcode").val();
+
+            var warranty =
+                $("#textWarranty").val();
+
+            var toBeReturned =
+                $("#textToBeReturned").val();
+
+            var purchasedPrice =
+                $("#textPurchasedPrice").val();
+
+            var description =
+                $("#textDescription").val();
+
+
+            if (!assetCategoryId ||
+                assetCategoryId === "0" ||
+                !assetTypeId ||
+                assetTypeId === "0" ||
+                !assetMakeId ||
+                assetMakeId === "0" ||
+                !modelName ||
+                !assetNo ||
+                !serialNo ||
+                !barcode ||
+                warranty === "" ||
+                toBeReturned === "" ||
+                purchasedPrice === "" ||
+                !description) {
+
+                Swal.fire(
+                    "Error!",
+                    "Please enter the valid details",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            var duplicate =
+                false;
+
+
+            $("#assetdata input[name$='.AssetNo']").each(function () {
+
+                if ($(this).val() === assetNo) {
+
+                    duplicate =
+                        true;
+
+                    return false;
+
+                }
+
+            });
+
+
+            if (duplicate) {
+
+                Swal.fire(
+                    "Error!",
+                    "Asset number already exists",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            $(".btnSubmitAdd")
+                .prop("disabled", true)
+                .html(
+                    "<span class='spinner-border spinner-border-sm me-1'></span> Please Wait..."
+                );
+
+
+            $.ajax({
+
+                url: '@Url.Action("AddTempAsset", "Asset")',
+
+                type: "GET",
+
+                dataType: "json",
+
+                data: {
+                    assetCategoryId: assetCategoryId,
+                    assetCategoryName: assetCategoryName,
+                    assetTypeId: assetTypeId,
+                    assetTypeName: assetTypeName,
+                    assetMakeId: assetMakeId,
+                    assetMakeName: assetMakeName,
+                    modelName: modelName,
+                    assetNo: assetNo,
+                    serialNo: serialNo,
+                    barcode: barcode,
+                    warranty: warranty,
+                    toBeReturned: toBeReturned,
+                    purchasedPrice: purchasedPrice,
+                    description: description
+                },
+
+                success: function (data) {
+
+                    if (data == "1" || data == 1) {
+
+                        loadAssets();
+
+                    }
+                    else {
+
+                        Swal.fire(
+                            "Something went wrong!",
+                            "Please try again",
+                            "error"
+                        );
+
+                    }
+
+                },
+
+                error: function () {
+
+                    Swal.fire(
+                        "Something went wrong!",
+                        "Please try again",
+                        "error"
+                    );
+
+                },
+
+                complete: function () {
+
+                    $(".btnSubmitAdd")
+                        .prop("disabled", false)
+                        .html(
+                            "<i data-lucide='plus'></i> Add"
+                        );
+
+                    if (window.lucide) {
+                        lucide.createIcons();
+                    }
+
+                }
+
+            });
+
+        }
+
+
+        function loadAssets() {
+
+            $.getJSON(
+                '@Url.Action("GetTempAssetListJsonResult", "Asset")',
+                function (data) {
+
+                    var tableBody =
+                        $("#assetdata");
+
+                    tableBody.empty();
+
+                    var itemIndex =
+                        0;
+
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            var row =
+                                "<tr id='assetRow_" + itemIndex + "'>" +
+
+                                    "<td style='display:none;'>" +
+
+                                        "<input id='Assets_" + itemIndex + "__TempAssetId' " +
+                                               "class='iHidden' " +
+                                               "name='Assets[" + itemIndex + "].TempAssetId' " +
+                                               "type='hidden' " +
+                                               "value='" + item.TempAssetId + "' />" +
+
+                                        "<input id='Assets_" + itemIndex + "__AssetCategoryId' " +
+                                               "name='Assets[" + itemIndex + "].AssetCategoryId' " +
+                                               "type='hidden' " +
+                                               "value='" + item.AssetCategoryId + "' />" +
+
+                                        "<input id='Assets_" + itemIndex + "__AssetTypeId' " +
+                                               "name='Assets[" + itemIndex + "].AssetTypeId' " +
+                                               "type='hidden' " +
+                                               "value='" + item.AssetTypeId + "' />" +
+
+                                        "<input id='Assets_" + itemIndex + "__AssetMakeId' " +
+                                               "name='Assets[" + itemIndex + "].AssetMakeId' " +
+                                               "type='hidden' " +
+                                               "value='" + item.AssetMakeId + "' />" +
+
+                                    "</td>" +
+
+                                    "<td>" +
+                                        "<input id='Assets_" + itemIndex + "__AssetCategoryName' " +
+                                               "name='Assets[" + itemIndex + "].AssetCategoryName' " +
+                                               "class='form-control form-control-sm' " +
+                                               "readonly " +
+                                               "type='text' " +
+                                               "value='" + escapeHtml(item.AssetCategoryName) + "' />" +
+                                    "</td>" +
+
+                                    "<td>" +
+                                        "<input id='Assets_" + itemIndex + "__AssetTypeName' " +
+                                               "name='Assets[" + itemIndex + "].AssetTypeName' " +
+                                               "class='form-control form-control-sm' " +
+                                               "readonly " +
+                                               "type='text' " +
+                                               "value='" + escapeHtml(item.AssetTypeName) + "' />" +
+                                    "</td>" +
+
+                                    "<td>" +
+                                        "<input id='Assets_" + itemIndex + "__AssetMakeName' " +
+                                               "name='Assets[" + itemIndex + "].AssetMakeName' " +
+                                               "class='form-control form-control-sm' " +
+                                               "readonly " +
+                                               "type='text' " +
+                                               "value='" + escapeHtml(item.AssetMakeName) + "' />" +
+                                    "</td>" +
+
+                                    "<td>" +
+                                        "<input id='Assets_" + itemIndex + "__ModelName' " +
+                                               "name='Assets[" + itemIndex + "].ModelName' " +
+                                               "class='form-control form-control-sm' " +
+                                               "type='text' " +
+                                               "value='" + escapeHtml(item.ModelName) + "' />" +
+                                    "</td>" +
+
+                                    "<td>" +
+                                        "<input id='Assets_" + itemIndex + "__AssetNo' " +
+                                               "name='Assets[" + itemIndex + "].AssetNo' " +
+                                               "class='form-control form-control-sm' " +
+                                               "type='text' " +
+                                               "value='" + escapeHtml(item.AssetNo) + "' />" +
+                                    "</td>" +
+
+                                    "<td>" +
+                                        "<input id='Assets_" + itemIndex + "__SerialNo' " +
+                                               "name='Assets[" + itemIndex + "].SerialNo' " +
+                                               "class='form-control form-control-sm' " +
+                                               "type='text' " +
+                                               "value='" + escapeHtml(item.SerialNo) + "' />" +
+                                    "</td>" +
+
+                                    "<td>" +
+                                        "<input id='Assets_" + itemIndex + "__Barcode' " +
+                                               "name='Assets[" + itemIndex + "].Barcode' " +
+                                               "class='form-control form-control-sm' " +
+                                               "type='text' " +
+                                               "value='" + escapeHtml(item.Barcode) + "' />" +
+                                    "</td>" +
+
+                                    "<td>" +
+                                        "<input id='Assets_" + itemIndex + "__WarrantyPeriod' " +
+                                               "name='Assets[" + itemIndex + "].WarrantyPeriod' " +
+                                               "class='form-control form-control-sm' " +
+                                               "type='text' " +
+                                               "value='" + escapeHtml(item.WarrantyPeriod) + "' />" +
+                                    "</td>" +
+
+                                    "<td>" +
+                                        "<input id='Assets_" + itemIndex + "__ToBeReturned' " +
+                                               "name='Assets[" + itemIndex + "].ToBeReturned' " +
+                                               "class='form-control form-control-sm' " +
+                                               "type='text' " +
+                                               "value='" + escapeHtml(item.ToBeReturned) + "' />" +
+                                    "</td>" +
+
+                                    "<td>" +
+                                        "<input id='Assets_" + itemIndex + "__PurchasePrice' " +
+                                               "name='Assets[" + itemIndex + "].PurchasePrice' " +
+                                               "class='form-control form-control-sm' " +
+                                               "type='text' " +
+                                               "value='" + escapeHtml(item.PurchasePrice) + "' />" +
+                                    "</td>" +
+
+                                    "<td>" +
+                                        "<input id='Assets_" + itemIndex + "__Description' " +
+                                               "name='Assets[" + itemIndex + "].Description' " +
+                                               "class='form-control form-control-sm' " +
+                                               "type='text' " +
+                                               "value='" + escapeHtml(item.Description) + "' />" +
+                                    "</td>" +
+
+                                    "<td class='text-end'>" +
+
+                                        "<button type='button' " +
+                                                "class='btn btn-sm btn-danger' " +
+                                                "onclick='deleteAsset(" + item.TempAssetId + ")'>" +
+
+                                            "<i data-lucide='trash-2'></i>" +
+
+                                        "</button>" +
+
+                                    "</td>" +
+
+                                "</tr>";
+
+
+                            tableBody.append(row);
+
+                            itemIndex++;
+
+                        }
+                    );
+
+
+                    if (window.lucide) {
+                        lucide.createIcons();
+                    }
+
+                }
+            );
+
+        }
+
+
+        function deleteAsset(itemId) {
+
+            Swal.fire({
+                title: "Are you sure?",
+                text: "Do you want to delete?",
+                icon: "warning",
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                showCancelButton: true,
+                reverseButtons: true
+            }).then(function (result) {
+
+                if (result.isConfirmed || result.value) {
+
+                    $.ajax({
+
+                        url: '@Url.Action("DeleteTempAsset", "Asset")',
+
+                        type: "GET",
+
+                        dataType: "json",
+
+                        data: {
+                            id: itemId
+                        },
+
+                        success: function (data) {
+
+                            if (data == "1" || data == 1) {
+
+                                Swal.fire(
+                                    "Deleted!",
+                                    "Record has been deleted",
+                                    "success"
+                                );
+
+                                loadAssets();
+
+                            }
+                            else {
+
+                                Swal.fire(
+                                    "Something went wrong!",
+                                    "Data is not deleted, Please try again",
+                                    "error"
+                                );
+
+                            }
+
+                        },
+
+                        error: function () {
+
+                            Swal.fire(
+                                "Something went wrong!",
+                                "Data is not deleted, Please try again",
+                                "error"
+                            );
+
+                        }
+
+                    });
+
+                }
+
+            });
+
+        }
+
+    </script>
+
+}

@@ -1,0 +1,222 @@
+﻿@model Web.Models.IncidentCompleteVM
+
+@using Service
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="card">
+
+            <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+
+                <h5 class="card-title mb-0">
+                    <i class="align-middle me-2" data-lucide="clipboard-check"></i>
+                    Incident | Request # @Model.IncidentRequestId
+                </h5>
+
+                <div class="d-flex gap-2">
+
+                    <a href="@Html.EncodedActionLink("", "Info", "IncidentRequest", "", new { id = Model.IncidentRequestId }, null)"
+                       target="_blank"
+                       class="btn btn-sm btn-light">
+
+                        <i class="align-middle me-1" data-lucide="info"></i>
+                        More
+
+                    </a>
+
+                    <a href="@Url.Action("PendingClose", "IncidentRequest")"
+                       class="btn btn-sm btn-light">
+
+                        <i class="align-middle me-1" data-lucide="arrow-left"></i>
+                        Back
+
+                    </a>
+
+                </div>
+
+            </div>
+
+            @using (Html.BeginForm("Close", "IncidentRequest", FormMethod.Post))
+            {
+                @Html.HiddenFor(model => model.IncidentRequestId)
+
+                <div class="card-body">
+
+                    <div class="row g-3">
+
+                        <div class="col-12">
+
+                            @Html.Partial("_RequestMin", Model.IncidentRequest)
+
+                        </div>
+
+                        <div class="col-12">
+
+                            <div class="card">
+
+                                <div class="card-body">
+
+                                    <div @ViewBag.HideDiv>
+
+                                        <div class="mb-3">
+
+                                            @Html.LabelFor(
+                                                model => model.RootCause,
+                                                new { @class = "form-label" }
+                                            )
+
+                                            @Html.TextAreaFor(
+                                                model => model.RootCause,
+                                                new
+                                                {
+                                                    @class = "form-control",
+                                                    rows = "3"
+                                                }
+                                            )
+
+                                            @Html.ValidationMessageFor(
+                                                model => model.RootCause,
+                                                "",
+                                                new { @class = "text-danger" }
+                                            )
+
+                                        </div>
+
+
+                                        <div class="mb-3">
+
+                                            @Html.LabelFor(
+                                                model => model.CorrectiveAction,
+                                                new { @class = "form-label" }
+                                            )
+
+                                            @Html.TextAreaFor(
+                                                model => model.CorrectiveAction,
+                                                new
+                                                {
+                                                    @class = "form-control",
+                                                    rows = "3"
+                                                }
+                                            )
+
+                                            @Html.ValidationMessageFor(
+                                                model => model.CorrectiveAction,
+                                                "",
+                                                new { @class = "text-danger" }
+                                            )
+
+                                        </div>
+
+
+                                        <div class="mb-3">
+
+                                            @Html.LabelFor(
+                                                model => model.PreventiveAction,
+                                                new { @class = "form-label" }
+                                            )
+
+                                            @Html.TextAreaFor(
+                                                model => model.PreventiveAction,
+                                                new
+                                                {
+                                                    @class = "form-control",
+                                                    rows = "3"
+                                                }
+                                            )
+
+                                            @Html.ValidationMessageFor(
+                                                model => model.PreventiveAction,
+                                                "",
+                                                new { @class = "text-danger" }
+                                            )
+
+                                        </div>
+
+
+                                        <div class="mb-3">
+
+                                            @Html.LabelFor(
+                                                model => model.LessonsLearnt,
+                                                new { @class = "form-label" }
+                                            )
+
+                                            @Html.TextAreaFor(
+                                                model => model.LessonsLearnt,
+                                                new
+                                                {
+                                                    @class = "form-control",
+                                                    rows = "3"
+                                                }
+                                            )
+
+                                            @Html.ValidationMessageFor(
+                                                model => model.LessonsLearnt,
+                                                "",
+                                                new { @class = "text-danger" }
+                                            )
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <div class="mb-0">
+
+                                        @Html.LabelFor(
+                                            model => model.Comment,
+                                            new { @class = "form-label" }
+                                        )
+
+                                        @Html.TextAreaFor(
+                                            model => model.Comment,
+                                            new
+                                            {
+                                                @class = "form-control",
+                                                rows = "3"
+                                            }
+                                        )
+
+                                        @Html.ValidationMessageFor(
+                                            model => model.Comment,
+                                            "",
+                                            new { @class = "text-danger" }
+                                        )
+
+                                    </div>
+
+                                </div>
+
+                                <div class="card-footer">
+
+                                    <div class="d-flex justify-content-end">
+
+                                        <button type="submit"
+                                                class="btn btn-sm btn-primary">
+
+                                            <i class="align-middle me-1" data-lucide="save"></i>
+                                            Update
+
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+</div>

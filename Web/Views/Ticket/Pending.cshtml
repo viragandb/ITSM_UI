@@ -1,0 +1,1178 @@
+﻿@model ICollection<Domain.Ticket>
+@using Service
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var activeTicketId = Convert.ToInt64(TempData["ActiveTicketId"]);
+}
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="card">
+
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="align-middle me-2" data-lucide="clock"></i>
+                    Pending Tickets
+                </h5>
+            </div>
+
+            <div class="card-body">
+
+                <div class="accordion" id="ticketAccordion">
+
+                    @foreach (var item in Model)
+                    {
+                        var collapseId = "ticket_" + item.TicketId;
+                        var isActive = activeTicketId == item.TicketId;
+                        var collapseClass = isActive ? "accordion-collapse collapse show" : "accordion-collapse collapse";
+                        var buttonClass = isActive ? "accordion-button" : "accordion-button collapsed";
+
+                        <div class="accordion-item">
+
+                            <h2 class="accordion-header" id="heading_@item.TicketId">
+
+                                <button class="@buttonClass"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#@collapseId"
+                                        aria-expanded="@(isActive ? "true" : "false")"
+                                        aria-controls="@collapseId">
+
+                                    <div class="w-100 d-flex justify-content-between align-items-center flex-wrap gap-2 me-3">
+
+                                        <div>
+
+                                            <strong>@item.Code</strong>
+
+                                            <span class="mx-2 text-muted">|</span>
+
+                                            @(item.RequestType != null && item.RequestType.Category != null
+                                                ? item.RequestType.Category.CategoryName
+                                                : "N/A")
+
+                                            <i class="align-middle mx-1" data-lucide="chevrons-right"></i>
+
+                                            @(item.RequestType != null && item.RequestType.AssetType != null
+                                                ? item.RequestType.AssetType.AssetTypeName
+                                                : "N/A")
+
+                                            <i class="align-middle mx-1" data-lucide="chevrons-right"></i>
+
+                                            <strong>
+                                                @(item.RequestType != null && item.RequestType.SubCategory != null
+                                                    ? item.RequestType.SubCategory.SubCategoryName
+                                                    : "N/A")
+                                            </strong>
+
+                                            <span class="mx-2">-</span>
+
+                                            @(item.Branch != null
+                                                ? item.Branch.Name
+                                                : "N/A")
+
+                                        </div>
+
+                                        <div class="text-muted small">
+
+                                            @(item.PendingTeam != null
+                                                ? item.PendingTeam.TeamName
+                                                : "N/A")
+
+                                            <span class="mx-2">|</span>
+
+                                            @item.RequestedDate.ToShortDateString()
+
+                                        </div>
+
+                                    </div>
+
+                                </button>
+
+                            </h2>
+
+                            <div id="@collapseId"
+                                 class="@collapseClass"
+                                 aria-labelledby="heading_@item.TicketId"
+                                 data-bs-parent="#ticketAccordion">
+
+                                <div class="accordion-body">
+
+                                    @Html.Partial("_Ticket", item)
+
+
+                                    @if (item.TicketTasks != null && item.TicketTasks.Any())
+                                    {
+                                        <div class="card mt-3">
+
+                                            <div class="card-header">
+
+                                                <h5 class="card-title mb-0">
+                                                    <i class="align-middle me-2" data-lucide="clipboard-check"></i>
+                                                    Ticket Tasks
+                                                </h5>
+
+                                            </div>
+
+                                            <div class="card-body">
+
+                                                <div class="table-responsive">
+
+                                                    <table class="table table-striped table-hover align-middle">
+
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Task</th>
+                                                                <th>Team</th>
+                                                                <th>Assigned To</th>
+                                                                <th>Status</th>
+                                                                <th class="text-end">Action</th>
+                                                            </tr>
+                                                        </thead>
+
+                                                        <tbody>
+
+                                                            @foreach (var task in item.TicketTasks)
+                                                            {
+                                                                <tr>
+
+                                                                    <td>
+                                                                        <button type="button"
+                                                                                class="btn btn-link p-0 text-decoration-none"
+                                                                                data-bs-toggle="collapse"
+                                                                                data-bs-target="#taskDescription_@task.TicketTaskId"
+                                                                                aria-expanded="false"
+                                                                                aria-controls="taskDescription_@task.TicketTaskId">
+
+                                                                            @task.Subject
+
+                                                                        </button>
+                                                                    </td>
+
+                                                                    <td>
+                                                                        @(task.AllocatedTeam != null
+                                                                            ? task.AllocatedTeam.TeamName
+                                                                            : "N/A")
+                                                                    </td>
+
+                                                                    <td>
+                                                                        @(task.AssignedToUser != null
+                                                                            ? task.AssignedToUser.FullName
+                                                                            : "N/A")
+                                                                    </td>
+
+                                                                    <td>
+
+                                                                        <span class="badge bg-@TicketTaskService.GetTicketStatusColor(task.Status)">
+                                                                            @task.Status.EnumDisplayName()
+                                                                        </span>
+
+                                                                    </td>
+
+                                                                    <td class="text-end">
+
+                                                                        <div class="d-flex justify-content-end gap-2">
+
+                                                                            @if (task.Status == Domain.TaskStatusEnum.Pending)
+                                                                            {
+                                                                                if (task.IsMyTeam)
+                                                                                {
+                                                                                    <button type="button"
+                                                                                            class="openModalUpdateTaskAssign btn btn-sm btn-info text-white"
+                                                                                            data-id="@task.TicketTaskId"
+                                                                                            data-code="@item.Code"
+                                                                                            data-teamid="@task.AllocatedTeamId"
+                                                                                            data-bs-toggle="modal"
+                                                                                            data-bs-target="#modalUpdateTaskAssign">
+
+                                                                                        <i class="align-middle me-1" data-lucide="user-plus"></i>
+                                                                                        Assign
+
+                                                                                    </button>
+                                                                                }
+
+                                                                                <button type="button"
+                                                                                        class="btn btn-sm btn-danger"
+                                                                                        onclick="deleteTask('@task.TicketTaskId')">
+
+                                                                                    <i class="align-middle" data-lucide="trash-2"></i>
+
+                                                                                </button>
+                                                                            }
+
+                                                                        </div>
+
+                                                                    </td>
+
+                                                                </tr>
+
+                                                                <tr>
+
+                                                                    <td colspan="5" class="p-0 border-0">
+
+                                                                        <div class="collapse"
+                                                                             id="taskDescription_@task.TicketTaskId">
+
+                                                                            <div class="p-3 bg-body-tertiary border-top">
+                                                                                @task.Description
+                                                                            </div>
+
+                                                                        </div>
+
+                                                                    </td>
+
+                                                                </tr>
+                                                            }
+
+                                                        </tbody>
+
+                                                    </table>
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+                                    }
+
+
+                                    <div class="row g-3 mt-1">
+
+                                        <div class="col-lg-8">
+
+                                            <div class="card">
+
+                                                <div class="card-header">
+
+                                                    <div class="d-flex justify-content-between align-items-center">
+
+                                                        <h5 class="card-title mb-0">
+                                                            <i class="align-middle me-2" data-lucide="message-square"></i>
+                                                            Ticket Status
+                                                        </h5>
+
+                                                        <button type="button"
+                                                                class="btn btn-sm btn-light"
+                                                                data-bs-toggle="collapse"
+                                                                data-bs-target="#ticketStatus_@item.TicketId"
+                                                                aria-expanded="false"
+                                                                aria-controls="ticketStatus_@item.TicketId">
+
+                                                            <i class="align-middle" data-lucide="chevron-down"></i>
+
+                                                        </button>
+
+                                                    </div>
+
+                                                </div>
+
+                                                <div class="collapse"
+                                                     id="ticketStatus_@item.TicketId">
+
+                                                    <div class="card-body">
+
+                                                        @if (item.TicketUpdates != null)
+                                                        {
+                                                            foreach (var status in item.TicketUpdates.OrderBy(o => o.UpdatedDate))
+                                                            {
+                                                                <div class="border rounded p-3 mb-3">
+
+                                                                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-2">
+
+                                                                        <div class="d-flex align-items-center gap-2">
+
+                                                                            <img src="@(status.UpdatedUser != null
+                                                                                        ? status.UpdatedUser.ProImageName
+                                                                                        : "/Images/userimage.png")"
+                                                                                 alt="User"
+                                                                                 class="rounded-circle"
+                                                                                 style="width:40px;height:40px;object-fit:cover;" />
+
+                                                                            <div>
+
+                                                                                <div class="fw-semibold">
+
+                                                                                    @(status.UpdatedUser != null
+                                                                                        ? status.UpdatedUser.FullName
+                                                                                        : "N/A")
+
+                                                                                    @if (status.Team != null && status.TeamId != 1)
+                                                                                    {
+                                                                                        <span class="text-muted">
+                                                                                            (@status.Team.TeamName)
+                                                                                        </span>
+                                                                                    }
+
+                                                                                </div>
+
+                                                                                <div class="text-muted small">
+                                                                                    @status.UpdatedDate
+                                                                                </div>
+
+                                                                            </div>
+
+                                                                        </div>
+
+                                                                        <strong>
+                                                                            @status.SpentTimeFomated (HH:MM)
+                                                                        </strong>
+
+                                                                    </div>
+
+                                                                    <div class="p-2 rounded bg-@TicketService.GetTicketStatusColor(status.Status)">
+
+                                                                        <strong>
+                                                                            @status.Status.EnumDisplayName()
+                                                                        </strong>
+
+                                                                        @if (!string.IsNullOrWhiteSpace(status.Comment))
+                                                                        {
+                                                                            <span>
+                                                                                | @status.Comment
+                                                                            </span>
+                                                                        }
+
+                                                                    </div>
+
+                                                                </div>
+                                                            }
+                                                        }
+
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+
+                                        <div class="col-lg-4">
+
+                                            @if (item.ItemAssets != null && item.ItemAssets.Any())
+                                            {
+                                                <div class="card">
+
+                                                    <div class="card-header">
+
+                                                        <div class="d-flex justify-content-between align-items-center">
+
+                                                            <h5 class="card-title mb-0">
+                                                                <i class="align-middle me-2" data-lucide="boxes"></i>
+                                                                Assets
+                                                            </h5>
+
+                                                            <button type="button"
+                                                                    class="btn btn-sm btn-light"
+                                                                    data-bs-toggle="collapse"
+                                                                    data-bs-target="#ticketAssets_@item.TicketId"
+                                                                    aria-expanded="false"
+                                                                    aria-controls="ticketAssets_@item.TicketId">
+
+                                                                <i class="align-middle" data-lucide="chevron-down"></i>
+
+                                                            </button>
+
+                                                        </div>
+
+                                                    </div>
+
+                                                    <div class="collapse"
+                                                         id="ticketAssets_@item.TicketId">
+
+                                                        <div class="card-body">
+
+                                                            <div class="table-responsive">
+
+                                                                <table class="table table-striped table-hover align-middle">
+
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th>Asset No</th>
+                                                                            <th>Asset Type</th>
+                                                                            <th>Make</th>
+                                                                            <th>Model</th>
+                                                                        </tr>
+                                                                    </thead>
+
+                                                                    <tbody>
+
+                                                                        @foreach (var asset in item.ItemAssets)
+                                                                        {
+                                                                            <tr>
+
+                                                                                <td>
+
+                                                                                    <a href="@Html.EncodedActionLink("", "Info", "Asset", "", new { id = asset.AssetId }, null)"
+                                                                                       target="_blank">
+
+                                                                                        @asset.Asset.AssetNo
+
+                                                                                    </a>
+
+                                                                                </td>
+
+                                                                                <td>
+                                                                                    @(asset.Asset != null && asset.Asset.AssetType != null
+                                                                                        ? asset.Asset.AssetType.AssetTypeName
+                                                                                        : "")
+                                                                                </td>
+
+                                                                                <td>
+                                                                                    @(asset.Asset != null && asset.Asset.AssetMake != null
+                                                                                        ? asset.Asset.AssetMake.Name
+                                                                                        : "")
+                                                                                </td>
+
+                                                                                <td>
+                                                                                    @(asset.Asset != null
+                                                                                        ? asset.Asset.ModelName
+                                                                                        : "")
+                                                                                </td>
+
+                                                                            </tr>
+                                                                        }
+
+                                                                    </tbody>
+
+                                                                </table>
+
+                                                            </div>
+
+                                                        </div>
+
+                                                    </div>
+
+                                                </div>
+                                            }
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="card-footer">
+
+                                    <div class="d-flex justify-content-end flex-wrap gap-2">
+
+                                        <a href="@Html.EncodedActionLink("", "Info", "Ticket", "", new { id = item.TicketId }, null)"
+                                           target="_blank"
+                                           class="btn btn-sm btn-light">
+
+                                            <i class="align-middle me-1" data-lucide="info"></i>
+                                            More
+
+                                        </a>
+
+                                        <button type="button"
+                                                class="openModalUpdateNewTask btn btn-sm btn-warning"
+                                                data-id="@item.TicketId"
+                                                data-code="@item.Code"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#modalUpdateNewTask">
+
+                                            <i class="align-middle me-1" data-lucide="plus"></i>
+                                            New Task
+
+                                        </button>
+
+                                        <a href="@Html.EncodedActionLink("", "DocUpload", "Ticket", "", new { id = item.TicketId }, null)"
+                                           class="btn btn-sm btn-warning">
+
+                                            <i class="align-middle me-1" data-lucide="upload"></i>
+                                            Upload Docs
+
+                                        </a>
+
+                                        <a href="@Html.EncodedActionLink("", "ChangeTicket", "Ticket", "", new { id = item.TicketId }, null)"
+                                           target="_blank"
+                                           class="btn btn-sm btn-info text-white">
+
+                                            <i class="align-middle me-1" data-lucide="pencil"></i>
+                                            Change
+
+                                        </a>
+
+                                        <a href="@Html.EncodedActionLink("", "TransferTicket", "Ticket", "", new { id = item.TicketId }, null)"
+                                           target="_blank"
+                                           class="btn btn-sm btn-info text-white">
+
+                                            <i class="align-middle me-1" data-lucide="arrow-right-left"></i>
+                                            Transfer
+
+                                        </a>
+
+                                        <a href="@Html.EncodedActionLink("", "UpdateTicket", "Ticket", "", new { id = item.TicketId }, null)"
+                                           target="_blank"
+                                           class="btn btn-sm btn-primary">
+
+                                            <i class="align-middle me-1" data-lucide="save"></i>
+                                            Update Status
+
+                                        </a>
+
+                                        <a href="@Html.EncodedActionLink("", "CompleteTicket", "Ticket", "", new { id = item.TicketId }, null)"
+                                           target="_blank"
+                                           class="btn btn-sm btn-success">
+
+                                            <i class="align-middle me-1" data-lucide="check-circle"></i>
+                                            Complete
+
+                                        </a>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+<div class="modal fade"
+     id="modalUpdateTaskAssign"
+     tabindex="-1"
+     aria-labelledby="modalUpdateTaskAssignLabel"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title"
+                    id="modalUpdateTaskAssignLabel">
+
+                    <i class="align-middle me-2" data-lucide="user-plus"></i>
+
+                    Ticket #
+                    <span id="taskAssignModelLabelId"></span>
+                    - Assign User
+
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <input type="hidden"
+                       name="taskAssignTicketId"
+                       id="taskAssignTicketId" />
+
+                <input type="hidden"
+                       name="taskAssignTeamId"
+                       id="taskAssignTeamId" />
+
+                <div class="mb-3">
+
+                    <label for="modalTeamMemberId"
+                           class="form-label">
+                        Team Member
+                    </label>
+
+                    <select id="modalTeamMemberId"
+                            name="modalTeamMemberId"
+                            class="form-select">
+
+                        <option value="0">
+                            -- Select --
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn btn-sm btn-danger"
+                        data-bs-dismiss="modal">
+
+                    <i class="align-middle me-1" data-lucide="x"></i>
+                    Cancel
+
+                </button>
+
+                <button type="button"
+                        class="btn btn-sm btn-primary btnClickDisable"
+                        onclick="updateTaskAssign()">
+
+                    <i class="align-middle me-1" data-lucide="save"></i>
+                    Update
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<div class="modal fade"
+     id="modalUpdateNewTask"
+     tabindex="-1"
+     aria-labelledby="modalUpdateNewTaskLabel"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title"
+                    id="modalUpdateNewTaskLabel">
+
+                    <i class="align-middle me-2" data-lucide="plus"></i>
+
+                    Ticket #
+                    <span id="newTaskModelLabelId"></span>
+                    - New Task
+
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <input type="hidden"
+                       name="newTaskTicketId"
+                       id="newTaskTicketId" />
+
+                <div class="mb-3">
+
+                    <label for="modalTaskTeamId"
+                           class="form-label">
+                        Team
+                    </label>
+
+                    <select id="modalTaskTeamId"
+                            name="modalTaskTeamId"
+                            class="form-select">
+
+                        <option value="0">
+                            -- Select --
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <div class="mb-3">
+
+                    <label for="textTaskName"
+                           class="form-label">
+                        Task Name
+                    </label>
+
+                    <textarea id="textTaskName"
+                              name="textTaskName"
+                              placeholder="Task Name"
+                              rows="2"
+                              class="form-control"></textarea>
+
+                </div>
+
+                <div class="mb-0">
+
+                    <label for="textTaskDescription"
+                           class="form-label">
+                        Description
+                    </label>
+
+                    <textarea id="textTaskDescription"
+                              name="textTaskDescription"
+                              placeholder="Description"
+                              rows="4"
+                              class="form-control"></textarea>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn btn-sm btn-danger"
+                        data-bs-dismiss="modal">
+
+                    <i class="align-middle me-1" data-lucide="x"></i>
+                    Cancel
+
+                </button>
+
+                <button type="button"
+                        class="btn btn-sm btn-primary btnClickDisable"
+                        onclick="updateNewTask()">
+
+                    <i class="align-middle me-1" data-lucide="save"></i>
+                    Update
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            loadTeams();
+
+            $("#modalTeamMemberId").select2({
+                width: "100%",
+                dropdownParent: $("#modalUpdateTaskAssign")
+            });
+
+            $("#modalTaskTeamId").select2({
+                width: "100%",
+                dropdownParent: $("#modalUpdateNewTask")
+            });
+
+        });
+
+
+        function parseJsonResult(data) {
+
+            if (typeof data === "string") {
+
+                try {
+                    return JSON.parse(data);
+                }
+                catch (e) {
+                    return [];
+                }
+
+            }
+
+            return data || [];
+        }
+
+
+        $(document).on("click", ".openModalUpdateTaskAssign", function () {
+
+            var taskId = $(this).data("id");
+            var code = $(this).data("code");
+            var teamId = $(this).data("teamid");
+
+            $("#taskAssignTicketId").val(taskId);
+            $("#taskAssignTeamId").val(teamId);
+            $("#taskAssignModelLabelId").text(code);
+
+            $("#modalUpdateTaskAssign .btnClickDisable")
+                .prop("disabled", false);
+
+            loadTeamUsers();
+
+        });
+
+
+        $(document).on("click", ".openModalUpdateNewTask", function () {
+
+            var ticketId = $(this).data("id");
+            var code = $(this).data("code");
+
+            $("#newTaskTicketId").val(ticketId);
+            $("#newTaskModelLabelId").text(code);
+
+            $("#textTaskName").val("");
+            $("#textTaskDescription").val("");
+
+            $("#modalTaskTeamId")
+                .val("0")
+                .trigger("change");
+
+            $("#modalUpdateNewTask .btnClickDisable")
+                .prop("disabled", false);
+
+        });
+
+
+        function loadTeamUsers() {
+
+            var teamId =
+                $("#taskAssignTeamId").val();
+
+            var dropDown =
+                $("#modalTeamMemberId");
+
+            dropDown.empty();
+
+            dropDown.append(
+                "<option value='0'>-- Select --</option>"
+            );
+
+
+            $.getJSON(
+                '@Url.Action("GetUsersByTeamIdJsonResult", "User")',
+                {
+                    teamId: teamId
+                },
+                function (data) {
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.EmpNo,
+                                    text: item.FullName
+                                })
+                            );
+
+                        }
+                    );
+
+                    dropDown.val("0").trigger("change");
+
+                }
+            );
+
+        }
+
+
+        function loadTeams() {
+
+            var dropDown =
+                $("#modalTaskTeamId");
+
+            dropDown.empty();
+
+            dropDown.append(
+                "<option value='0'>-- Select --</option>"
+            );
+
+
+            $.getJSON(
+                '@Url.Action("GetTeamListJsonResult", "Team")',
+                function (data) {
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.TeamId,
+                                    text: item.TeamName
+                                })
+                            );
+
+                        }
+                    );
+
+                    dropDown.val("0").trigger("change");
+
+                }
+            );
+
+        }
+
+
+        function updateTaskAssign() {
+
+            var taskId =
+                $("#taskAssignTicketId").val();
+
+            var teamUserId =
+                $("#modalTeamMemberId").val();
+
+            var button =
+                $("#modalUpdateTaskAssign .btnClickDisable");
+
+
+            if (!teamUserId || teamUserId == "0") {
+
+                Swal.fire(
+                    "Error!",
+                    "Please enter the required data",
+                    "error"
+                );
+
+                return;
+            }
+
+
+            button.prop("disabled", true);
+
+
+            $.ajax({
+
+                url: '@Url.Action("Assign", "TicketTask")',
+
+                type: "GET",
+
+                dataType: "json",
+
+                data: {
+                    taskId: taskId,
+                    userId: teamUserId
+                },
+
+                success: function (data) {
+
+                    if (data == "1" || data == 1) {
+
+                        Swal.fire(
+                            "Completed",
+                            "Ticket task has been assigned",
+                            "success"
+                        );
+
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 200);
+
+                    }
+                    else {
+
+                        button.prop("disabled", false);
+
+                        Swal.fire(
+                            "Something went wrong!",
+                            "Please try again",
+                            "error"
+                        );
+
+                    }
+
+                },
+
+                error: function () {
+
+                    button.prop("disabled", false);
+
+                    Swal.fire(
+                        "Something went wrong!",
+                        "Please try again",
+                        "error"
+                    );
+
+                }
+
+            });
+
+        }
+
+
+        function updateNewTask() {
+
+            var ticketId =
+                $("#newTaskTicketId").val();
+
+            var teamId =
+                $("#modalTaskTeamId").val();
+
+            var taskName =
+                $("#textTaskName").val().trim();
+
+            var description =
+                $("#textTaskDescription").val().trim();
+
+            var button =
+                $("#modalUpdateNewTask .btnClickDisable");
+
+
+            if (!teamId ||
+                teamId == "0" ||
+                !taskName ||
+                !description) {
+
+                Swal.fire(
+                    "Error!",
+                    "Please enter the required data",
+                    "error"
+                );
+
+                return;
+            }
+
+
+            button.prop("disabled", true);
+
+
+            $.ajax({
+
+                url: '@Url.Action("Create", "TicketTask")',
+
+                type: "GET",
+
+                dataType: "json",
+
+                data: {
+                    ticketId: ticketId,
+                    teamId: teamId,
+                    taskName: taskName,
+                    desc: description
+                },
+
+                success: function (data) {
+
+                    if (data == "1" || data == 1) {
+
+                        Swal.fire(
+                            "Completed",
+                            "Ticket task has been created",
+                            "success"
+                        );
+
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 100);
+
+                    }
+                    else {
+
+                        button.prop("disabled", false);
+
+                        Swal.fire(
+                            "Something went wrong!",
+                            "Please try again",
+                            "error"
+                        );
+
+                    }
+
+                },
+
+                error: function () {
+
+                    button.prop("disabled", false);
+
+                    Swal.fire(
+                        "Something went wrong!",
+                        "Please try again",
+                        "error"
+                    );
+
+                }
+
+            });
+
+        }
+
+
+        function deleteTask(itemId) {
+
+            Swal.fire({
+
+                title: "Are you sure?",
+                text: "Do you want to delete?",
+                icon: "warning",
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                showCancelButton: true,
+                reverseButtons: true
+
+            }).then(function (result) {
+
+                if (result.isConfirmed || result.value) {
+
+                    $.ajax({
+
+                        url: '@Url.Action("Delete", "TicketTask")',
+
+                        type: "GET",
+
+                        dataType: "json",
+
+                        data: {
+                            id: itemId
+                        },
+
+                        success: function (data) {
+
+                            if (data == "1" || data == 1) {
+
+                                Swal.fire(
+                                    "Deleted!",
+                                    "Record has been deleted",
+                                    "success"
+                                );
+
+                                setTimeout(function () {
+                                    window.location.reload();
+                                }, 1000);
+
+                            }
+                            else if (data == "2" || data == 2) {
+
+                                Swal.fire(
+                                    "Data in use!",
+                                    "Data is currently in use and cannot be deleted",
+                                    "error"
+                                );
+
+                            }
+                            else {
+
+                                Swal.fire(
+                                    "Something went wrong!",
+                                    "Data is not deleted, Please try again",
+                                    "error"
+                                );
+
+                            }
+
+                        },
+
+                        error: function () {
+
+                            Swal.fire(
+                                "Something went wrong!",
+                                "Data is not deleted, Please try again",
+                                "error"
+                            );
+
+                        }
+
+                    });
+
+                }
+
+            });
+
+        }
+
+    </script>
+}

@@ -1,0 +1,308 @@
+﻿@model Web.Models.AddTicketVM
+@using Service
+@{
+    /**/
+
+    ViewBag.Title = "AddTicket";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("AddTicket", "Problem", FormMethod.Post, new { @class = "form-horizontal" }))
+{
+    @Html.HiddenFor(model => model.ProblemId)
+
+    <div class="row">
+
+        <div class="col-md-12">
+
+            <div class="card card-danger">
+                <div class="card-header with-border">
+                    <h3 class="card-title">Assigned Tickets</h3>
+                    <div class="card-tools pull-right">
+                        <a href="@Url.Action("AssignItems", "Problem")" class="btn btn-social btn-cancel">
+                            <i class="fa fa-arrow-left"></i>Back
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+
+                    <table id="dataTable2" class="table table-bordered table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Ticket Id</th>
+                                <th>Subject</th>
+                                <th>Description</th>
+                                <th>Requested By</th>
+                                <th>Requested Date</th>
+                                <th>Status</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                if (Model.AssignedTickets != null)
+                                {
+                                    foreach (var item in Model.AssignedTickets)
+                                    {
+                                        <tr>
+
+                                            <td>
+                                                <a href="@Html.EncodedActionLink("", "TicketInfo", "Ticket", "", new { id = item.TicketId }, null)" target="_blank">
+                                                    @item.Code
+                                                </a>
+
+                                            </td>
+                                            <td>@item.Subject</td>
+                                            <td>@item.Description</td>
+                                            <td>@item.RequestedUser.FullName</td>
+                                            <td>@item.RequestedDate.ToShortDateString()</td>
+                                            <td>
+                                                <span class="label text- label-@TicketService.GetTicketStatusColor(item.Status)">
+                                                    @item.Status.EnumDisplayName()
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <a onclick="deleteItem('@item.TicketId', '@item.Code')" class="btn btn-sm btn-social btn-delete">
+                                                    <i class="fa fa-trash-o"></i> Remove
+                                                </a>
+                                            </td>
+
+                                        </tr>
+                                    }
+                                }
+                            }
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <div class="row">
+
+        <div class="col-md-12">
+            <div class="card box">
+                <div class="card-header with-border">
+                    <div class="col-lg-12">
+
+                        <div class="form-group row">
+                            <label class="control-label col-md-2">
+                                Requested Date :
+                            </label>
+                            <div class="col-md-2">
+                                <div class="input-group date">
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </div>
+                                    <input type="text" name="StartDate" id="StartDate" value="@ViewBag.StartDate" class="form-control datepicker" />
+                                </div>
+                            </div>
+
+                            <label class="control-label col-md-1">
+                                To
+                            </label>
+                            <div class="col-md-2">
+                                <div class="input-group date">
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </div>
+                                    <input type="text" name="EndDate" id="EndDate" value="@ViewBag.EndDate" class="form-control datepicker" />
+                                </div>
+                            </div>
+
+                            <div class="col-md-5 text-right">
+                                <button type="submit" class="btn btn-social">
+                                    <i class="fa fa-search"></i>Search
+                                </button>
+
+                            </div>
+
+
+                        </div>
+                        @*<div class="card-tools pull-right">
+
+                            </div>*@
+                    </div>
+                </div>
+
+                <div class="card-body">
+
+                    <table id="dataTable" class="table table-bordered table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Ticket Id</th>
+                                <th>Subject</th>
+                                <th>Description</th>
+                                <th>Requested By</th>
+                                <th>Requested Date</th>
+                                <th>Status</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                foreach (var item in Model.Tickets)
+                                {
+                                    <tr>
+
+                                        <td>
+                                            <a href="@Html.EncodedActionLink("","Info", "Ticket","", new { id = item.TicketId },null)" target="_blank">
+                                                @item.Code
+                                            </a>
+
+                                        </td>
+
+                                        <td>@item.Subject</td>
+                                        <td>@item.Description</td>
+                                        <td>@item.RequestedUser.FullName</td>
+                                        <td>@item.RequestedDate.ToShortDateString()</td>
+                                        <td>
+                                            <span class="label text- label-@TicketService.GetTicketStatusColor(item.Status)">
+                                                @item.Status.EnumDisplayName()
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <a onclick="assignItem('@item.TicketId', '@item.Code')" class="btn btn-sm btn-social btn-primary">
+                                                <i class="fa fa-plus-square"></i> Assign
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+
+                    </table>
+
+                </div>
+                <!-- /.card-body -->
+
+            </div>
+
+        </div>
+    </div>
+}
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+
+        $(document).ready(function () {
+
+            $('#dataTable').DataTable({
+                "paging": false,
+                "lengthChange": true,
+                "searching": true,
+                "ordering": true,
+                "info": true,
+                "autoWidth": true
+            });
+
+        });
+
+
+        $(document).ready(function () {
+
+
+        });
+
+
+        function deleteItem(itemId, itemName) {
+
+            var probId = $('#ProblemId').val();
+
+
+            swal({
+                title: "Are you sure?",
+                text: "Do you want to delete : " + itemName,
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                closeOnConfirm: true,
+                closeOnCancel: true
+            }, function (isConfirm) {
+                if (isConfirm) {
+                    $.ajax({
+                        url: "@Url.Action("DeleteTicket", "Problem")",
+                        type: 'GET',
+                        dataType: "json",
+                        data: { ticketId: itemId, problemId: probId },
+                        success: function (data) {
+                            if (data == "1") {
+                                swal("Deleted!", "Record has been deleted", "success");
+                                setTimeout(function () {
+                                    window.location.reload();
+                                }, 500);
+                            }
+                            else if(data == "2")
+                                swal("Data in use!", "Data is currently in use and can not be deleted", "error");
+                            else
+                                swal("Something went wrong!", "Data is not deleted, Please try again", "error");
+                        },
+                        error: function (xhr) {
+                            swal("Something went wrong!", "Data is not deleted, Please try again", "error");
+                        }
+                    });
+
+                } else {
+                    swal("Cancelled", "Action canceled, Data is not deleted", "error");
+                }
+                });
+
+        }
+
+
+        function assignItem(itemId, itemName) {
+            var probId = $('#ProblemId').val();
+            swal({
+                title: "Are you sure?",
+                text: "Do you want to assign : " + itemName,
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                closeOnConfirm: true,
+                closeOnCancel: true
+            }, function (isConfirm) {
+                if (isConfirm) {
+                    $.ajax({
+                        url: "@Url.Action("AssignTicket", "Problem")",
+                        type: 'GET',
+                        dataType: "json",
+                        data: { ticketId: itemId, problemId: probId  },
+                        success: function (data) {
+                            if (data == "1") {
+                                swal("Assigned!", "Ticket has been assigned", "success");
+                                setTimeout(function () {
+                                    window.location.reload();
+                                }, 500);
+                            }
+                            else if (data == "2")
+                                swal("Data already exists!", "Data is currently available and can not be assigned", "error");
+                            else
+                                swal("Something went wrong!", "Data is not assigned, Please try again", "error");
+                        },
+                        error: function (xhr) {
+                            swal("Something went wrong!", "Data is not assigned, Please try again", "error");
+                        }
+                    });
+
+                } else {
+                    swal("Cancelled", "Action canceled, Data is not deleted", "error");
+                }
+                });
+
+
+        }
+
+    </script>
+}
+

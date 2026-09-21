@@ -1,0 +1,284 @@
+﻿@model IList<Domain.UserTeam>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="card">
+
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="align-middle me-2" data-lucide="building-2"></i>
+                    Assign Departments
+                </h5>
+            </div>
+
+            @using (Html.BeginForm("Create", "UserDept", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true)
+
+                <div class="card-body">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-8">
+
+                            <label for="EmpNo" class="form-label">
+                                User
+                            </label>
+
+                            <select id="EmpNo"
+                                    name="EmpNo"
+                                    class="form-select select2">
+                                <option value=""></option>
+                            </select>
+
+                            <span class="text-danger"
+                                  data-valmsg-for="EmpNo"
+                                  data-valmsg-replace="true">
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                    <hr class="my-4" />
+
+                    <div class="row">
+
+                        <div class="col-12">
+
+                            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+
+                                <label class="form-label fw-semibold mb-0">
+                                    Departments
+                                </label>
+
+                                <div class="form-check">
+
+                                    <input type="checkbox"
+                                           id="selectAllCheckbox"
+                                           class="form-check-input"
+                                           onchange="toggleSelectAll(this, 'myCheckbox')" />
+
+                                    <label class="form-check-label"
+                                           for="selectAllCheckbox">
+                                        Select All
+                                    </label>
+
+                                </div>
+
+                            </div>
+
+                            <div id="depts"></div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="card-footer">
+
+                    <div class="d-flex justify-content-end gap-2">
+
+                        <a href="@Url.Action("Create", "UserDept")"
+                           class="btn btn-sm btn-danger">
+
+                            <i class="align-middle me-1" data-lucide="rotate-ccw"></i>
+                            Reset
+
+                        </a>
+
+                        <button type="submit"
+                                class="btn btn-sm btn-primary">
+
+                            <i class="align-middle me-1" data-lucide="save"></i>
+                            Save
+
+                        </button>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+</div>
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $("#EmpNo").select2({
+                width: "100%"
+            });
+
+            loadUsers();
+
+            $("#EmpNo").on("change", function () {
+                getUserDepts();
+            });
+
+        });
+
+
+        function parseJsonResult(data) {
+
+            if (typeof data === "string") {
+
+                try {
+                    return JSON.parse(data);
+                }
+                catch (e) {
+                    return [];
+                }
+
+            }
+
+            return data || [];
+        }
+
+
+        function selectAllCheckboxes(checkboxName, isChecked) {
+
+            var checkboxes =
+                document.getElementsByClassName(checkboxName);
+
+            for (var i = 0; i < checkboxes.length; i++) {
+                checkboxes[i].checked = isChecked;
+            }
+
+        }
+
+
+        function toggleSelectAll(sourceCheckbox, checkboxName) {
+
+            selectAllCheckboxes(
+                checkboxName,
+                sourceCheckbox.checked
+            );
+
+        }
+
+
+        function loadUsers() {
+
+            var dropDown =
+                $("#EmpNo");
+
+            dropDown.empty();
+
+            dropDown.append(
+                "<option value='0'>-- Select --</option>"
+            );
+
+
+            $.getJSON(
+                '@Url.Action("GetUsersAllListJsonResult", "User")',
+                function (data) {
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            var departmentName =
+                                item.DepartmentName || "N/A";
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.EmpNo,
+                                    text:
+                                        item.EmpNo +
+                                        " | " +
+                                        item.FullName +
+                                        " (" +
+                                        departmentName +
+                                        ")"
+                                })
+                            );
+
+                        }
+                    );
+
+
+                    var selectedEmpNo =
+                        '@ViewBag.EmpNo';
+
+                    if (selectedEmpNo) {
+                        dropDown.val(selectedEmpNo);
+                    }
+
+                    dropDown.trigger("change.select2");
+
+                    getUserDepts();
+
+                }
+            );
+
+        }
+
+
+        function getUserDepts() {
+
+            var empNo =
+                $("#EmpNo").val();
+
+            $("#depts").empty();
+
+            $("#selectAllCheckbox")
+                .prop("checked", false);
+
+
+            if (!empNo || empNo == "0") {
+                return;
+            }
+
+
+            $.ajax({
+
+                url: '@Url.Action("GetUserDepts", "UserDept")',
+
+                contentType: "application/html;charset=utf-8",
+
+                type: "GET",
+
+                dataType: "html",
+
+                data: {
+                    empNo: empNo
+                },
+
+                success: function (data) {
+
+                    $("#depts").html(data);
+
+                    if (window.lucide) {
+                        lucide.createIcons();
+                    }
+
+                },
+
+                error: function () {
+
+                    $("#depts").html(
+                        '<div class="alert alert-danger mb-0">Unable to load departments.</div>'
+                    );
+
+                }
+
+            });
+
+        }
+
+    </script>
+}

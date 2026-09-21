@@ -1,0 +1,730 @@
+﻿@model ICollection<Domain.AssetTransferRequest>
+@using Service
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="card">
+
+            <div class="card-header">
+
+                <ul class="nav nav-pills card-header-pills" role="tablist">
+
+                    <li class="nav-item" role="presentation">
+
+                        <a class="nav-link active"
+                           href="#tab_Pending"
+                           data-bs-toggle="tab"
+                           role="tab">
+
+                            <i class="align-middle me-1" data-lucide="clock"></i>
+                            Pending
+
+                        </a>
+
+                    </li>
+
+                    <li class="nav-item" role="presentation">
+
+                        <a class="nav-link"
+                           href="#tab_InTransit"
+                           data-bs-toggle="tab"
+                           role="tab">
+
+                            <i class="align-middle me-1" data-lucide="truck"></i>
+                            In Transit
+
+                        </a>
+
+                    </li>
+
+                    <li class="nav-item" role="presentation">
+
+                        <a class="nav-link"
+                           href="#tab_Closed"
+                           data-bs-toggle="tab"
+                           role="tab">
+
+                            <i class="align-middle me-1" data-lucide="check-circle"></i>
+                            Completed
+
+                        </a>
+
+                    </li>
+
+                    <li class="nav-item" role="presentation">
+
+                        <a class="nav-link"
+                           href="#tab_Rejected"
+                           data-bs-toggle="tab"
+                           role="tab">
+
+                            <i class="align-middle me-1" data-lucide="thumbs-down"></i>
+                            Rejected
+
+                        </a>
+
+                    </li>
+
+                </ul>
+
+            </div>
+
+
+            <div class="card-body">
+
+                <div class="tab-content">
+
+                    <div class="tab-pane fade show active"
+                         id="tab_Pending"
+                         role="tabpanel">
+
+                        <div id="pendingAccordion">
+
+                            @foreach (var item in Model.Where(w =>
+                                w.Status == Domain.AssetTransStatusEnum.Initiated))
+                            {
+                                var collapseId =
+                                    "pending_" + item.AssetTransferRequestId;
+
+                                <div class="card mb-3">
+
+                                    <div class="card-header">
+
+                                        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-2">
+
+                                            <div>
+
+                                                <a href="#@collapseId"
+                                                   class="text-body text-decoration-none fw-semibold collapsed"
+                                                   data-bs-toggle="collapse"
+                                                   aria-expanded="false"
+                                                   aria-controls="@collapseId">
+
+                                                    <i class="align-middle me-1" data-lucide="file-text"></i>
+                                                    #@item.AssetTransferRequestId
+
+                                                </a>
+
+                                                <span class="ms-2 text-muted">
+
+                                                    @item.BranchFrom.Name
+                                                    -
+                                                    @item.DepartmentFrom.DepartmentName
+
+                                                    <i class="align-middle mx-1" data-lucide="chevrons-right"></i>
+
+                                                    @item.Branch.Name
+                                                    -
+                                                    @item.Department.DepartmentName
+
+                                                </span>
+
+                                            </div>
+
+                                            <span class="badge bg-@AssetTransferRequestService.GetTransTypeColor(item.TransactionType)">
+                                                @item.TransactionType.EnumDisplayName()
+                                            </span>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div id="@collapseId"
+                                         class="collapse"
+                                         data-bs-parent="#pendingAccordion">
+
+                                        <div class="card-body">
+
+                                            @Html.Partial(
+                                                "~/Views/AssetTransaction/_Min.cshtml",
+                                                item
+                                            )
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            }
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="tab-pane fade"
+                         id="tab_InTransit"
+                         role="tabpanel">
+
+                        <div id="transitAccordion">
+
+                            @foreach (var item in Model.Where(w =>
+                                w.Status == Domain.AssetTransStatusEnum.InTransit ||
+                                w.Status == Domain.AssetTransStatusEnum.Vendor))
+                            {
+                                var collapseId =
+                                    "transit_" + item.AssetTransferRequestId;
+
+                                <div class="card mb-3">
+
+                                    <div class="card-header">
+
+                                        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-2">
+
+                                            <div>
+
+                                                <a href="#@collapseId"
+                                                   class="text-body text-decoration-none fw-semibold collapsed"
+                                                   data-bs-toggle="collapse"
+                                                   aria-expanded="false"
+                                                   aria-controls="@collapseId">
+
+                                                    <i class="align-middle me-1" data-lucide="file-text"></i>
+                                                    #@item.AssetTransferRequestId
+
+                                                </a>
+
+                                                <span class="ms-2 text-muted">
+
+                                                    @item.BranchFrom.Name
+
+                                                    <i class="align-middle mx-1" data-lucide="chevrons-right"></i>
+
+                                                    @item.Branch.Name
+                                                    -
+                                                    @item.Department.DepartmentName
+
+                                                </span>
+
+                                            </div>
+
+                                            <span class="badge bg-@AssetTransferRequestService.GetTransTypeColor(item.TransactionType)">
+                                                @item.TransactionType.EnumDisplayName()
+                                            </span>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div id="@collapseId"
+                                         class="collapse"
+                                         data-bs-parent="#transitAccordion">
+
+                                        <div class="card-body">
+
+                                            @Html.Partial(
+                                                "~/Views/AssetTransaction/_Min.cshtml",
+                                                item
+                                            )
+
+                                        </div>
+
+                                        <div class="card-footer">
+
+                                            <div class="d-flex justify-content-end">
+
+                                                <a href="@Html.EncodedActionLink("", "GatePass", "AssetTransaction", "", new { id = item.AssetTransferRequestId }, null)"
+                                                   target="_blank"
+                                                   class="btn btn-success btn-sm">
+
+                                                    <i class="align-middle me-1" data-lucide="printer"></i>
+                                                    Print Gate Pass
+
+                                                </a>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            }
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="tab-pane fade"
+                         id="tab_Closed"
+                         role="tabpanel">
+
+                        <div class="table-responsive">
+
+                            <table id="completedDataTable"
+                                   class="table table-striped table-hover align-middle w-100">
+
+                                <thead>
+
+                                    <tr>
+                                        <th style="width:45px;"></th>
+                                        <th>Request #</th>
+                                        <th>Transfer Type</th>
+                                        <th>From Branch</th>
+                                        <th>From Department</th>
+                                        <th>To Branch</th>
+                                        <th>To Department</th>
+                                        <th>Assigned To</th>
+                                        <th>Assigned Type</th>
+                                        <th>Comment</th>
+                                    </tr>
+
+                                </thead>
+
+                                <tbody>
+
+                                    @foreach (var item in Model.Where(w =>
+                                        w.Status == Domain.AssetTransStatusEnum.Completed))
+                                    {
+                                        var assetCollapseId =
+                                            "completedAssets_" + item.AssetTransferRequestId;
+
+                                        <tr>
+
+                                            <td>
+
+                                                <button type="button"
+                                                        class="btn btn-sm btn-light"
+                                                        data-bs-toggle="collapse"
+                                                        data-bs-target="#@assetCollapseId"
+                                                        aria-expanded="false"
+                                                        aria-controls="@assetCollapseId">
+
+                                                    <i class="align-middle" data-lucide="chevron-down"></i>
+
+                                                </button>
+
+                                            </td>
+
+                                            <td>
+
+                                                <a href="@Html.EncodedActionLink("", "Info", "AssetTransaction", "", new { id = item.AssetTransferRequestId }, null)"
+                                                   target="_blank">
+
+                                                    @item.AssetTransferRequestId
+
+                                                </a>
+
+                                            </td>
+
+                                            <td>
+                                                @item.TransactionType.EnumDisplayName()
+                                            </td>
+
+                                            <td>
+                                                @item.BranchFrom.Name
+                                            </td>
+
+                                            <td>
+                                                @item.DepartmentFrom.DepartmentName
+                                            </td>
+
+                                            <td>
+                                                @item.Branch.Name
+                                            </td>
+
+                                            <td>
+                                                @item.Department.DepartmentName
+                                            </td>
+
+                                            <td>
+                                                @(item.AssignedToUser != null
+                                                    ? item.AssignedToUser.FullName
+                                                    : "N/A")
+                                            </td>
+
+                                            <td>
+                                                @item.AssignedType.EnumDisplayName()
+                                            </td>
+
+                                            <td>
+                                                @item.Comment
+                                            </td>
+
+                                        </tr>
+
+                                        <tr>
+
+                                            <td colspan="10"
+                                                class="p-0 border-0">
+
+                                                <div id="@assetCollapseId"
+                                                     class="collapse">
+
+                                                    <div class="p-3 bg-body-tertiary">
+
+                                                        <div class="table-responsive">
+
+                                                            <table class="table table-sm table-bordered table-hover align-middle mb-0">
+
+                                                                <thead>
+
+                                                                    <tr>
+                                                                        <th>Asset #</th>
+                                                                        <th>Serial #</th>
+                                                                        <th>Asset Type</th>
+                                                                        <th>Make</th>
+                                                                        <th>Model</th>
+                                                                    </tr>
+
+                                                                </thead>
+
+                                                                <tbody>
+
+                                                                    @foreach (var asset in item.TransferItems)
+                                                                    {
+                                                                        <tr>
+
+                                                                            <td>
+
+                                                                                <a href="@Html.EncodedActionLink("", "Info", "Asset", "", new { id = asset.AssetId }, null)"
+                                                                                   target="_blank">
+
+                                                                                    @asset.Asset.AssetNo
+
+                                                                                </a>
+
+                                                                            </td>
+
+                                                                            <td>
+                                                                                @asset.Asset.SerialNo
+                                                                            </td>
+
+                                                                            <td>
+                                                                                @asset.Asset.AssetType.AssetTypeName
+                                                                            </td>
+
+                                                                            <td>
+                                                                                @asset.Asset.AssetMake.Name
+                                                                            </td>
+
+                                                                            <td>
+                                                                                @asset.Asset.ModelName
+                                                                            </td>
+
+                                                                        </tr>
+                                                                    }
+
+                                                                </tbody>
+
+                                                            </table>
+
+                                                        </div>
+
+                                                    </div>
+
+                                                </div>
+
+                                            </td>
+
+                                        </tr>
+                                    }
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="tab-pane fade"
+                         id="tab_Rejected"
+                         role="tabpanel">
+
+                        <div class="table-responsive">
+
+                            <table id="rejectedDataTable"
+                                   class="table table-striped table-hover align-middle w-100">
+
+                                <thead>
+
+                                    <tr>
+                                        <th style="width:45px;"></th>
+                                        <th>Request #</th>
+                                        <th>Transfer Type</th>
+                                        <th>From Branch</th>
+                                        <th>From Department</th>
+                                        <th>To Branch</th>
+                                        <th>To Department</th>
+                                        <th>Assigned To</th>
+                                        <th>Assigned Type</th>
+                                        <th>Comment</th>
+                                    </tr>
+
+                                </thead>
+
+                                <tbody>
+
+                                    @foreach (var item in Model.Where(w =>
+                                        w.Status == Domain.AssetTransStatusEnum.Rejected))
+                                    {
+                                        var assetCollapseId =
+                                            "rejectedAssets_" + item.AssetTransferRequestId;
+
+                                        <tr>
+
+                                            <td>
+
+                                                <button type="button"
+                                                        class="btn btn-sm btn-light"
+                                                        data-bs-toggle="collapse"
+                                                        data-bs-target="#@assetCollapseId"
+                                                        aria-expanded="false"
+                                                        aria-controls="@assetCollapseId">
+
+                                                    <i class="align-middle" data-lucide="chevron-down"></i>
+
+                                                </button>
+
+                                            </td>
+
+                                            <td>
+
+                                                <a href="@Html.EncodedActionLink("", "Info", "AssetTransaction", "", new { id = item.AssetTransferRequestId }, null)"
+                                                   target="_blank">
+
+                                                    @item.AssetTransferRequestId
+
+                                                </a>
+
+                                            </td>
+
+                                            <td>
+                                                @item.TransactionType.EnumDisplayName()
+                                            </td>
+
+                                            <td>
+                                                @item.BranchFrom.Name
+                                            </td>
+
+                                            <td>
+                                                @item.DepartmentFrom.DepartmentName
+                                            </td>
+
+                                            <td>
+                                                @item.Branch.Name
+                                            </td>
+
+                                            <td>
+                                                @item.Department.DepartmentName
+                                            </td>
+
+                                            <td>
+                                                @(item.AssignedToUser != null
+                                                    ? item.AssignedToUser.FullName
+                                                    : "N/A")
+                                            </td>
+
+                                            <td>
+                                                @item.AssignedType.EnumDisplayName()
+                                            </td>
+
+                                            <td>
+                                                @item.Comment
+                                            </td>
+
+                                        </tr>
+
+                                        <tr>
+
+                                            <td colspan="10"
+                                                class="p-0 border-0">
+
+                                                <div id="@assetCollapseId"
+                                                     class="collapse">
+
+                                                    <div class="p-3 bg-body-tertiary">
+
+                                                        <div class="table-responsive">
+
+                                                            <table class="table table-sm table-bordered table-hover align-middle mb-0">
+
+                                                                <thead>
+
+                                                                    <tr>
+                                                                        <th>Asset #</th>
+                                                                        <th>Serial #</th>
+                                                                        <th>Asset Type</th>
+                                                                        <th>Make</th>
+                                                                        <th>Model</th>
+                                                                    </tr>
+
+                                                                </thead>
+
+                                                                <tbody>
+
+                                                                    @foreach (var asset in item.TransferItems)
+                                                                    {
+                                                                        <tr>
+
+                                                                            <td>
+
+                                                                                <a href="@Html.EncodedActionLink("", "Info", "Asset", "", new { id = asset.AssetId }, null)"
+                                                                                   target="_blank">
+
+                                                                                    @asset.Asset.AssetNo
+
+                                                                                </a>
+
+                                                                            </td>
+
+                                                                            <td>
+                                                                                @asset.Asset.SerialNo
+                                                                            </td>
+
+                                                                            <td>
+                                                                                @asset.Asset.AssetType.AssetTypeName
+                                                                            </td>
+
+                                                                            <td>
+                                                                                @asset.Asset.AssetMake.Name
+                                                                            </td>
+
+                                                                            <td>
+                                                                                @asset.Asset.ModelName
+                                                                            </td>
+
+                                                                        </tr>
+                                                                    }
+
+                                                                </tbody>
+
+                                                            </table>
+
+                                                        </div>
+
+                                                    </div>
+
+                                                </div>
+
+                                            </td>
+
+                                        </tr>
+                                    }
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            initializeTransactionTable(
+                "#completedDataTable",
+                "ITSM - Completed Asset Transactions"
+            );
+
+            initializeTransactionTable(
+                "#rejectedDataTable",
+                "ITSM - Rejected Asset Transactions"
+            );
+
+        });
+
+
+        function initializeTransactionTable(tableId, reportTitle) {
+
+            if (!$.fn.DataTable) {
+                return;
+            }
+
+
+            var table =
+                $(tableId).DataTable({
+
+                    responsive: false,
+                    lengthChange: false,
+                    autoWidth: false,
+                    paging: false,
+                    ordering: true,
+
+                    columnDefs: [
+                        {
+                            targets: 0,
+                            orderable: false,
+                            searchable: false
+                        }
+                    ],
+
+                    buttons: [
+
+                        {
+                            extend: "excelHtml5",
+                            text: "Excel",
+                            title: reportTitle,
+                            exportOptions: {
+                                columns: ":visible:not(:first-child)",
+                                modifier: {
+                                    page: "current"
+                                }
+                            }
+                        },
+
+                        {
+                            extend: "pdfHtml5",
+                            text: "PDF",
+                            title: reportTitle,
+                            orientation: "landscape",
+                            exportOptions: {
+                                columns: ":visible:not(:first-child)",
+                                modifier: {
+                                    page: "current"
+                                }
+                            }
+                        },
+
+                        {
+                            extend: "print",
+                            text: "Print",
+                            title: reportTitle,
+                            exportOptions: {
+                                columns: ":visible:not(:first-child)"
+                            },
+                            autoPrint: true
+                        },
+
+                        "colvis"
+
+                    ]
+
+                });
+
+
+            table
+                .buttons()
+                .container()
+                .appendTo(
+                    $(tableId + "_wrapper")
+                        .find(".col-md-6:eq(0)")
+                );
+
+        }
+
+    </script>
+
+}

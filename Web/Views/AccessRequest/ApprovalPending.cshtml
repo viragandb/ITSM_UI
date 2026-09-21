@@ -1,0 +1,1200 @@
+﻿@model ICollection<Domain.AR.AccessRequest>
+@using Service.AR
+@using Service
+@using Domain.AR
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+
+    <div class="col-12">
+
+        <div class="card">
+
+            <div class="card-header">
+
+                <ul class="nav nav-pills card-header-pills"
+                    role="tablist">
+
+                    <li class="nav-item"
+                        role="presentation">
+
+                        <a class="nav-link @TempData["ActivePending"]"
+                           href="#tab_Pending"
+                           data-bs-toggle="tab"
+                           role="tab">
+
+                            <i class="align-middle me-1"
+                               data-lucide="clock"></i>
+
+                            Pending
+
+                        </a>
+
+                    </li>
+
+                    <li class="nav-item"
+                        role="presentation">
+
+                        <a class="nav-link @TempData["ActiveApproved"]"
+                           href="#tab_Approved"
+                           data-bs-toggle="tab"
+                           role="tab">
+
+                            <i class="align-middle me-1"
+                               data-lucide="loader-circle"></i>
+
+                            On Going
+
+                        </a>
+
+                    </li>
+
+                    <li class="nav-item"
+                        role="presentation">
+
+                        <a class="nav-link"
+                           href="#tab_Closed"
+                           data-bs-toggle="tab"
+                           role="tab">
+
+                            <i class="align-middle me-1"
+                               data-lucide="circle-check"></i>
+
+                            Closed
+
+                        </a>
+
+                    </li>
+
+                    <li class="nav-item"
+                        role="presentation">
+
+                        <a class="nav-link"
+                           href="#tab_Rejected"
+                           data-bs-toggle="tab"
+                           role="tab">
+
+                            <i class="align-middle me-1"
+                               data-lucide="circle-x"></i>
+
+                            Rejected
+
+                        </a>
+
+                    </li>
+
+                </ul>
+
+            </div>
+
+            <div class="card-body">
+
+                <div class="tab-content">
+
+                    <div class="tab-pane fade @TempData["ActivePending"]"
+                         id="tab_Pending"
+                         role="tabpanel">
+
+                        <div id="accordion">
+
+                            @{
+                                var expandShow = "";
+
+                                foreach (var item in Model.Where(w =>
+                                    w.Status == AccessRequestStatusEnum.Initiated))
+                                {
+                                    var collapseId = "G_" + item.AccessRequestId;
+
+                                    <div class="card mb-3">
+
+                                        <div class="card-header">
+
+                                            <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-2">
+
+                                                <div>
+
+                                                    <a href="#@collapseId"
+                                                       data-bs-toggle="collapse"
+                                                       class="text-body text-decoration-none fw-semibold collapsed"
+                                                       aria-expanded="false"
+                                                       aria-controls="@collapseId">
+
+                                                        <i class="align-middle me-1"
+                                                           data-lucide="file-key"></i>
+
+                                                        Request #@item.AccessRequestId
+
+                                                    </a>
+
+                                                    <span class="ms-2">
+
+                                                        <i class="align-middle me-1"
+                                                           data-lucide="shield"></i>
+
+                                                        @item.AccessRequestType.Name
+
+                                                    </span>
+
+                                                </div>
+
+                                                <div>
+
+                                                    <span class="badge bg-@AccessRequestService.GetUserTypeColor(item.AccessType)">
+
+                                                        @item.AccessType.EnumDisplayName()
+
+                                                    </span>
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+                                        <div id="@collapseId"
+                                             class="collapse @expandShow"
+                                             data-bs-parent="#accordion">
+
+                                            <div class="card-body">
+
+                                                @Html.Partial("_RequestMin", item)
+
+                                                @if (item.AccessRequestType.ApproverInstructions != null)
+                                                {
+                                                    <hr />
+
+                                                    <div class="mb-0">
+
+                                                        <div class="d-flex align-items-center mb-2">
+
+                                                            <i class="align-middle me-2"
+                                                               data-lucide="info"></i>
+
+                                                            <strong>
+                                                                @Html.LabelFor(model => item.AccessRequestType.ApproverInstructions)
+                                                            </strong>
+
+                                                        </div>
+
+                                                        <div class="text-muted">
+                                                            @Html.Raw(item.AccessRequestType.ApproverInstructions)
+                                                        </div>
+
+                                                    </div>
+                                                }
+
+                                            </div>
+
+                                            <div class="card-footer">
+
+                                                <div class="d-flex flex-wrap justify-content-end gap-2">
+
+                                                    <a href="@Html.EncodedActionLink(
+                                                                 "",
+                                                                 "Info",
+                                                                 "AccessRequest",
+                                                                 "",
+                                                                 new
+                                                                 {
+                                                                     id = item.AccessRequestId
+                                                                 },
+                                                                 null
+                                                             )"
+                                                       target="_blank"
+                                                       class="btn btn-sm btn-light">
+
+                                                        <i class="align-middle me-1"
+                                                           data-lucide="info"></i>
+
+                                                        More
+
+                                                    </a>
+
+                                                    <button type="button"
+                                                            data-id="@item.AccessRequestId"
+                                                            class="openModalUpdateReject btn btn-danger btn-sm"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#modalUpdateReject">
+
+                                                        <i class="align-middle me-1"
+                                                           data-lucide="thumbs-down"></i>
+
+                                                        Reject
+
+                                                    </button>
+
+                                                    <button type="button"
+                                                            data-id="@item.AccessRequestId"
+                                                            data-reqname="@item.AccessRequestType.Name"
+                                                            class="openModalUpdateApprove btn btn-primary btn-sm"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#modalUpdateApprove">
+
+                                                        <i class="align-middle me-1"
+                                                           data-lucide="thumbs-up"></i>
+
+                                                        Approve
+
+                                                    </button>
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                }
+                            }
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="tab-pane fade @TempData["ActiveApproved"]"
+                         id="tab_Approved"
+                         role="tabpanel">
+
+                        <div class="table-responsive">
+
+                            <table class="table table-striped table-hover align-middle dataTable">
+
+                                <thead>
+                                    <tr>
+                                        <th>Request #</th>
+                                        <th>Type</th>
+                                        <th>Access Type</th>
+                                        <th>Subject</th>
+                                        <th>Duration Type</th>
+                                        <th>Created By</th>
+                                        <th>Requester</th>
+                                        <th>Status</th>
+                                        <th>Requested Date</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+
+                                    @foreach (var item in Model.Where(w =>
+                                        w.Status == AccessRequestStatusEnum.Pending))
+                                    {
+                                        <tr>
+
+                                            <td>
+
+                                                <a href="@Html.EncodedActionLink(
+                                                             "",
+                                                             "Info",
+                                                             "AccessRequest",
+                                                             "",
+                                                             new
+                                                             {
+                                                                 id = item.AccessRequestId
+                                                             },
+                                                             null
+                                                         )"
+                                                   target="_blank">
+
+                                                    #@item.AccessRequestId
+
+                                                </a>
+
+                                            </td>
+
+                                            <td>
+
+                                                <span class="badge bg-@item.AccessRequestType.Color">
+                                                    @item.AccessRequestType.Name
+                                                </span>
+
+                                            </td>
+
+                                            <td>
+
+                                                <span class="badge bg-@AccessRequestService.GetUserTypeColor(item.AccessType)">
+                                                    @item.AccessType.EnumDisplayName()
+                                                </span>
+
+                                            </td>
+
+                                            <td>
+                                                @item.Subject
+                                            </td>
+
+                                            <td>
+                                                @item.DurationType.EnumDisplayName()
+                                            </td>
+
+                                            <td>
+                                                @item.CreatedUser.FullName
+                                            </td>
+
+                                            <td>
+
+                                                @if (item.AccessType == Domain.AllocatedTypeEnum.Internal)
+                                                {
+                                                    @item.RequestedUser.FullName
+                                                }
+                                                else
+                                                {
+                                                    @item.Organization
+                                                }
+
+                                            </td>
+
+                                            <td>
+
+                                                <span class="badge bg-@AccessRequestService.GetStatusColor(item.Status)">
+
+                                                    @item.Status.EnumDisplayName()
+
+                                                    @if (item.Status == Domain.AR.AccessRequestStatusEnum.Pending)
+                                                    {
+                                                        <i class="align-middle mx-1"
+                                                           data-lucide="chevrons-right"></i>
+
+                                                        <span>
+                                                            @item.WorkflowLevelType.EnumDisplayName()
+                                                            -
+                                                            @(item.TeamId != null
+                                                                ? item.Team.TeamName
+                                                                : "N/A")
+                                                        </span>
+                                                    }
+
+                                                </span>
+
+                                            </td>
+
+                                            <td>
+                                                @item.RequestedDate
+                                            </td>
+
+                                        </tr>
+                                    }
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="tab-pane fade"
+                         id="tab_Closed"
+                         role="tabpanel">
+
+                        <div class="table-responsive">
+
+                            <table class="table table-striped table-hover align-middle dataTable">
+
+                                <thead>
+                                    <tr>
+                                        <th>Request #</th>
+                                        <th>Type</th>
+                                        <th>Access Type</th>
+                                        <th>Subject</th>
+                                        <th>Duration Type</th>
+                                        <th>Created By</th>
+                                        <th>Requester</th>
+                                        <th>Requested Date</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+
+                                    @foreach (var item in Model.Where(w =>
+                                        w.Status == AccessRequestStatusEnum.Completed))
+                                    {
+                                        <tr>
+
+                                            <td>
+
+                                                <a href="@Html.EncodedActionLink(
+                                                             "",
+                                                             "Info",
+                                                             "AccessRequest",
+                                                             "",
+                                                             new
+                                                             {
+                                                                 id = item.AccessRequestId
+                                                             },
+                                                             null
+                                                         )"
+                                                   target="_blank">
+
+                                                    #@item.AccessRequestId
+
+                                                </a>
+
+                                            </td>
+
+                                            <td>
+
+                                                <span class="badge bg-@item.AccessRequestType.Color">
+                                                    @item.AccessRequestType.Name
+                                                </span>
+
+                                            </td>
+
+                                            <td>
+
+                                                <span class="badge bg-@AccessRequestService.GetUserTypeColor(item.AccessType)">
+                                                    @item.AccessType.EnumDisplayName()
+                                                </span>
+
+                                            </td>
+
+                                            <td>
+                                                @item.Subject
+                                            </td>
+
+                                            <td>
+                                                @item.DurationType.EnumDisplayName()
+                                            </td>
+
+                                            <td>
+                                                @item.CreatedUser.FullName
+                                            </td>
+
+                                            <td>
+
+                                                @if (item.AccessType == Domain.AllocatedTypeEnum.Internal)
+                                                {
+                                                    @item.RequestedUser.FullName
+                                                }
+                                                else
+                                                {
+                                                    @item.Organization
+                                                }
+
+                                            </td>
+
+                                            <td>
+                                                @item.RequestedDate
+                                            </td>
+
+                                        </tr>
+                                    }
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="tab-pane fade"
+                         id="tab_Rejected"
+                         role="tabpanel">
+
+                        <div class="table-responsive">
+
+                            <table class="table table-striped table-hover align-middle dataTable">
+
+                                <thead>
+                                    <tr>
+                                        <th>Request #</th>
+                                        <th>Type</th>
+                                        <th>Access Type</th>
+                                        <th>Subject</th>
+                                        <th>Duration Type</th>
+                                        <th>Created By</th>
+                                        <th>Requester</th>
+                                        <th>Requested Date</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+
+                                    @foreach (var item in Model.Where(w =>
+                                        w.Status == AccessRequestStatusEnum.Rejected))
+                                    {
+                                        <tr>
+
+                                            <td>
+
+                                                <a href="@Html.EncodedActionLink(
+                                                             "",
+                                                             "Info",
+                                                             "AccessRequest",
+                                                             "",
+                                                             new
+                                                             {
+                                                                 id = item.AccessRequestId
+                                                             },
+                                                             null
+                                                         )"
+                                                   target="_blank">
+
+                                                    #@item.AccessRequestId
+
+                                                </a>
+
+                                            </td>
+
+                                            <td>
+
+                                                <span class="badge bg-@item.AccessRequestType.Color">
+                                                    @item.AccessRequestType.Name
+                                                </span>
+
+                                            </td>
+
+                                            <td>
+
+                                                <span class="badge bg-@AccessRequestService.GetUserTypeColor(item.AccessType)">
+                                                    @item.AccessType.EnumDisplayName()
+                                                </span>
+
+                                            </td>
+
+                                            <td>
+                                                @item.Subject
+                                            </td>
+
+                                            <td>
+                                                @item.DurationType.EnumDisplayName()
+                                            </td>
+
+                                            <td>
+                                                @item.CreatedUser.FullName
+                                            </td>
+
+                                            <td>
+
+                                                @if (item.AccessType == Domain.AllocatedTypeEnum.Internal)
+                                                {
+                                                    @item.RequestedUser.FullName
+                                                }
+                                                else
+                                                {
+                                                    @item.Organization
+                                                }
+
+                                            </td>
+
+                                            <td>
+                                                @item.RequestedDate
+                                            </td>
+
+                                        </tr>
+                                    }
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<div class="modal fade"
+     id="modalUpdateApprove"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title">
+
+                    Request #
+                    <span id="approveModalRequestId"></span>
+                    Approve
+
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <input type="hidden"
+                       id="approveRequestId"
+                       value="" />
+
+                <p>
+
+                    I hereby confirm that I fully endorse the information provided in this
+                    <strong>
+                        <span id="approveRequestName"></span> request
+                    </strong>
+                    is accurate and adheres to the National Development Bank's policies
+                    and procedures to the best of my knowledge and affirm that my request
+                    is not being submitted for any unlawful or fraudulent intent.
+
+                </p>
+
+                <div class="mb-3">
+
+                    <label for="approveComment"
+                           class="form-label">
+                        Comment
+                    </label>
+
+                    <textarea id="approveComment"
+                              class="form-control"
+                              rows="3"
+                              placeholder="Enter comment"></textarea>
+
+                </div>
+
+                <div class="form-check mb-3">
+
+                    <input type="checkbox"
+                           id="approveAttachmentRequired"
+                           class="form-check-input" />
+
+                    <label class="form-check-label"
+                           for="approveAttachmentRequired">
+
+                        Approval from AVP/VP Attached
+
+                    </label>
+
+                </div>
+
+                <div class="mb-3">
+
+                    <label for="approveFile"
+                           class="form-label">
+
+                        Attachment
+
+                    </label>
+
+                    <input type="file"
+                           id="approveFile"
+                           class="form-control"
+                           accept="application/pdf" />
+
+                    <div class="form-text">
+                        PDF only. Maximum file size 3 MB.
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn btn-danger btn-sm"
+                        data-bs-dismiss="modal">
+
+                    <i class="align-middle me-1"
+                       data-lucide="x"></i>
+
+                    Cancel
+
+                </button>
+
+                <button type="button"
+                        class="btn btn-primary btn-sm btnClickDisable"
+                        onclick="approve()">
+
+                    <i class="align-middle me-1"
+                       data-lucide="thumbs-up"></i>
+
+                    Approve
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<div class="modal fade"
+     id="modalUpdateReject"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title">
+
+                    Request #
+                    <span id="rejectModalRequestId"></span>
+                    Reject
+
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <input type="hidden"
+                       id="rejectRequestId"
+                       value="" />
+
+                <div class="mb-3">
+
+                    <label for="rejectComment"
+                           class="form-label">
+                        Comment
+                    </label>
+
+                    <textarea id="rejectComment"
+                              class="form-control"
+                              rows="3"
+                              placeholder="Enter rejection comment"></textarea>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn btn-light btn-sm"
+                        data-bs-dismiss="modal">
+
+                    <i class="align-middle me-1"
+                       data-lucide="x"></i>
+
+                    Cancel
+
+                </button>
+
+                <button type="button"
+                        class="btn btn-danger btn-sm btnClickDisable"
+                        onclick="reject()">
+
+                    <i class="align-middle me-1"
+                       data-lucide="thumbs-down"></i>
+
+                    Reject
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).on(
+            "click",
+            ".openModalUpdateApprove",
+            function () {
+
+                var requestId =
+                    $(this).data('id');
+
+                var requestName =
+                    $(this).data('reqname');
+
+                $("#approveRequestId")
+                    .val(requestId);
+
+                $("#approveModalRequestId")
+                    .text(requestId);
+
+                $("#approveRequestName")
+                    .text(requestName);
+
+                $("#approveComment")
+                    .val("");
+
+                $("#approveAttachmentRequired")
+                    .prop("checked", false);
+
+                $("#approveFile")
+                    .val("");
+
+                $('#modalUpdateApprove .btnClickDisable')
+                    .prop('disabled', false);
+
+            }
+        );
+
+
+        $(document).on(
+            "click",
+            ".openModalUpdateReject",
+            function () {
+
+                var requestId =
+                    $(this).data('id');
+
+                $("#rejectRequestId")
+                    .val(requestId);
+
+                $("#rejectModalRequestId")
+                    .text(requestId);
+
+                $("#rejectComment")
+                    .val("");
+
+                $('#modalUpdateReject .btnClickDisable')
+                    .prop('disabled', false);
+
+            }
+        );
+
+
+        $(document).ready(function () {
+
+            if ($.fn.DataTable) {
+
+                $('.dataTable').DataTable({
+                    paging: true,
+                    lengthChange: true,
+                    searching: true,
+                    ordering: true,
+                    info: true,
+                    autoWidth: false,
+                    responsive: true
+                });
+
+            }
+
+        });
+
+
+        function approve() {
+
+            var requestId =
+                $('#approveRequestId').val();
+
+            var comment =
+                $('#approveComment').val();
+
+            var checkboxValue =
+                $('#approveAttachmentRequired')
+                    .is(':checked');
+
+            var fileInput =
+                document.getElementById(
+                    'approveFile'
+                );
+
+            var file =
+                fileInput &&
+                fileInput.files.length > 0
+                    ? fileInput.files[0]
+                    : null;
+
+            var maxFileSize =
+                3 * 1024 * 1024;
+
+
+            if (
+                checkboxValue &&
+                !file
+            ) {
+
+                Swal.fire(
+                    "Error!",
+                    "Please attach a file when approval is required",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            if (
+                file &&
+                file.type !== "application/pdf"
+            ) {
+
+                Swal.fire(
+                    "Error!",
+                    "Only PDF files are allowed",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            if (
+                file &&
+                file.size > maxFileSize
+            ) {
+
+                Swal.fire(
+                    "Error!",
+                    "File size must be less than 3MB",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            if (
+                !comment ||
+                comment.trim() === ''
+            ) {
+
+                Swal.fire(
+                    "Error!",
+                    "Please enter a comment",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            $('#modalUpdateApprove .btnClickDisable')
+                .prop('disabled', true);
+
+
+            var formData =
+                new FormData();
+
+            formData.append(
+                'requestId',
+                requestId
+            );
+
+            formData.append(
+                'comment',
+                comment.trim()
+            );
+
+            formData.append(
+                'checkboxValue',
+                checkboxValue
+            );
+
+
+            if (file) {
+
+                formData.append(
+                    'file',
+                    file
+                );
+
+            }
+
+
+            fetch(
+                '@Url.Action("Approve", "AccessRequest")',
+                {
+                    method: 'POST',
+
+                    headers: {
+                        'Accept': 'application/json'
+                    },
+
+                    body: formData
+                }
+            )
+            .then(function (response) {
+
+                if (!response.ok) {
+                    throw new Error(
+                        'Request failed'
+                    );
+                }
+
+                return response.json();
+
+            })
+            .then(function (data) {
+
+                if (
+                    data == "1" ||
+                    data == 1
+                ) {
+
+                    Swal.fire(
+                        "Completed",
+                        "Request has been approved",
+                        "success"
+                    );
+
+                    setTimeout(
+                        function () {
+                            window.location.reload();
+                        },
+                        300
+                    );
+
+                }
+                else {
+
+                    $('#modalUpdateApprove .btnClickDisable')
+                        .prop('disabled', false);
+
+                    Swal.fire(
+                        "Something went wrong!",
+                        "Please try again",
+                        "error"
+                    );
+
+                }
+
+            })
+            .catch(function () {
+
+                $('#modalUpdateApprove .btnClickDisable')
+                    .prop('disabled', false);
+
+                Swal.fire(
+                    "Something went wrong!",
+                    "Please try again",
+                    "error"
+                );
+
+            });
+
+        }
+
+
+        function reject() {
+
+            var requestId =
+                $('#rejectRequestId').val();
+
+            var comment =
+                $('#rejectComment').val();
+
+
+            if (
+                !comment ||
+                comment.trim() === ''
+            ) {
+
+                Swal.fire(
+                    "Error!",
+                    "Please enter a comment",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            $('#modalUpdateReject .btnClickDisable')
+                .prop('disabled', true);
+
+
+            $.ajax({
+
+                url: '@Url.Action("Reject", "AccessRequest")',
+
+                type: 'GET',
+
+                dataType: 'json',
+
+                data: {
+                    requestId: requestId,
+                    comment: comment.trim()
+                },
+
+                success: function (data) {
+
+                    if (
+                        data == "1" ||
+                        data == 1
+                    ) {
+
+                        Swal.fire(
+                            "Completed",
+                            "Request has been rejected",
+                            "success"
+                        );
+
+                        setTimeout(
+                            function () {
+                                window.location.reload();
+                            },
+                            100
+                        );
+
+                    }
+                    else {
+
+                        $('#modalUpdateReject .btnClickDisable')
+                            .prop('disabled', false);
+
+                        Swal.fire(
+                            "Something went wrong!",
+                            "Please try again",
+                            "error"
+                        );
+
+                    }
+
+                },
+
+                error: function () {
+
+                    $('#modalUpdateReject .btnClickDisable')
+                        .prop('disabled', false);
+
+                    Swal.fire(
+                        "Something went wrong!",
+                        "Please try again",
+                        "error"
+                    );
+
+                }
+
+            });
+
+        }
+
+    </script>
+
+}

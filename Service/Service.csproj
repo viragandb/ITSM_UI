@@ -1,0 +1,233 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{F3AA0115-8326-4FDF-A483-D27D384AD06A}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Service</RootNamespace>
+    <AssemblyName>Service</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="log4net, Version=2.0.15.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.2.0.15\lib\net45\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Azure.KeyVault.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Azure.KeyVault.Core.1.0.0\lib\net40\Microsoft.Azure.KeyVault.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Azure.Storage.Blob, Version=10.0.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Azure.Storage.Blob.10.0.2\lib\net452\Microsoft.Azure.Storage.Blob.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Azure.Storage.Common, Version=10.0.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Azure.Storage.Common.10.0.2\lib\net452\Microsoft.Azure.Storage.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Exchange.WebServices">
+      <HintPath>..\Web\Dll\Microsoft.Exchange.WebServices.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.DirectoryServices" />
+    <Reference Include="System.DirectoryServices.AccountManagement" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.EnterpriseServices" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Helpers, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.7\lib\net45\System.Web.Helpers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Mvc, Version=5.2.7.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Mvc.5.2.7\lib\net45\System.Web.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Razor.3.2.7\lib\net45\System.Web.Razor.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.Web.WebPages, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.7\lib\net45\System.Web.WebPages.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Deployment, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.7\lib\net45\System.Web.WebPages.Deployment.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.7\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AccessControlService.cs" />
+    <Compile Include="ADService.cs" />
+    <Compile Include="AR\AccessApplicationService.cs" />
+    <Compile Include="AR\AccessLevelService.cs" />
+    <Compile Include="AR\AccessPrivilegeCategoryService.cs" />
+    <Compile Include="AR\AccessRequestService.cs" />
+    <Compile Include="AR\AccessRequestTypeService.cs" />
+    <Compile Include="AR\DeviceAccessItemTypeService.cs" />
+    <Compile Include="AR\DeviceAccessService.cs" />
+    <Compile Include="AR\PhysicalAccessService.cs" />
+    <Compile Include="AR\PhysicalAreaService.cs" />
+    <Compile Include="AR\RemoteAccessService.cs" />
+    <Compile Include="AR\SystemAccessService.cs" />
+    <Compile Include="AR\UserAccessItemTypeService.cs" />
+    <Compile Include="AR\UserAccessService.cs" />
+    <Compile Include="AR\UserPrivilegeAccessService.cs" />
+    <Compile Include="AssetLinkLogService.cs" />
+    <Compile Include="AssetLinkService.cs" />
+    <Compile Include="AssetLogService.cs" />
+    <Compile Include="AssetMakeService.cs" />
+    <Compile Include="AssetService.cs" />
+    <Compile Include="AssetTransactionLogService.cs" />
+    <Compile Include="AssetTransferRequestService.cs" />
+    <Compile Include="AssetTypeService.cs" />
+    <Compile Include="AssetVerificationRequestService.cs" />
+    <Compile Include="BranchDepartmentService.cs" />
+    <Compile Include="BranchService.cs" />
+    <Compile Include="CategoryService.cs" />
+    <Compile Include="ChangeProblemService.cs" />
+    <Compile Include="ChangeRequestTypeService.cs" />
+    <Compile Include="ChangeService.cs" />
+    <Compile Include="ChangeTicketService.cs" />
+    <Compile Include="CM\ChangeAreaService.cs" />
+    <Compile Include="CM\ChangeImplementDataService.cs" />
+    <Compile Include="CM\ChangeRequestCategoryService.cs" />
+    <Compile Include="CM\ChangeRequestService.cs" />
+    <Compile Include="CM\ChangeTypeService.cs" />
+    <Compile Include="DeliverySLAService.cs" />
+    <Compile Include="DepartmentService.cs" />
+    <Compile Include="DM\DeviceManagementRequestService.cs" />
+    <Compile Include="DR\DisposalRequestService.cs" />
+    <Compile Include="EmailService.cs" />
+    <Compile Include="EventService.cs" />
+    <Compile Include="EventTypeService.cs" />
+    <Compile Include="FileUploadService.cs" />
+    <Compile Include="GlobalStaticService.cs" />
+    <Compile Include="GRNoteService.cs" />
+    <Compile Include="GroupService.cs" />
+    <Compile Include="ActiveDirectoryService.cs" />
+    <Compile Include="HolidayService.cs" />
+    <Compile Include="IM\IncidentRequestService.cs" />
+    <Compile Include="ItemAssetService.cs" />
+    <Compile Include="ItemDocService.cs" />
+    <Compile Include="ItemLogService.cs" />
+    <Compile Include="ItemService.cs" />
+    <Compile Include="KedbItemService.cs" />
+    <Compile Include="MenuItemFunctionService.cs" />
+    <Compile Include="MenuItemService.cs" />
+    <Compile Include="MenuService.cs" />
+    <Compile Include="NotificationService.cs" />
+    <Compile Include="PolicyService.cs" />
+    <Compile Include="ProblemService.cs" />
+    <Compile Include="ProblemTicketService.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+    <Compile Include="RA\RemoteAccessRequestService.cs" />
+    <Compile Include="RA\RemoteAgreementService.cs" />
+    <Compile Include="RegionService.cs" />
+    <Compile Include="ReleaseChangeService.cs" />
+    <Compile Include="ReleaseService.cs" />
+    <Compile Include="RequestTypeService.cs" />
+    <Compile Include="ScheduledDateService.cs" />
+    <Compile Include="ScheduledTaskService.cs" />
+    <Compile Include="SerialService.cs" />
+    <Compile Include="DateTimeService.cs" />
+    <Compile Include="SubCategoryService.cs" />
+    <Compile Include="SystemEnvironmentService.cs" />
+    <Compile Include="SystemService.cs" />
+    <Compile Include="TaskCategoryService.cs" />
+    <Compile Include="TaskProcessService.cs" />
+    <Compile Include="TaskUpdateService.cs" />
+    <Compile Include="TeamService.cs" />
+    <Compile Include="TicketDocService.cs" />
+    <Compile Include="TicketLogService.cs" />
+    <Compile Include="TicketPriorityService.cs" />
+    <Compile Include="TicketRateService.cs" />
+    <Compile Include="TicketService.cs" />
+    <Compile Include="TicketStatusService.cs" />
+    <Compile Include="TicketTaskService.cs" />
+    <Compile Include="TicketUpdateService.cs" />
+    <Compile Include="UserBranchService.cs" />
+    <Compile Include="UserDepartmentService.cs" />
+    <Compile Include="UserGroupService.cs" />
+    <Compile Include="UserService.cs" />
+    <Compile Include="UserTeamService.cs" />
+    <Compile Include="VendorService.cs" />
+    <Compile Include="VendorSLAService.cs" />
+    <Compile Include="WorkflowLevelService.cs" />
+    <Compile Include="WorkflowService.cs" />
+    <Compile Include="WorkTaskService.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CSRM_SQL\CSRM_SQL.csproj">
+      <Project>{9e671984-fce6-4942-9772-9395b2b7b79d}</Project>
+      <Name>CSRM_SQL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Data\Data.csproj">
+      <Project>{d1fc03d6-58bc-4be1-a125-88cad68499d3}</Project>
+      <Name>Data</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Domain\Domain.csproj">
+      <Project>{825a6a89-a64d-4e69-8a2f-37a5602f4401}</Project>
+      <Name>Domain</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WebReferences Include="Web References\" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

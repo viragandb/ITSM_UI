@@ -1,0 +1,328 @@
+﻿@model ICollection<Domain.Change>
+@using Service
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="card">
+
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="align-middle me-2" data-lucide="file-text"></i>
+                    Change Requests
+                </h5>
+            </div>
+
+            <div class="card-body">
+
+                <div class="accordion" id="changeAccordion">
+
+                    @foreach (var item in Model)
+                    {
+                        var collapseId = "change_" + item.ChangeId;
+                        var headingId = "heading_" + item.ChangeId;
+
+                        <div class="accordion-item mb-3">
+
+                            <h2 class="accordion-header" id="@headingId">
+
+                                <button class="accordion-button collapsed"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#@collapseId"
+                                        aria-expanded="false"
+                                        aria-controls="@collapseId">
+
+                                    <div class="w-100 d-flex flex-wrap justify-content-between align-items-center gap-2">
+
+                                        <div>
+
+                                            <strong>
+                                                Change @item.ChangeId
+                                            </strong>
+
+                                            <span class="mx-2 text-muted">|</span>
+
+                                            <span>
+                                                @item.AssetType.AssetCategory.EnumDisplayName()
+                                            </span>
+
+                                            <i class="align-middle mx-1"
+                                               data-lucide="chevron-right">
+                                            </i>
+
+                                            <span>
+                                                @item.AssetType.AssetTypeName
+                                            </span>
+
+                                            <i class="align-middle mx-1"
+                                               data-lucide="chevron-right">
+                                            </i>
+
+                                            <strong>
+                                                @item.ChangeRequestType.ChangeRequestTypeName
+                                            </strong>
+
+                                        </div>
+
+                                        <div class="d-flex flex-wrap align-items-center gap-2 me-3">
+
+                                            <span class="text-muted">
+                                                @item.RequestedDate.ToShortDateString()
+                                            </span>
+
+                                            <a href="@Html.EncodedActionLink("", "Info", "Change", "", new { id = item.ChangeId }, null)"
+                                               target="_blank"
+                                               class="btn btn-sm btn-light"
+                                               onclick="event.stopPropagation();">
+
+                                                <i class="align-middle" data-lucide="info"></i>
+
+                                            </a>
+
+                                            <a href="@Html.EncodedActionLink("", "UpdateReview", "Change", "", new { id = item.ChangeId }, null)"
+                                               class="btn btn-sm btn-warning"
+                                               onclick="event.stopPropagation();">
+
+                                                <i class="align-middle me-1" data-lucide="message-square"></i>
+                                                Review
+
+                                            </a>
+
+                                        </div>
+
+                                    </div>
+
+                                </button>
+
+                            </h2>
+
+                            <div id="@collapseId"
+                                 class="accordion-collapse collapse"
+                                 aria-labelledby="@headingId"
+                                 data-bs-parent="#changeAccordion">
+
+                                <div class="accordion-body">
+
+                                    @Html.Partial("_Change", item)
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        function approveItem(itemId, itemName) {
+
+            Swal.fire({
+
+                title: "Approve Request",
+                text: "Do you want to approve: " + itemName + "?",
+                icon: "warning",
+                input: "text",
+                inputLabel: "Comment",
+                inputPlaceholder: "Enter comment",
+                showCancelButton: true,
+                confirmButtonText: "Approve",
+                cancelButtonText: "Cancel",
+                reverseButtons: true,
+                inputValidator: function (value) {
+
+                    if (!value || !value.trim()) {
+                        return "Please enter the comment.";
+                    }
+
+                }
+
+            }).then(function (result) {
+
+                if (result.isConfirmed) {
+
+                    var comment =
+                        result.value;
+
+                    $.ajax({
+
+                        url: '@Url.Action("ReviewApprove", "Change")',
+
+                        type: "GET",
+
+                        dataType: "json",
+
+                        data: {
+                            id: itemId,
+                            comment: comment
+                        },
+
+                        success: function (data) {
+
+                            if (data == "1" || data == 1) {
+
+                                Swal.fire(
+                                    "Approved!",
+                                    "Request has been approved",
+                                    "success"
+                                );
+
+                                setTimeout(function () {
+                                    window.location.reload();
+                                }, 1000);
+
+                            }
+                            else if (data == "2" || data == 2) {
+
+                                Swal.fire(
+                                    "Invalid!",
+                                    "Please enter the comment.",
+                                    "error"
+                                );
+
+                            }
+                            else {
+
+                                Swal.fire(
+                                    "Something went wrong!",
+                                    "Request cannot be processed, Please try again",
+                                    "error"
+                                );
+
+                            }
+
+                        },
+
+                        error: function () {
+
+                            Swal.fire(
+                                "Something went wrong!",
+                                "Request cannot be processed",
+                                "error"
+                            );
+
+                        }
+
+                    });
+
+                }
+
+            });
+
+        }
+
+
+        function rejectItem(itemId, itemName) {
+
+            Swal.fire({
+
+                title: "Reject Request",
+                text: "Do you want to reject: " + itemName + "?",
+                icon: "warning",
+                input: "text",
+                inputLabel: "Comment",
+                inputPlaceholder: "Enter comment",
+                showCancelButton: true,
+                confirmButtonText: "Reject",
+                cancelButtonText: "Cancel",
+                reverseButtons: true,
+                inputValidator: function (value) {
+
+                    if (!value || !value.trim()) {
+                        return "Please enter the comment.";
+                    }
+
+                }
+
+            }).then(function (result) {
+
+                if (result.isConfirmed) {
+
+                    var comment =
+                        result.value;
+
+                    $.ajax({
+
+                        url: '@Url.Action("ReviewReject", "Change")',
+
+                        type: "GET",
+
+                        dataType: "json",
+
+                        data: {
+                            id: itemId,
+                            comment: comment
+                        },
+
+                        success: function (data) {
+
+                            if (data == "1" || data == 1) {
+
+                                Swal.fire(
+                                    "Rejected!",
+                                    "Request has been rejected",
+                                    "success"
+                                );
+
+                                setTimeout(function () {
+                                    window.location.reload();
+                                }, 1000);
+
+                            }
+                            else if (data == "2" || data == 2) {
+
+                                Swal.fire(
+                                    "Invalid!",
+                                    "Please enter the comment.",
+                                    "error"
+                                );
+
+                            }
+                            else {
+
+                                Swal.fire(
+                                    "Something went wrong!",
+                                    "Request cannot be processed, Please try again",
+                                    "error"
+                                );
+
+                            }
+
+                        },
+
+                        error: function () {
+
+                            Swal.fire(
+                                "Something went wrong!",
+                                "Request cannot be processed",
+                                "error"
+                            );
+
+                        }
+
+                    });
+
+                }
+
+            });
+
+        }
+
+    </script>
+}

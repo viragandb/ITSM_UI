@@ -1,0 +1,1022 @@
+﻿<!DOCTYPE html>
+
+<html lang="en"
+      data-bs-theme="light"
+      data-layout="fluid"
+      data-sidebar-theme="dark"
+      data-sidebar-position="left"
+      data-sidebar-behavior="sticky">
+
+<head>
+
+    <meta charset="utf-8" />
+
+    <meta http-equiv="X-UA-Compatible"
+          content="IE=edge" />
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+    <meta name="description"
+          content="IT Service Management" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+    <title>
+        @(ViewBag.Title != null ? ViewBag.Title + " - ITSM" : "ITSM")
+    </title>
+    @*<link href="@Url.Content("~/Content/AdminLTE/adminlte.min.css")" rel="stylesheet" />*@
+    <link href="@Url.Content("~/Plugins/icheck-bootstrap/icheck-bootstrap.min.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/Plugins/daterangepicker/daterangepicker.css")" rel="stylesheet" />
+
+    <!-- ====================================================== -->
+    <!-- APPSTACK -->
+    <!-- Bootstrap 5.3 / AppStack Main CSS -->
+    <!-- ====================================================== -->
+
+    <link href="@Url.Content("~/theme/css/app.css")"
+          rel="stylesheet" />
+
+
+    <!-- ====================================================== -->
+    <!-- FONT AWESOME -->
+    <!-- Keep because existing DB/menu/icons use Font Awesome -->
+    <!-- ====================================================== -->
+
+    <link href="@Url.Content("~/Plugins/fontawesome-free/css/all.min.css")"
+          rel="stylesheet" />
+
+
+    <!-- ====================================================== -->
+    <!-- JQUERY UI -->
+    <!-- Legacy autocomplete support -->
+    <!-- ====================================================== -->
+
+    <link href="@Url.Content("~/Content/jquery-ui.css")"
+          rel="stylesheet" />
+
+
+    <!-- ====================================================== -->
+    <!-- TOASTR -->
+    <!-- ====================================================== -->
+
+    <link href="@Url.Content("~/Plugins/toastr/toastr.min.css")"
+          rel="stylesheet" />
+
+
+    <!-- ====================================================== -->
+    <!-- SWEET ALERT -->
+    <!-- ====================================================== -->
+
+    <link href="@Url.Content("~/Plugins/sweetalert2/sweetalert2.min.css")"
+          rel="stylesheet" />
+
+
+    <!-- ====================================================== -->
+    <!-- SELECT2 -->
+    <!-- ====================================================== -->
+
+    <link href="@Url.Content("~/Plugins/select2/css/select2.min.css")"
+          rel="stylesheet" />
+
+
+    <!-- ====================================================== -->
+    <!-- DATE RANGE PICKER -->
+    <!-- ====================================================== -->
+
+    <link href="@Url.Content("~/Plugins/daterangepicker/daterangepicker.css")"
+          rel="stylesheet" />
+
+
+    <!-- ====================================================== -->
+    <!-- BS STEPPER -->
+    <!-- ====================================================== -->
+
+    <link href="@Url.Content("~/Plugins/bs-stepper/css/bs-stepper.min.css")"
+          rel="stylesheet" />
+
+
+    <!-- ====================================================== -->
+    <!-- MODERNIZR -->
+    <!-- ====================================================== -->
+
+    @Scripts.Render("~/bundles/modernizr")
+
+
+    <!-- ====================================================== -->
+    <!-- APPLICATION / LEGACY COMPATIBILITY STYLES -->
+    <!-- ====================================================== -->
+
+    <style>
+
+        /* ===================================================== */
+        /* GENERAL                                               */
+        /* ===================================================== */
+
+        body {
+            overflow-x: hidden;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+
+        /* ===================================================== */
+        /* PRELOADER                                             */
+        /* ===================================================== */
+
+        .preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+
+            width: 100%;
+            height: 100%;
+
+            background:
+                #ffffff
+                url('@Url.Content("~/Content/PreLoader/loading.gif")')
+                no-repeat
+                center center;
+
+            z-index: 9999999;
+
+            opacity: 0.90;
+        }
+
+
+        /* ===================================================== */
+        /* SIDEBAR PROFILE                                       */
+        /* ===================================================== */
+
+        .sidebar .sidebar-profile {
+            padding: 1rem 1.5rem;
+        }
+
+        .sidebar .sidebar-profile img {
+            object-fit: cover;
+        }
+
+
+        /* ===================================================== */
+        /* JQUERY UI                                             */
+        /* ===================================================== */
+
+        .ui-corner-all {
+            border-radius: 4px;
+        }
+
+        .ui-widget-content {
+            border: 1px solid #dee2e6;
+            color: #212529;
+            background-color: #ffffff;
+        }
+
+        .ui-menu {
+            display: block;
+            list-style: none;
+            margin: 0;
+            padding: 2px;
+        }
+
+        .ui-autocomplete {
+            cursor: default;
+            position: absolute;
+            z-index: 99999999 !important;
+        }
+
+        .ui-menu .ui-menu-item {
+            width: 100%;
+        }
+
+        .ui-menu .ui-menu-item-wrapper {
+            display: block;
+            padding: 6px 10px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .ui-menu .ui-menu-item-wrapper:hover,
+        .ui-menu .ui-state-active {
+            margin: 0;
+            border: 0;
+
+            background-color: var(--bs-primary);
+            color: #ffffff;
+        }
+
+
+        /* ===================================================== */
+        /* SELECT2                                               */
+        /* Bootstrap 5 / AppStack compatibility                  */
+        /* ===================================================== */
+
+        .select2-container {
+            width: 100% !important;
+        }
+
+        .select2-container .select2-selection--single {
+            height: 38px;
+
+            padding: 5px 10px;
+
+            border: 1px solid var(--bs-border-color);
+            border-radius: var(--bs-border-radius);
+
+            background-color: var(--bs-body-bg);
+        }
+
+        .select2-container--default
+        .select2-selection--single
+        .select2-selection__rendered {
+            padding-left: 0;
+
+            line-height: 26px;
+
+            color: var(--bs-body-color);
+        }
+
+        .select2-container--default
+        .select2-selection--single
+        .select2-selection__arrow {
+            height: 36px;
+        }
+
+        .select2-container--default
+        .select2-selection--multiple {
+            min-height: 38px;
+
+            border: 1px solid var(--bs-border-color);
+            border-radius: var(--bs-border-radius);
+
+            background-color: var(--bs-body-bg);
+        }
+
+        .select2-dropdown {
+            border-color: var(--bs-border-color);
+
+            background-color: var(--bs-body-bg);
+
+            color: var(--bs-body-color);
+        }
+
+        .select2-search__field {
+            border: 1px solid var(--bs-border-color) !important;
+
+            background-color: var(--bs-body-bg);
+
+            color: var(--bs-body-color);
+        }
+
+
+        /* ===================================================== */
+        /* DATATABLES                                            */
+        /* AppStack compatible basic fixes                       */
+        /* ===================================================== */
+
+        table.dataTable {
+            width: 100% !important;
+        }
+
+        .dataTables_wrapper {
+            width: 100%;
+        }
+
+        .dataTables_wrapper .dataTables_filter input {
+            margin-left: .5rem;
+
+            padding: .375rem .75rem;
+
+            border: 1px solid var(--bs-border-color);
+            border-radius: var(--bs-border-radius);
+
+            background-color: var(--bs-body-bg);
+
+            color: var(--bs-body-color);
+        }
+
+        .dataTables_wrapper .dataTables_length select {
+            padding: .375rem 1.8rem .375rem .75rem;
+
+            border: 1px solid var(--bs-border-color);
+            border-radius: var(--bs-border-radius);
+
+            background-color: var(--bs-body-bg);
+
+            color: var(--bs-body-color);
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button {
+            border-radius: var(--bs-border-radius);
+        }
+
+
+        /* ===================================================== */
+        /* LEGACY TABLE SUPPORT                                  */
+        /* ===================================================== */
+
+        .table > thead > tr > th {
+            vertical-align: middle;
+        }
+
+
+        /* ===================================================== */
+        /* MODAL                                                 */
+        /* ===================================================== */
+
+        .modal {
+            z-index: 1055;
+        }
+
+        .modal-backdrop {
+            z-index: 1050;
+        }
+
+
+        /* ===================================================== */
+        /* NOTIFICATION DROPDOWNS                                */
+        /* ===================================================== */
+
+        .dropdown-menu-lg {
+            min-width: 320px;
+        }
+
+        .list-group-item {
+            border-left: 0;
+            border-right: 0;
+        }
+
+
+        /* ===================================================== */
+        /* FONT AWESOME INSIDE APPSTACK SIDEBAR                  */
+        /* ===================================================== */
+
+        .sidebar-link > i.fa,
+        .sidebar-link > i.fas,
+        .sidebar-link > i.far,
+        .sidebar-link > i.fab {
+            width: 24px;
+            margin-right: .5rem;
+            text-align: center;
+        }
+
+
+        /* ===================================================== */
+        /* FORM VALIDATION                                       */
+        /* ===================================================== */
+
+        .field-validation-error {
+            color: var(--bs-danger);
+            font-size: .875rem;
+        }
+
+        .input-validation-error {
+            border-color: var(--bs-danger) !important;
+        }
+
+    </style>
+
+
+    <!-- Page specific CSS -->
+    @RenderSection("styles", required: false)
+
+</head>
+
+
+<body>
+
+
+    <!-- ====================================================== -->
+    <!-- PRELOADER -->
+    <!-- ====================================================== -->
+
+    <div id="preloader1"
+         class="preloader">
+    </div>
+
+
+    <!-- ====================================================== -->
+    <!-- APPSTACK WRAPPER -->
+    <!-- ====================================================== -->
+
+    <div class="wrapper">
+
+
+        <!-- ================================================== -->
+        <!-- SIDEBAR -->
+        <!-- ================================================== -->
+
+        @Html.Partial("_SideBar")
+
+
+        <!-- ================================================== -->
+        <!-- MAIN -->
+        <!-- ================================================== -->
+
+        <div class="main">
+
+
+            <!-- ============================================== -->
+            <!-- NAVBAR -->
+            <!-- ============================================== -->
+
+            @Html.Partial("_NavBar")
+
+
+            <!-- ============================================== -->
+            <!-- CONTENT -->
+            <!-- ============================================== -->
+
+            <main class="content">
+
+                <div class="container-fluid p-0">
+
+
+                    <!-- ====================================== -->
+                    <!-- PAGE TITLE / BREADCRUMB -->
+                    <!-- ====================================== -->
+
+                    @Html.Action(
+                        "AdminMenuTitleLayout",
+                        "Home",
+                        new { Area = "" }
+                    )
+
+
+                    <!-- ====================================== -->
+                    <!-- PAGE -->
+                    <!-- ====================================== -->
+
+                    @RenderBody()
+
+
+                </div>
+
+            </main>
+
+
+            <!-- ============================================== -->
+            <!-- FOOTER -->
+            <!-- ============================================== -->
+
+            <footer class="footer">
+
+                <div class="container-fluid">
+
+                    <div class="row text-muted">
+
+                        <div class="col-6 text-start">
+
+                            <p class="mb-0">
+
+                                <strong>
+                                    &copy; @DateTime.Today.Year CCD AT
+                                </strong>
+
+                                All rights reserved.
+
+                            </p>
+
+                        </div>
+
+                        <div class="col-6 text-end">
+
+                            <p class="mb-0">
+                                Version 1.0.0
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </footer>
+
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ====================================================== -->
+    <!-- APPSTACK -->
+    <!--
+        IMPORTANT:
+        AppStack app.js is loaded first.
+
+        The AppStack sample only requires app.js for:
+        Bootstrap 5
+        Lucide
+        sidebar
+        theme
+        dropdown
+        collapse
+        AppStack components
+    -->
+    <!-- ====================================================== -->
+
+    <script src="@Url.Content("~/theme/js/app.js")"></script>
+
+
+
+    <!-- ====================================================== -->
+    <!-- JQUERY UI -->
+    <!--
+        AppStack app.js exposes jQuery in the AppStack build.
+        Therefore do not load another jquery.min.js here.
+    -->
+    <!-- ====================================================== -->
+
+    <script src="@Url.Content("~/Plugins/jquery-ui/jquery-ui.js")"></script>
+
+
+
+    <!-- ====================================================== -->
+    <!-- MOMENT -->
+    <!-- ====================================================== -->
+
+    <script src="@Url.Content("~/Plugins/moment/moment.min.js")"></script>
+
+
+
+    <!-- ====================================================== -->
+    <!-- INPUT MASK -->
+    <!-- ====================================================== -->
+
+    <script src="@Url.Content("~/Plugins/inputmask/jquery.inputmask.min.js")"></script>
+
+
+
+    <!-- ====================================================== -->
+    <!-- DATE RANGE PICKER -->
+    <!-- ====================================================== -->
+
+    <script src="@Url.Content("~/Plugins/daterangepicker/daterangepicker.js")"></script>
+
+
+
+    <!-- ====================================================== -->
+    <!-- SELECT2 -->
+    <!-- ====================================================== -->
+
+    <script src="@Url.Content("~/Plugins/select2/js/select2.full.min.js")"></script>
+
+
+
+    <!-- ====================================================== -->
+    <!-- TOASTR -->
+    <!-- ====================================================== -->
+
+    <script src="@Url.Content("~/Plugins/toastr/toastr.min.js")"></script>
+
+
+
+    <!-- ====================================================== -->
+    <!-- SWEET ALERT -->
+    <!-- ====================================================== -->
+
+    <script src="@Url.Content("~/Plugins/sweetalert2/sweetalert2.min.js")"></script>
+
+
+
+    <!-- ====================================================== -->
+    <!-- JQUERY VALIDATION -->
+    <!-- ====================================================== -->
+
+    <script src="@Url.Content("~/Scripts/jquery.validate.js")"></script>
+
+    <script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.js")"></script>
+
+
+
+    <!-- ====================================================== -->
+    <!-- BS STEPPER -->
+    <!-- ====================================================== -->
+
+    <script src="@Url.Content("~/Plugins/bs-stepper/js/bs-stepper.min.js")"></script>
+
+
+
+    <!-- ====================================================== -->
+    <!-- DATATABLE EXPORT DEPENDENCIES -->
+    <!--
+        AppStack itself contains DataTables on the pages where
+        DataTables are used.
+
+        These dependencies are kept for your existing export
+        buttons.
+    -->
+    <!-- ====================================================== -->
+
+    <script src="@Url.Content("~/Plugins/jszip/jszip.min.js")"></script>
+
+    <script src="@Url.Content("~/Plugins/pdfmake/pdfmake.min.js")"></script>
+
+    <script src="@Url.Content("~/Plugins/pdfmake/vfs_fonts.js")"></script>
+
+
+
+    <!-- ====================================================== -->
+    <!-- TEMPDATA ERROR -->
+    <!-- ====================================================== -->
+
+    @if (TempData["ErrorMessage"] != null &&
+         !string.IsNullOrWhiteSpace(TempData["ErrorMessage"].ToString()))
+    {
+        <script type="text/javascript">
+
+            document.addEventListener("DOMContentLoaded", function () {
+
+                toastr.error(
+                    @Html.Raw(
+                        HttpUtility.JavaScriptStringEncode(
+                            TempData["ErrorMessage"].ToString(),
+                            true
+                        )
+                    ),
+                    'Warning'
+                );
+
+            });
+
+        </script>
+    }
+
+
+
+    <!-- ====================================================== -->
+    <!-- TEMPDATA SUCCESS -->
+    <!-- ====================================================== -->
+
+    @if (TempData["SuccessMessage"] != null &&
+         !string.IsNullOrWhiteSpace(TempData["SuccessMessage"].ToString()))
+    {
+        <script type="text/javascript">
+
+            document.addEventListener("DOMContentLoaded", function () {
+
+                toastr.success(
+                    @Html.Raw(
+                        HttpUtility.JavaScriptStringEncode(
+                            TempData["SuccessMessage"].ToString(),
+                            true
+                        )
+                    ),
+                    'Success'
+                );
+
+            });
+
+        </script>
+    }
+
+
+
+    <!-- ====================================================== -->
+    <!-- GLOBAL APPLICATION INITIALIZATION -->
+    <!-- ====================================================== -->
+
+    <script type="text/javascript">
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+
+            // ==================================================
+            // SELECT2
+            // ==================================================
+
+            if (typeof $ !== "undefined" && $.fn.select2) {
+
+                $('.select2').select2({
+                    width: '100%'
+                });
+
+                /*
+                 * Legacy class kept so we do not need to immediately
+                 * modify every old view.
+                 *
+                 * It no longer uses:
+                 *
+                 * theme: 'bootstrap4'
+                 */
+
+                $('.select2bs4').select2({
+                    width: '100%'
+                });
+
+            }
+
+
+
+            // ==================================================
+            // INPUT MASK
+            // ==================================================
+
+            if (typeof $ !== "undefined" && $.fn.inputmask) {
+
+                $('#datemask').inputmask(
+                    'dd/mm/yyyy',
+                    {
+                        placeholder: 'dd/mm/yyyy'
+                    }
+                );
+
+                $('#datemask2').inputmask(
+                    'mm/dd/yyyy',
+                    {
+                        placeholder: 'mm/dd/yyyy'
+                    }
+                );
+
+                $('[data-mask]').inputmask();
+
+            }
+
+
+
+            // ==================================================
+            // DATE RANGE PICKER
+            // ==================================================
+
+            if (typeof $ !== "undefined" &&
+                $.fn.daterangepicker &&
+                typeof moment !== "undefined") {
+
+
+                // Standard range
+                if ($('#reservation').length) {
+
+                    $('#reservation').daterangepicker();
+
+                }
+
+
+                // Range with time
+                if ($('#reservationtime').length) {
+
+                    $('#reservationtime').daterangepicker({
+
+                        timePicker: true,
+
+                        timePickerIncrement: 30,
+
+                        locale: {
+                            format: 'MM/DD/YYYY hh:mm A'
+                        }
+
+                    });
+
+                }
+
+
+                // Date range button
+                if ($('#daterange-btn').length) {
+
+                    $('#daterange-btn').daterangepicker(
+                        {
+
+                            ranges: {
+
+                                'Today': [
+                                    moment(),
+                                    moment()
+                                ],
+
+                                'Yesterday': [
+                                    moment().subtract(1, 'days'),
+                                    moment().subtract(1, 'days')
+                                ],
+
+                                'Last 7 Days': [
+                                    moment().subtract(6, 'days'),
+                                    moment()
+                                ],
+
+                                'Last 30 Days': [
+                                    moment().subtract(29, 'days'),
+                                    moment()
+                                ],
+
+                                'This Month': [
+                                    moment().startOf('month'),
+                                    moment().endOf('month')
+                                ],
+
+                                'Last Month': [
+                                    moment()
+                                        .subtract(1, 'month')
+                                        .startOf('month'),
+
+                                    moment()
+                                        .subtract(1, 'month')
+                                        .endOf('month')
+                                ]
+
+                            },
+
+                            startDate: moment().subtract(29, 'days'),
+
+                            endDate: moment()
+
+                        },
+
+                        function (start, end) {
+
+                            $('#reportrange span').html(
+                                start.format('MMMM D, YYYY')
+                                +
+                                ' - '
+                                +
+                                end.format('MMMM D, YYYY')
+                            );
+
+                        }
+                    );
+
+                }
+
+
+                // ==================================================
+                // REPLACEMENT FOR OLD TEMPUSDOMINUS DATE PICKER
+                //
+                // Existing:
+                // class="datePicker"
+                //
+                // can continue working without Bootstrap 4
+                // ==================================================
+
+                $('.datePicker').each(function () {
+
+                    if (!$(this).data('daterangepicker')) {
+
+                        $(this).daterangepicker({
+
+                            singleDatePicker: true,
+
+                            showDropdowns: true,
+
+                            autoUpdateInput: false,
+
+                            locale: {
+                                format: 'DD/MM/YYYY'
+                            }
+
+                        });
+
+                        $(this).on(
+                            'apply.daterangepicker',
+                            function (ev, picker) {
+
+                                $(this).val(
+                                    picker.startDate.format('DD/MM/YYYY')
+                                );
+
+                            }
+                        );
+
+                    }
+
+                });
+
+
+                // reservationdate compatibility
+                if ($('#reservationdate').length) {
+
+                    $('#reservationdate').daterangepicker({
+
+                        singleDatePicker: true,
+
+                        showDropdowns: true,
+
+                        autoUpdateInput: false,
+
+                        locale: {
+                            format: 'DD/MM/YYYY'
+                        }
+
+                    });
+
+                    $('#reservationdate').on(
+                        'apply.daterangepicker',
+                        function (ev, picker) {
+
+                            $(this).val(
+                                picker.startDate.format('DD/MM/YYYY')
+                            );
+
+                        }
+                    );
+
+                }
+
+            }
+
+
+
+            // ==================================================
+            // PRELOADER
+            // ==================================================
+
+            if (typeof $ !== "undefined") {
+
+                $('.preloader').fadeOut(100);
+
+            }
+            else {
+
+                var preloader =
+                    document.getElementById('preloader1');
+
+                if (preloader) {
+                    preloader.style.display = 'none';
+                }
+
+            }
+
+
+
+            // ==================================================
+            // DISABLE SUBMIT BUTTON
+            // ==================================================
+
+            if (typeof $ !== "undefined") {
+
+                $('.btnSubmitDisable').on(
+                    'click',
+                    function (e) {
+
+                        var button = $(this);
+
+                        var form = button.closest('form');
+
+
+                        $('#preloader1').show();
+
+                        button.prop('disabled', true);
+
+
+                        if (
+                            form.length &&
+                            typeof form.valid === 'function' &&
+                            !form.valid()
+                        ) {
+
+                            button.prop('disabled', false);
+
+                            $('#preloader1').hide();
+
+                            return false;
+
+                        }
+
+
+                        /*
+                         * Do not call form.submit() manually.
+                         *
+                         * The original button click will submit it.
+                         * Calling form.submit() here can cause double
+                         * submission in some forms.
+                         */
+
+                    }
+                );
+
+            }
+
+
+
+            // ==================================================
+            // BS STEPPER
+            // ==================================================
+
+            if (
+                typeof Stepper !== "undefined" &&
+                document.querySelector('.bs-stepper')
+            ) {
+
+                window.stepper =
+                    new Stepper(
+                        document.querySelector('.bs-stepper')
+                    );
+
+            }
+
+        });
+
+    </script>
+
+
+
+    <!-- ====================================================== -->
+    <!-- PAGE SPECIFIC JAVASCRIPT -->
+    <!-- ====================================================== -->
+
+    @RenderSection("scripts", required: false)
+
+
+</body>
+
+</html>

@@ -1,0 +1,589 @@
+﻿@model ICollection<Domain.RA.RemoteAccessRequest>
+@using Service.RA
+@using Service
+@using Domain.RA
+@using Domain.AR
+@{
+    ViewBag.Title = "MyRequest";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var empNo = Session["UserId"].ToString();
+}
+
+<div class="row">
+    <div class="col-lg-12">
+
+        <div class="card card-danger card-outline">
+            <div class="card-header p-2">
+                <ul class="nav nav-pills">
+                    <li class="nav-item"><a class="nav-link active" href="#tab_Pending" data-bs-toggle="tab">Pending</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#tab_Clarification" data-bs-toggle="tab">Request For Clarifications</a></li>
+                    <li class="nav-item"><a class="nav-link " href="#tab_Approved" data-bs-toggle="tab">On Going</a></li>
+                    <li class="nav-item"><a class="nav-link " href="#tab_Closed" data-bs-toggle="tab">Closed</a></li>
+                    <li class="nav-item"><a class="nav-link " href="#tab_Rejected" data-bs-toggle="tab">Rejected</a></li>
+                    <li class="nav-item"><a class="nav-link " href="#tab_MyAnnexures" data-bs-toggle="tab">My Annexures</a></li>
+                    <li class="nav-item"><a class="nav-link " href="#tab_Expiring" data-bs-toggle="tab">Expiring Requests</a></li>
+                </ul>
+            </div>
+            <div class="card-body">
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab_Pending">
+                        <table id="dataTable" class="table table-bordered table-striped table-hover dataTable">
+                            <thead>
+                                <tr>
+                                    <th>Request #</th>
+                                    <th>Department</th>
+                                    <th>Requested Date</th>
+                                    <th>Access Type</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+                                    foreach (var item in Model.Where(w => w.Status == AccessRequestStatusEnum.Initiated))
+                                    {
+                                        <tr>
+                                            <td>
+                                                <a href="@Html.EncodedActionLink("", "Info", "RemoteAccessRequest", "", new { id = item.RemoteAccessRequestId }, null)"
+                                                   target="_blank">
+                                                    <span> # </span>
+
+                                                    @item.RemoteAccessRequestId
+                                                </a>
+                                            </td>
+
+                                            <td>@item.Department.DepartmentName</td>
+                                            <td>@item.RequestedDate.ToString("yyyy-MM-dd")</td>
+                                            <td>@item.RemoteAccessType.EnumDisplayName()</td>
+                                            <td>@item.Status.EnumDisplayName()</td>
+
+
+
+
+
+                                            <td>
+                                                <a data-id="@item.RemoteAccessRequestId" class="openModalUpdateReject btn btn-danger btn-sm text-white " data-bs-toggle="modal" data-bs-target="#modalUpdateReject">
+                                                    <i class="fas fa-thumbs-down"></i> Reject
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+
+                        </table>
+
+                    </div>
+                    <div class="tab-pane " id="tab_Clarification">
+                        <table id="dataTable" class="table table-bordered table-striped table-hover dataTable">
+                            <thead>
+                                <tr>
+                                    <th>Request #</th>
+                                    <th>Department</th>
+                                    <th>Requested Date</th>
+                                    <th>Reason For Clarification</th>
+                                    <th>Access Type</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+                                    foreach (var item in Model.Where(w => w.IsClarificationNeeded == true && w.ClarificationType == ClarificationType.Requester))
+                                    {
+
+                                        var latestClarificationRequest = item.RemoteAccessRequestUpdates
+                                            .Where(u =>
+                                                u.Status == Domain.AR.AccessRequestStatusEnum.ClarificationRequested)
+                                            .OrderByDescending(u => u.UpdatedDate)
+                                            .FirstOrDefault();
+
+                                        <tr>
+                                            <td>
+                                                <a href="@Html.EncodedActionLink("", "Info", "RemoteAccessRequest", "", new { id = item.RemoteAccessRequestId }, null)"
+                                                   target="_blank">
+                                                    <span> # </span>
+
+                                                    @item.RemoteAccessRequestId
+                                                </a>
+                                            </td>
+
+                                            <td>@item.Department.DepartmentName</td>
+                                            <td>@item.RequestedDate.ToString("yyyy-MM-dd")</td>
+                                            <td>@latestClarificationRequest.Comment</td>
+                                            <td>@item.RemoteAccessType.EnumDisplayName()</td>
+                                            <td>@item.Status.EnumDisplayName()</td>
+
+                                            <td>
+                                                <a data-id="@item.RemoteAccessRequestId" class="openModalClarificationReply btn btn-primary btn-sm text-white " data-bs-toggle="modal" data-bs-target="#modalClarificationReply">
+                                                    <i class="fa fa-comment"></i>  Provide clarification
+                                                </a>
+                                            </td>
+
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+
+                        </table>
+                    </div>
+                    <div class="tab-pane " id="tab_Approved">
+                        <table id="dataTable" class="table table-bordered table-striped table-hover dataTable">
+                            <thead>
+                                <tr>
+                                    <th>Request #</th>
+                                    <th>Department</th>
+                                    <th>Requested Date</th>
+                                    <th>Access Type</th>
+                                    <th>Status</th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+                                    foreach (var item in Model.Where(w => w.Status == AccessRequestStatusEnum.Pending))
+                                    {
+                                        <tr>
+                                            <td>
+                                                <a href="@Html.EncodedActionLink("", "Info", "RemoteAccessRequest", "", new { id = item.RemoteAccessRequestId }, null)"
+                                                   target="_blank">
+                                                    <span> # </span>
+
+                                                    @item.RemoteAccessRequestId
+                                                </a>
+                                            </td>
+
+                                            <td>@item.Department.DepartmentName</td>
+                                            <td>@item.RequestedDate.ToString("yyyy-MM-dd")</td>
+                                            <td>@item.RemoteAccessType.EnumDisplayName()</td>
+                                            <td>@item.Status.EnumDisplayName()</td>
+
+
+
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+
+                        </table>
+                    </div>
+
+                    <div class="tab-pane " id="tab_Closed">
+                        <table id="dataTable" class="table table-bordered table-striped table-hover dataTable">
+                            <thead>
+                                <tr>
+                                    <th>Request #</th>
+                                    <th>Department</th>
+                                    <th>Requested Date</th>
+                                    <th>Access Type</th>
+                                    <th>Status</th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+                                    foreach (var item in Model.Where(w => w.Status == AccessRequestStatusEnum.Completed))
+                                    {
+                                        <tr>
+                                            <td>
+                                                <a href="@Html.EncodedActionLink("", "Info", "RemoteAccessRequest", "", new { id = item.RemoteAccessRequestId }, null)"
+                                                   target="_blank">
+                                                    <span> # </span>
+
+                                                    @item.RemoteAccessRequestId
+                                                </a>
+                                            </td>
+
+                                            <td>@item.Department.DepartmentName</td>
+                                            <td>@item.RequestedDate.ToString("yyyy-MM-dd")</td>
+                                            <td>@item.RemoteAccessType.EnumDisplayName()</td>
+                                            <td>@item.Status.EnumDisplayName()</td>
+
+
+
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+
+                        </table>
+                    </div>
+
+
+                    <div class="tab-pane " id="tab_Rejected">
+                        <table id="dataTable" class="table table-bordered table-striped table-hover dataTable">
+                            <thead>
+                                <tr>
+                                    <th>Request #</th>
+                                    <th>Department</th>
+                                    <th>Requested Date</th>
+                                    <th>Access Type</th>
+                                    <th>Status</th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+                                    foreach (var item in Model.Where(w => w.Status == AccessRequestStatusEnum.Rejected))
+                                    {
+                                        <tr>
+                                            <td>
+                                                <a href="@Html.EncodedActionLink("", "Info", "RemoteAccessRequest", "", new { id = item.RemoteAccessRequestId }, null)"
+                                                   target="_blank">
+                                                    <span> # </span>
+
+                                                    @item.RemoteAccessRequestId
+                                                </a>
+                                            </td>
+
+                                            <td>@item.Department.DepartmentName</td>
+                                            <td>@item.RequestedDate.ToString("yyyy-MM-dd")</td>
+                                            <td>@item.RemoteAccessType.EnumDisplayName()</td>
+                                            <td>@item.Status.EnumDisplayName()</td>
+
+
+
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                    <div class="tab-pane " id="tab_MyAnnexures">
+
+                        <div class="row">
+                            <div class="col-lg-12">
+
+                                <div class="card card-danger card-outline">
+                                    <div class="card-header">
+                                        <h3 class="card-title m-0">Search Annexure</h3>
+                                        <div class="text-right">
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="form-group">
+                                            <label>Select Request</label>
+                                            <select id="requestDropdown" class="form-control">
+                                                <option value="">-- Select Request --</option>
+                                                @foreach (var item in Model.Where(e => e.CreatedBy == empNo))
+                                                {
+                                                    <option value="@item.RemoteAccessRequestId">Request #@item.RemoteAccessRequestId | @item.CreatedBy | @item.Status</option>
+
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+
+
+                        <div class="row">
+                            <div class="col-lg-12">
+
+                                <div class="card card-primary card-outline">
+                                    <div class="card-header">
+                                        <h3 class="card-title m-0">File Preview</h3>
+                                        <div class="text-right">
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+
+                                        <div class="text-right mb-2">
+                                            <button id="btnPrint" class="btn btn-primary btn-sm" disabled>
+                                                <i class="fas fa-print"></i> Print
+                                            </button>
+                                        </div>
+
+                                        <div id="annexureViewer" class="border p-3 bg-white">
+                                            <p class="text-muted">Select a request to view annexure</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="tab-pane " id="tab_Expiring">
+                        <table id="dataTable" class="table table-bordered table-striped table-hover dataTable">
+                            <thead>
+                                <tr>
+                                    <th>Request #</th>
+                                    <th>Department</th>
+                                    <th>Requested Date</th>
+                                    <th>Access Type</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{
+                                    foreach (var item in Model.Where(w => w.Status == AccessRequestStatusEnum.RevokeConfirmationPending))
+                                    {
+                                        <tr>
+                                            <td>
+                                                <a href="@Html.EncodedActionLink("", "Info", "RemoteAccessRequest", "", new { id = item.RemoteAccessRequestId }, null)"
+                                                   target="_blank">
+                                                    <span> # </span>
+
+                                                    @item.RemoteAccessRequestId
+                                                </a>
+                                            </td>
+
+                                            <td>@item.Department.DepartmentName</td>
+                                            <td>@item.RequestedDate.ToString("yyyy-MM-dd")</td>
+                                            <td>@item.RemoteAccessType.EnumDisplayName()</td>
+                                            <td>@item.Status.EnumDisplayName()</td>
+
+                                            <td>
+                                                <a data-id="@item.RemoteAccessRequestId" class="continueAccess btn btn-primary btn-sm text-white ">
+                                                    <i class="fa fa-thumbs-up"></i> Continue
+                                                </a>
+                                            </td>
+
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalUpdateReject">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title ">Request #<label id="modelLableId" name="modelLableId"></label> Reject</h5>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="modalTicketIdReject" id="modalTicketIdReject" value="" />
+
+                    <h6>Are You Sure ?</h6>
+                </div>
+
+                <div class="modal-footer ">
+                    <button type="button" class="btn btn-danger btn-sm" data-bs-dismiss="modal"><i class="fas fa-window-close"></i>&nbsp;&nbsp;Cancel</button>
+
+                    <button type="button" class="btn btn-info btn-sm btnClickDisable" onclick="reject()"><i class="fas fa-thumbs-down"></i>&nbsp;&nbsp; Reject</button>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+<div class="modal fade" id="modalClarificationReply">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title ">Request #<label id="lblClarificationReplyId" name="lblClarificationReplyId"></label> Clarify</h5>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" name="modalClarificationReplyId" id="modalClarificationReplyId" value="" />
+
+                <input type="text" class="form-control" placeholder="Enter clarification" name="txtClarificationReply" id="txtClarificationReply" value="" />
+
+            </div>
+
+            <div class="modal-footer ">
+                <button type="button" class="btn btn-danger btn-sm" data-bs-dismiss="modal"><i class="fas fa-window-close"></i>&nbsp;&nbsp;Cancel</button>
+
+                <button type="button" class="btn btn-info btn-sm btnClickDisable" onclick="replyClarification()"><i class="fas fa-thumbs-up"></i>&nbsp;&nbsp; Provide Clarification</button>
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    @*</div><div class="modal fade" id="modalClarification">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title ">Request # <label id="modelLableId" name="modelLableId"></label> Clarify</h5>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="modalTicketIdClarification" id="modalTicketIdClarification" value="" />
+                        <input type="text" class="form-control" placeholder="Enter clarification" name="modalClarificationText" id="modalClarificationText" value="" />
+
+                    </div>
+
+                    <div class="modal-footer ">
+                        <button type="button" class="btn btn-danger btn-sm" data-bs-dismiss="modal"><i class="fas fa-window-close"></i>&nbsp;&nbsp;Cancel</button>
+
+                        <button type="button" class="btn btn-info btn-sm btnClickDisable" onclick="provideClarification()"><i class="fas fa-thumbs-up"></i>&nbsp;&nbsp; Provide Clarification</button>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>*@
+</div>
+
+
+
+@section scripts {
+
+
+    <script type="text/javascript">
+
+
+        $(document).ready(function () {
+            $('.dataTable').DataTable({
+                "paging": true,
+                "lengthChange": true,
+                "searching": true,
+                "ordering": false,
+                "info": true,
+                "autoWidth": true
+            });
+        });
+
+        $('.openModalUpdateReject').on('click', function () {
+            let id = $(this).data("id");
+            
+            $("#modalTicketIdReject").val(id);
+            $("#modelLableId").text(id);
+        });
+
+        $(document).on('click', '.openModalClarificationReply', function () {
+
+            let id = $(this).data('id');
+
+            $("#modalClarificationReplyId").val(id);
+
+            $("#modalClarificationReply #lblClarificationReplyId").text(id);
+
+            $("#txtClarificationReply").val("");
+
+        });
+
+        function replyClarification() {
+
+            const formData = new FormData();
+
+            formData.append("RequestId",
+                $("#modalClarificationReplyId").val());
+
+            formData.append("Reply",
+                $("#txtClarificationReply").val());
+
+
+
+            $('.btnClickDisable').prop('disabled', true);
+
+
+            fetch('/RemoteAccessRequest/MyRequestReplyClarification',
+                {
+                    method: "POST",
+                    body: formData
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if (data === 1) {
+                        Swal.fire("Completed", "Successfully Replied to Clarification", "success");
+                        setTimeout(() => { window.location.reload(); }, 2000);
+                    }
+                    else if (data === 3) {
+                        Swal.fire("Error", "Please provide a clarification reply", "error");
+                        setTimeout(() => { window.location.reload(); }, 2000);
+
+                    } else {
+                        Swal.fire("Error", "Something went wrong", "error");
+                    }
+                });
+
+        }
+
+
+
+
+        function reject() {
+
+            var requestId = $("#modalTicketIdReject").val();
+
+            $('.btnClickDisable').prop('disabled', true);
+
+            const formData = new FormData();
+            formData.append("RequestId", requestId);
+
+            fetch('/RemoteAccessRequest/MyRequestReject', {
+                method: "POST",
+                headers: { "Accept": "application/json" },
+                body: formData
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data === 1) {
+                        Swal.fire("Completed", "Request has been cancelled", "success");
+                        setTimeout(() => { window.location.reload(); }, 2000);
+                    } else {
+                        Swal.fire("Error", "Something went wrong", "error");
+                    }
+                });
+
+        }
+
+
+        $('#requestDropdown').change(function () {
+            const id = $(this).val();
+            console.log(id)
+
+            if (!id) {
+                $('#annexureViewer').html('<p class="text-muted">Select a request to view annexure</p>');
+                $('#btnPrint').prop('disabled', true);
+                return;
+            }
+
+            $.get('/RemoteAccessRequest/GetAnnexure', { RequestId: id }, function (data) {
+                $('#annexureViewer').load('/RemoteAccessRequest/GetAnnexure?requestId=' + id);
+                $('#btnPrint').prop('disabled', false);
+            });
+        });
+
+        $('#btnPrint').click(function () {
+            window.print();
+        });
+
+        $(document).on("click", ".continueAccess", function () {
+
+            var requestId = $(this).data("id");
+
+            const formData = new FormData();
+            formData.append("requestId", requestId);
+
+            fetch('/RemoteAccessRequest/ContinueAccess', {
+                method: "POST",
+                headers: { "Accept": "application/json" },
+                body: formData
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data === 1) {
+                        Swal.fire("Completed", "Successfully notified to continue Access", "success");
+                        setTimeout(() => { window.location.reload(); }, 2000);
+                    }
+                    else {
+                        Swal.fire("Error", "Something went wrong", "error");
+                    }
+                });
+        });
+    </script>
+}

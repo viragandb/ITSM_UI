@@ -1,0 +1,337 @@
+﻿@model Domain.Event
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("Create", "Event", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card">
+
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="align-middle me-2" data-lucide="calendar-plus"></i>
+                        New Event
+                    </h5>
+                </div>
+
+                <div class="card-body">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+
+                            @Html.LabelFor(
+                                model => model.EventTypeId,
+                                new { @class = "form-label" }
+                            )
+
+                            <select id="EventTypeId"
+                                    name="EventTypeId"
+                                    class="form-select">
+                            </select>
+
+                            <span class="text-danger"
+                                  data-valmsg-for="EventTypeId"
+                                  data-valmsg-replace="true">
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="mb-3 mt-3">
+
+                        @Html.LabelFor(
+                            model => model.Subject,
+                            new { @class = "form-label" }
+                        )
+
+                        @Html.TextBoxFor(
+                            model => model.Subject,
+                            new { @class = "form-control" }
+                        )
+
+                        @Html.ValidationMessageFor(
+                            model => model.Subject,
+                            "",
+                            new { @class = "text-danger" }
+                        )
+
+                    </div>
+
+
+                    <div class="mb-3">
+
+                        @Html.LabelFor(
+                            model => model.Description,
+                            new { @class = "form-label" }
+                        )
+
+                        @Html.TextAreaFor(
+                            model => model.Description,
+                            new
+                            {
+                                @class = "form-control",
+                                rows = "4",
+                                style = "white-space: pre-wrap;"
+                            }
+                        )
+
+                        @Html.ValidationMessageFor(
+                            model => model.Description,
+                            "",
+                            new { @class = "text-danger" }
+                        )
+
+                    </div>
+
+
+                    <div class="row g-3">
+
+                        <div class="col-md-4">
+
+                            @Html.LabelFor(
+                                model => model.EventDate,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.TextBoxFor(
+                                model => model.EventDate,
+                                "{0:yyyy-MM-dd}",
+                                new
+                                {
+                                    @class = "form-control",
+                                    type = "date"
+                                }
+                            )
+
+                            @Html.ValidationMessageFor(
+                                model => model.EventDate,
+                                "",
+                                new { @class = "text-danger" }
+                            )
+
+                        </div>
+
+
+                        <div class="col-md-4">
+
+                            @Html.LabelFor(
+                                model => model.EventTime,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.TextBoxFor(
+                                model => model.EventTime,
+                                new
+                                {
+                                    @class = "form-control",
+                                    type = "time"
+                                }
+                            )
+
+                            @Html.ValidationMessageFor(
+                                model => model.EventTime,
+                                "",
+                                new { @class = "text-danger" }
+                            )
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="card mt-4">
+
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="align-middle me-2" data-lucide="image"></i>
+                                Images
+                            </h5>
+                        </div>
+
+                        <div class="card-body">
+
+                            <div class="row g-3">
+
+                                <div class="col-md-4">
+
+                                    <label for="image1" class="form-label">
+                                        Image 1
+                                    </label>
+
+                                    <input type="file"
+                                           name="image1"
+                                           id="image1"
+                                           class="form-control"
+                                           accept="image/*" />
+
+                                </div>
+
+                                <div class="col-md-4">
+
+                                    <label for="image2" class="form-label">
+                                        Image 2
+                                    </label>
+
+                                    <input type="file"
+                                           name="image2"
+                                           id="image2"
+                                           class="form-control"
+                                           accept="image/*" />
+
+                                </div>
+
+                                <div class="col-md-4">
+
+                                    <label for="image3" class="form-label">
+                                        Image 3
+                                    </label>
+
+                                    <input type="file"
+                                           name="image3"
+                                           id="image3"
+                                           class="form-control"
+                                           accept="image/*" />
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="card-footer">
+
+                    <div class="d-flex justify-content-end">
+
+                        <button type="submit"
+                                id="btnSave"
+                                class="btn btn-sm btn-primary">
+
+                            <i class="align-middle me-1" data-lucide="save"></i>
+                            Save
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+}
+
+
+@section scripts {
+
+    <script src="~/Scripts/jquery.validate.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            loadEventType();
+
+
+            $("#btnSave").on("click", function (e) {
+
+                var form = $(this).closest("form");
+
+                if (!form.valid()) {
+
+                    e.preventDefault();
+
+                    $("#preloader1").hide();
+
+                    return false;
+                }
+
+
+                $(this).prop("disabled", true);
+
+                $("#preloader1").show();
+
+                return true;
+
+            });
+
+        });
+
+
+        function parseJsonResult(data) {
+
+            if (typeof data === "string") {
+
+                try {
+                    return JSON.parse(data);
+                }
+                catch (e) {
+                    return [];
+                }
+
+            }
+
+            return data || [];
+        }
+
+
+        function loadEventType() {
+
+            $.getJSON(
+                '@Url.Action("GetEventTypeListJsonResult", "Event")',
+                function (data) {
+
+                    var dropDown = $("#EventTypeId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- Select --</option>"
+                    );
+
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.EventTypeId,
+                                    text: item.EventTypeName
+                                })
+                            );
+
+                        }
+                    );
+
+
+                    var selectedId =
+                        '@ViewBag.EventTypeId';
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+                }
+            );
+
+        }
+
+    </script>
+}

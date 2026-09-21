@@ -1,0 +1,255 @@
+﻿
+@using Service
+@model IEnumerable<Domain.DRDrill>
+@{
+    /**/
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@using (Html.BeginForm("Index", "DRDrill", FormMethod.Get, new { @class = "form-horizontal" }))
+{
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card box-danger">
+                <div class="card-header with-border">
+                    <h3 class="card-title"> DR Drill</h3>
+                    <div class="card-tools pull-right">
+                        <a href="@Url.Action("Create", "DRDrill")" class="btn btn-social btn-cancel">
+                            <i class="fa fa-plus"></i>Schedule New DR Drill
+                        </a>
+
+                    </div>
+                </div>
+
+
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+
+
+                            <div class="form-group ">
+
+                                <label class="control-label col-md-2">
+                                    Scheduled Date :
+                                </label>
+                                <div class="col-md-2">
+                                    <div class="input-group date">
+                                        <div class="input-group-addon">
+                                            <i class="fa fa-calendar"></i>
+                                        </div>
+                                        <input type="text" name="StartDate" id="StartDate" value="@ViewBag.StartDate" class="form-control datepicker" />
+                                    </div>
+                                </div>
+
+
+                                <label class="control-label col-md-1">
+                                    To
+                                </label>
+                                <div class="col-md-2">
+                                    <div class="input-group date">
+                                        <div class="input-group-addon">
+                                            <i class="fa fa-calendar"></i>
+                                        </div>
+                                        <input type="text" name="EndDate" id="EndDate" value="@ViewBag.EndDate" class="form-control datepicker" />
+                                    </div>
+                                </div>
+
+
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+                <div class="card-footer">
+                    <div class="text-right">
+                        <button type="submit" class="btn btn-social">
+                            <i class="fa fa-search"></i>Search
+                        </button>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+    <div class="row">
+
+        <div class="col-lg-12">
+            <div class="card">
+
+                @*<div class="card-header with-border">
+                        <h3 class="card-title">Release Requests</h3>
+
+                    </div>*@
+
+                <div class="card-body">
+                    @{
+                        foreach (var item in Model)
+                        {
+
+                            <div class="panel box box-primary">
+
+                                <div class="card-header">
+                                    <h4 class="card-title">
+                                        <a data-toggle="collapse" data-parent="#accordion" href="#@item.DRDrillId">
+                                            DR Drill - @item.ScheduleDate.ToShortDateString()
+                                        </a>
+
+
+                                    </h4>
+                                    <div class="card-tools pull-right">
+                                        <i class="fa fa-user"></i> &nbsp;&nbsp; @item.UpdatedBy
+                                        &nbsp;&nbsp;&nbsp;&nbsp;
+                                        <i class="fa fa-calendar"></i> &nbsp;&nbsp; @item.UpdatedDate
+                                        &nbsp;&nbsp;&nbsp;&nbsp;
+                                        <span class="label text- label-@DRDrillService.GetStatusColor(item.Status)">
+                                            @item.Status.EnumDisplayName()
+                                        </span>
+
+                                        @*<a href="@Html.EncodedActionLink("", "CreateBackupReview", "Backup", "", new { backupReviewLogId = item.BackupReviewLogId }, null)" target="_blank"
+                                               class="btn btn-sm btn-social btn-@BackupReviewLogService.GetChecklistTypeColor(item.ChacklistType)">
+                                                <i class="fa fa-floppy-o"></i> Update
+                                            </a>*@
+
+
+                                        @*<a href="@Html.EncodedActionLink("","AddChange", "Release","", new { id = item.ReleaseId },null)" class="btn btn-sm btn-social btn-success">
+                                                <i class="fa fa-cogs"></i>Changes
+                                            </a>
+                                            <a href="@Html.EncodedActionLink("","AssignAsset", "Release","", new { id = item.ReleaseId },null)" class="btn btn-sm btn-social btn-default">
+                                                <i class="fa fa-plug"></i>Assets
+                                            </a>
+                                            <a href="@Html.EncodedActionLink("","DocUpload", "Release","", new { id = item.ReleaseId },null)" class="btn btn-sm btn-social btn-warning">
+                                                <i class="fa fa-upload"></i>Docs
+                                            </a>*@
+
+                                    </div>
+
+                                </div>
+                                <div id="@item.DRDrillId" class="panel-collapse collapse">
+                                    <div class="card-body">
+                                        <div class="form-group row">
+                                            @Html.LabelFor(model => item.ScheduleDate, new { @class = "col-lg-2 text-right" })
+                                            <div class="col-lg-10">
+                                                @item.ScheduleDate.ToShortDateString()
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            @Html.LabelFor(model => item.Description, new { @class = "col-lg-2 text-right" })
+                                            <div class="col-lg-10">
+                                                @item.Description
+                                            </div>
+                                        </div>
+                                        @if (item.Comment != null)
+                                        {
+                                            <div class="form-group row">
+                                                @Html.LabelFor(model => item.DrillDate, new { @class = "col-lg-2 text-right" })
+                                                <div class="col-lg-10">
+                                                    @item.DrillDate.ToShortDateString()
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                @Html.LabelFor(model => item.Comment, new { @class = "col-lg-2 text-right" })
+                                                <div class="col-lg-10">
+                                                    @item.Comment
+                                                </div>
+                                            </div>
+                                        }
+                                        @if (item.ReviewerComment != null)
+                                        {
+                                            <div class="form-group row">
+                                                @Html.LabelFor(model => item.ReviewerComment, new { @class = "col-lg-2 text-right" })
+                                                <div class="col-lg-10">
+                                                    @item.ReviewerComment
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                @Html.LabelFor(model => item.NoOfIncidents, new { @class = "col-lg-2 text-right" })
+                                                <div class="col-lg-10">
+                                                    @item.NoOfIncidents
+                                                </div>
+                                            </div>
+
+                                        }
+
+
+                                    </div>
+
+
+                                    <div class="card-footer">
+                                        <div class="text-right">
+                                            @if (item.Status == Domain.DRDrillStatusEnum.Pending)
+                                            {
+                                                <a href="@Html.EncodedActionLink("", "Complete", "DRDrill", "", new { id = item.DRDrillId }, null)" class="btn btn-sm btn-social btn-primary">
+                                                    <i class="fa fa-hourglass-end"></i>Complete
+                                                </a>
+                                            }
+                                            @if (item.Status == Domain.DRDrillStatusEnum.Completed)
+                                            {
+                                                <a href="@Html.EncodedActionLink("", "Review", "DRDrill", "", new { id = item.DRDrillId }, null)" class="btn btn-sm btn-social btn-primary">
+                                                    <i class="fa fa-comment"></i>Review
+                                                </a>
+                                            }
+                                        </div>
+                                    </div>
+                                    </div>
+                            </div>
+                        }
+                    }
+
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+
+
+
+}
+
+
+@section scripts {
+    <script src="~/Scripts/jquery.validate.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
+
+    <script type="text/javascript">
+
+
+        $(document).ready(function () {
+
+            //$('#dataTable').DataTable({
+            //    "paging": false,
+            //    "lengthChange": true,
+            //    "searching": true,
+            //    "ordering": true,
+            //    "info": true,
+            //    "autoWidth": true
+            //});
+
+        });
+
+
+        $(document).ready(function () {
+
+        });
+
+
+
+
+
+    </script>
+}
+
+
+
+
+
+
+
+
+

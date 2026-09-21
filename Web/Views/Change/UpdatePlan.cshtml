@@ -1,0 +1,205 @@
+﻿@model Domain.Change
+@using Service
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="card">
+
+            <div class="card-header d-flex justify-content-between align-items-center">
+
+                <h5 class="card-title mb-0">
+                    <i class="align-middle me-2" data-lucide="clipboard-check"></i>
+                    Plan Change
+                </h5>
+
+                <a href="@Url.Action("Plan", "Change")"
+                   class="btn btn-sm btn-light">
+
+                    <i class="align-middle me-1" data-lucide="arrow-left"></i>
+                    Back
+
+                </a>
+
+            </div>
+
+            @using (Html.BeginForm("UpdatePlan", "Change", FormMethod.Post))
+            {
+                @Html.HiddenFor(model => model.ChangeId)
+
+                <div class="card-body">
+
+                    <div class="row g-4">
+
+                        <div class="col-lg-6">
+
+                            @Html.Partial("_ChangeMin", Model)
+
+                        </div>
+
+                        <div class="col-lg-6">
+
+                            <div class="card">
+
+                                <div class="card-header d-flex justify-content-between align-items-center">
+
+                                    <h5 class="card-title mb-0">
+                                        <i class="align-middle me-2" data-lucide="file-text"></i>
+                                        Plan
+                                    </h5>
+
+                                    <button type="button"
+                                            class="btn btn-sm btn-light"
+                                            data-bs-toggle="collapse"
+                                            data-bs-target="#planBody"
+                                            aria-expanded="true"
+                                            aria-controls="planBody">
+
+                                        <i class="align-middle" data-lucide="chevron-down"></i>
+
+                                    </button>
+
+                                </div>
+
+                                <div id="planBody"
+                                     class="collapse show">
+
+                                    <div class="card-body">
+
+                                        <div class="mb-3">
+
+                                            @Html.LabelFor(
+                                                model => model.Reason,
+                                                new { @class = "form-label" }
+                                            )
+
+                                            @Html.TextAreaFor(
+                                                model => model.Reason,
+                                                new
+                                                {
+                                                    @class = "form-control",
+                                                    rows = "3"
+                                                }
+                                            )
+
+                                            @Html.ValidationMessageFor(
+                                                model => model.Reason,
+                                                "",
+                                                new { @class = "text-danger" }
+                                            )
+
+                                        </div>
+
+                                        <div class="mb-3">
+
+                                            @Html.LabelFor(
+                                                model => model.Impact,
+                                                new { @class = "form-label" }
+                                            )
+
+                                            @Html.TextAreaFor(
+                                                model => model.Impact,
+                                                new
+                                                {
+                                                    @class = "form-control",
+                                                    rows = "3"
+                                                }
+                                            )
+
+                                            @Html.ValidationMessageFor(
+                                                model => model.Impact,
+                                                "",
+                                                new { @class = "text-danger" }
+                                            )
+
+                                        </div>
+
+                                        <div class="mb-3">
+
+                                            @Html.LabelFor(
+                                                model => model.RollOutPlan,
+                                                new { @class = "form-label" }
+                                            )
+
+                                            @Html.TextAreaFor(
+                                                model => model.RollOutPlan,
+                                                new
+                                                {
+                                                    @class = "form-control",
+                                                    rows = "3"
+                                                }
+                                            )
+
+                                            @Html.ValidationMessageFor(
+                                                model => model.RollOutPlan,
+                                                "",
+                                                new { @class = "text-danger" }
+                                            )
+
+                                        </div>
+
+                                        <div class="mb-3">
+
+                                            @Html.LabelFor(
+                                                model => model.BackOutPlan,
+                                                new { @class = "form-label" }
+                                            )
+
+                                            @Html.TextAreaFor(
+                                                model => model.BackOutPlan,
+                                                new
+                                                {
+                                                    @class = "form-control",
+                                                    rows = "3"
+                                                }
+                                            )
+
+                                            @Html.ValidationMessageFor(
+                                                model => model.BackOutPlan,
+                                                "",
+                                                new { @class = "text-danger" }
+                                            )
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="card-footer">
+
+                                        <div class="d-flex justify-content-end">
+
+                                            <button type="submit"
+                                                    class="btn btn-primary btn-sm">
+
+                                                <i class="align-middle me-1" data-lucide="save"></i>
+                                                Update
+
+                                            </button>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+</div>
+
+@section scripts {
+
+}

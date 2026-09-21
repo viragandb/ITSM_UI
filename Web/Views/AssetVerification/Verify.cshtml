@@ -1,0 +1,610 @@
+﻿@model Web.Models.AssetVerifyVM
+@using Service
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="card">
+
+            <div class="card-header d-flex justify-content-between align-items-center">
+
+                <h5 class="card-title mb-0">
+                    <i class="align-middle me-2" data-lucide="check-check"></i>
+                    Asset Verification | Request #@Model.RequestId
+                </h5>
+
+                <div class="d-flex gap-2">
+
+                    <a href="@Html.EncodedActionLink("", "Info", "AssetVerification", "", new { id = Model.RequestId }, null)"
+                       target="_blank"
+                       class="btn btn-sm btn-light">
+
+                        <i class="align-middle me-1" data-lucide="info"></i>
+                        More
+
+                    </a>
+
+                    <a href="@Url.Action("Pending", "AssetVerification")"
+                       class="btn btn-sm btn-light">
+
+                        <i class="align-middle me-1" data-lucide="arrow-left"></i>
+                        Back
+
+                    </a>
+
+                </div>
+
+            </div>
+
+            @using (Html.BeginForm("Verify", "AssetVerification", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            {
+                @Html.HiddenFor(model => model.RequestId)
+
+                <div class="card-body">
+
+                    <div class="row g-4">
+
+                        <div class="col-lg-8">
+
+                            <dl class="row mb-0">
+
+                                <dt class="col-sm-3">
+                                    @Html.DisplayNameFor(model => model.Request.BranchId)
+                                </dt>
+
+                                <dd class="col-sm-3">
+                                    @Model.Request.Branch.Name
+                                </dd>
+
+                                <dt class="col-sm-3">
+                                    @Html.DisplayNameFor(model => model.Request.DepartmentId)
+                                </dt>
+
+                                <dd class="col-sm-3">
+                                    @Model.Request.Department.DepartmentName
+                                </dd>
+
+                                <dt class="col-sm-3">
+                                    @Html.DisplayNameFor(model => model.Request.AssetCategory)
+                                </dt>
+
+                                <dd class="col-sm-3">
+                                    @Model.Request.AssetCategory.EnumDisplayName()
+                                </dd>
+
+                                <dt class="col-sm-3">
+                                    @Html.DisplayNameFor(model => model.Request.VerificationDate)
+                                </dt>
+
+                                <dd class="col-sm-3">
+                                    @Model.Request.VerificationDate.ToString("dd/MM/yyyy")
+                                </dd>
+
+                            </dl>
+
+                        </div>
+
+
+                        <div class="col-lg-4">
+
+                            <div class="mb-3">
+
+                                <label for="fileInput" class="form-label">
+                                    Upload Asset List
+                                </label>
+
+                                <div class="input-group">
+
+                                    <input type="file"
+                                           id="fileInput"
+                                           class="form-control" />
+
+                                    <button type="button"
+                                            id="fileButton"
+                                            class="btn btn-primary">
+
+                                        <i class="align-middle me-1" data-lucide="upload"></i>
+                                        Upload
+
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <hr />
+
+
+                    <div class="table-responsive">
+
+                        <table id="dataTable"
+                               class="table table-striped table-hover align-middle w-100">
+
+                            <thead>
+
+                                <tr>
+                                    <th>Asset #</th>
+                                    <th>Barcode</th>
+                                    <th>Serial #</th>
+                                    <th>Asset Type</th>
+                                    <th>Asset Make</th>
+                                    <th>Model Name</th>
+                                    <th style="min-width:140px;">Availability (Y/N)</th>
+                                    <th style="min-width:200px;">Comment</th>
+                                </tr>
+
+                            </thead>
+
+                            <tbody id="assetdata">
+
+                                @if (Model.Assets != null)
+                                {
+                                    for (var i = 0; i < Model.Assets.Count; i++)
+                                    {
+                                        <tr id="@i">
+
+                                            <td>
+
+                                                @Html.HiddenFor(m => Model.Assets[i].AssetId, new { @class = "iHidden" })
+                                                @Html.HiddenFor(m => Model.Assets[i].AssetNo)
+                                                @Html.HiddenFor(m => Model.Assets[i].Barcode)
+                                                @Html.HiddenFor(m => Model.Assets[i].SerialNo)
+                                                @Html.HiddenFor(m => Model.Assets[i].AssetTypeName)
+                                                @Html.HiddenFor(m => Model.Assets[i].AssetMakeName)
+                                                @Html.HiddenFor(m => Model.Assets[i].ModelName)
+
+                                                @Model.Assets[i].AssetNo
+
+                                            </td>
+
+                                            <td>
+                                                @Model.Assets[i].Barcode
+                                            </td>
+
+                                            <td>
+                                                @Model.Assets[i].SerialNo
+                                            </td>
+
+                                            <td>
+                                                @Model.Assets[i].AssetTypeName
+                                            </td>
+
+                                            <td>
+                                                @Model.Assets[i].AssetMakeName
+                                            </td>
+
+                                            <td>
+                                                @Model.Assets[i].ModelName
+                                            </td>
+
+                                            <td>
+
+                                                @Html.TextBoxFor(
+                                                    m => m.Assets[i].Availability,
+                                                    new { @class = "form-control form-control-sm" }
+                                                )
+
+                                            </td>
+
+                                            <td>
+
+                                                @Html.TextBoxFor(
+                                                    m => m.Assets[i].Comment,
+                                                    new { @class = "form-control form-control-sm" }
+                                                )
+
+                                            </td>
+
+                                        </tr>
+                                    }
+                                }
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+
+                    <div class="row g-3 mt-2">
+
+                        <div class="col-12">
+
+                            @Html.LabelFor(
+                                model => model.FinalComment,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.TextAreaFor(
+                                model => model.FinalComment,
+                                new
+                                {
+                                    @class = "form-control",
+                                    rows = "3",
+                                    style = "white-space: pre-wrap;"
+                                }
+                            )
+
+                            @Html.ValidationMessageFor(
+                                model => model.FinalComment,
+                                "",
+                                new { @class = "text-danger" }
+                            )
+
+                        </div>
+
+
+                        <div class="col-12">
+
+                            <label for="fileInputVerifiedDoc"
+                                   class="form-label">
+                                Upload Verified Document
+                            </label>
+
+                            <input type="file"
+                                   name="fileInputVerifiedDoc"
+                                   id="fileInputVerifiedDoc"
+                                   class="form-control" />
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="card-footer">
+
+                    <div class="d-flex justify-content-end">
+
+                        <button type="submit"
+                                id="btnSave"
+                                class="btn btn-primary btnSubmitDisable">
+
+                            <i class="align-middle me-1" data-lucide="send"></i>
+                            Update Verification
+
+                        </button>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+</div>
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $("#fileButton").on("click", function () {
+
+                var fileInput =
+                    $("#fileInput")[0];
+
+
+                if (!fileInput.files || fileInput.files.length === 0) {
+
+                    Swal.fire(
+                        "Error!",
+                        "Please select an asset list file",
+                        "error"
+                    );
+
+                    return;
+
+                }
+
+
+                var button =
+                    $("#fileButton");
+
+                button
+                    .prop("disabled", true)
+                    .html(
+                        '<span class="spinner-border spinner-border-sm me-1"></span> Uploading'
+                    );
+
+
+                var requestId =
+                    $("#RequestId").val();
+
+
+                var formData =
+                    new FormData();
+
+                formData.append(
+                    "file",
+                    fileInput.files[0]
+                );
+
+                formData.append(
+                    "additionalParam",
+                    requestId
+                );
+
+
+                $.ajax({
+
+                    type: "POST",
+
+                    url: '@Url.Action("UploadFiles", "AssetVerification")',
+
+                    dataType: "json",
+
+                    contentType: false,
+
+                    processData: false,
+
+                    data: formData,
+
+                    success: function (result) {
+
+                        Swal.fire(
+                            "Completed",
+                            result,
+                            "success"
+                        );
+
+                        addAssets();
+
+                    },
+
+                    error: function () {
+
+                        button
+                            .prop("disabled", false)
+                            .html(
+                                '<i class="align-middle me-1" data-lucide="upload"></i> Upload'
+                            );
+
+
+                        if (window.lucide) {
+                            lucide.createIcons();
+                        }
+
+
+                        Swal.fire(
+                            "Something went wrong!",
+                            "Please try again",
+                            "error"
+                        );
+
+                    }
+
+                });
+
+            });
+
+        });
+
+
+        function parseJsonResult(data) {
+
+            if (typeof data === "string") {
+
+                try {
+                    return JSON.parse(data);
+                }
+                catch (e) {
+                    return [];
+                }
+
+            }
+
+            return data || [];
+
+        }
+
+
+        function escapeHtml(value) {
+
+            if (value == null) {
+                return "";
+            }
+
+            return $("<div/>")
+                .text(value)
+                .html();
+
+        }
+
+
+        function addAssets() {
+
+            var requestId =
+                $("#RequestId").val();
+
+
+            $.getJSON(
+                '@Url.Action("GetAssetListJsonResult", "AssetVerification")',
+                {
+                    requestId: requestId
+                },
+                function (data) {
+
+                    var assets =
+                        parseJsonResult(data);
+
+
+                    $("#assetdata").empty();
+
+
+                    $.each(assets, function (index, item) {
+
+                        var assetId =
+                            escapeHtml(item.AssetId);
+
+                        var assetNo =
+                            escapeHtml(item.AssetNo);
+
+                        var barcode =
+                            escapeHtml(item.Barcode);
+
+                        var serialNo =
+                            escapeHtml(item.SerialNo);
+
+                        var assetTypeName =
+                            escapeHtml(item.AssetTypeName);
+
+                        var assetMakeName =
+                            escapeHtml(item.AssetMakeName);
+
+                        var modelName =
+                            escapeHtml(item.ModelName);
+
+                        var availability =
+                            escapeHtml(item.Availability);
+
+                        var comment =
+                            escapeHtml(item.Comment);
+
+
+                        var newItem =
+
+                            "<tr id='" + index + "'>" +
+
+                                "<td>" +
+
+                                    "<input id='Assets_" + index + "__AssetId' " +
+                                           "class='iHidden' " +
+                                           "name='Assets[" + index + "].AssetId' " +
+                                           "type='hidden' " +
+                                           "value='" + assetId + "' />" +
+
+                                    "<input id='Assets_" + index + "__AssetNo' " +
+                                           "name='Assets[" + index + "].AssetNo' " +
+                                           "type='hidden' " +
+                                           "value='" + assetNo + "' />" +
+
+                                    "<input id='Assets_" + index + "__Barcode' " +
+                                           "name='Assets[" + index + "].Barcode' " +
+                                           "type='hidden' " +
+                                           "value='" + barcode + "' />" +
+
+                                    "<input id='Assets_" + index + "__SerialNo' " +
+                                           "name='Assets[" + index + "].SerialNo' " +
+                                           "type='hidden' " +
+                                           "value='" + serialNo + "' />" +
+
+                                    "<input id='Assets_" + index + "__AssetTypeName' " +
+                                           "name='Assets[" + index + "].AssetTypeName' " +
+                                           "type='hidden' " +
+                                           "value='" + assetTypeName + "' />" +
+
+                                    "<input id='Assets_" + index + "__AssetMakeName' " +
+                                           "name='Assets[" + index + "].AssetMakeName' " +
+                                           "type='hidden' " +
+                                           "value='" + assetMakeName + "' />" +
+
+                                    "<input id='Assets_" + index + "__ModelName' " +
+                                           "name='Assets[" + index + "].ModelName' " +
+                                           "type='hidden' " +
+                                           "value='" + modelName + "' />" +
+
+                                    assetNo +
+
+                                "</td>" +
+
+                                "<td>" +
+                                    barcode +
+                                "</td>" +
+
+                                "<td>" +
+                                    serialNo +
+                                "</td>" +
+
+                                "<td>" +
+                                    assetTypeName +
+                                "</td>" +
+
+                                "<td>" +
+                                    assetMakeName +
+                                "</td>" +
+
+                                "<td>" +
+                                    modelName +
+                                "</td>" +
+
+                                "<td>" +
+
+                                    "<input id='Assets_" + index + "__Availability' " +
+                                           "name='Assets[" + index + "].Availability' " +
+                                           "type='text' " +
+                                           "value='" + availability + "' " +
+                                           "class='form-control form-control-sm' />" +
+
+                                "</td>" +
+
+                                "<td>" +
+
+                                    "<input id='Assets_" + index + "__Comment' " +
+                                           "name='Assets[" + index + "].Comment' " +
+                                           "type='text' " +
+                                           "value='" + comment + "' " +
+                                           "class='form-control form-control-sm' />" +
+
+                                "</td>" +
+
+                            "</tr>";
+
+
+                        $("#assetdata")
+                            .append(newItem);
+
+                    });
+
+
+                    $("#fileButton")
+                        .prop("disabled", false)
+                        .html(
+                            '<i class="align-middle me-1" data-lucide="upload"></i> Upload'
+                        );
+
+
+                    if (window.lucide) {
+                        lucide.createIcons();
+                    }
+
+                }
+            )
+            .fail(function () {
+
+                $("#fileButton")
+                    .prop("disabled", false)
+                    .html(
+                        '<i class="align-middle me-1" data-lucide="upload"></i> Upload'
+                    );
+
+
+                if (window.lucide) {
+                    lucide.createIcons();
+                }
+
+
+                Swal.fire(
+                    "Something went wrong!",
+                    "Unable to load the uploaded asset list",
+                    "error"
+                );
+
+            });
+
+        }
+
+    </script>
+}

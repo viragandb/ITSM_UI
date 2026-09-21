@@ -1,0 +1,693 @@
+﻿@model IEnumerable<Domain.CallLog>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("CallData", "WorkTask", FormMethod.Get))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card">
+
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="align-middle me-2" data-lucide="phone"></i>
+                        Call Data
+                    </h5>
+                </div>
+
+                <div class="card-body">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-4">
+
+                            <label for="TeamId" class="form-label">
+                                Team
+                            </label>
+
+                            <select id="TeamId"
+                                    name="TeamId"
+                                    class="form-select">
+
+                                <option value=""></option>
+
+                            </select>
+
+                        </div>
+
+                        <div class="col-md-4">
+
+                            <label for="UserEmpNo" class="form-label">
+                                Task Owner
+                            </label>
+
+                            <select id="UserEmpNo"
+                                    name="UserEmpNo"
+                                    class="form-select">
+
+                                <option value=""></option>
+
+                            </select>
+
+                            <span class="text-danger"
+                                  data-valmsg-for="UserEmpNo"
+                                  data-valmsg-replace="true">
+                            </span>
+
+                        </div>
+
+                        <div class="col-md-4">
+
+                            <label for="CallDate" class="form-label">
+                                Date
+                            </label>
+
+                            <input type="date"
+                                   name="CallDate"
+                                   id="CallDate"
+                                   value="@ViewBag.CallDate"
+                                   class="form-control" />
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="card-footer">
+
+                    <div class="d-flex justify-content-end">
+
+                        <button type="submit"
+                                class="btn btn-sm btn-primary">
+
+                            <i class="align-middle me-1" data-lucide="search"></i>
+                            Search
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card">
+
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="align-middle me-2" data-lucide="plus"></i>
+                        Add New
+                    </h5>
+                </div>
+
+                <div class="card-body">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-4">
+
+                            <label for="CallTeamId" class="form-label">
+                                Team
+                            </label>
+
+                            <select id="CallTeamId"
+                                    name="CallTeamId"
+                                    class="form-select">
+
+                                <option value=""></option>
+
+                            </select>
+
+                        </div>
+
+                        <div class="col-md-8">
+
+                            <label for="CallUserEmpNo" class="form-label">
+                                Task Owner
+                            </label>
+
+                            <select id="CallUserEmpNo"
+                                    name="CallUserEmpNo"
+                                    class="form-select">
+
+                                <option value=""></option>
+
+                            </select>
+
+                        </div>
+
+                        <div class="col-md-4">
+
+                            <label for="OnlineHrs" class="form-label">
+                                Online Hrs
+                            </label>
+
+                            <input type="text"
+                                   id="OnlineHrs"
+                                   name="OnlineHrs"
+                                   class="form-control" />
+
+                        </div>
+
+                        <div class="col-md-4">
+
+                            <label for="MissedCalls" class="form-label">
+                                No Of Missed Calls
+                            </label>
+
+                            <input type="text"
+                                   id="MissedCalls"
+                                   name="MissedCalls"
+                                   class="form-control" />
+
+                        </div>
+
+                        <div class="col-md-4">
+
+                            <label for="ReceivedCalls" class="form-label">
+                                No Of Received Calls
+                            </label>
+
+                            <input type="text"
+                                   id="ReceivedCalls"
+                                   name="ReceivedCalls"
+                                   class="form-control" />
+
+                        </div>
+
+                        <div class="col-md-4">
+
+                            <label for="TotalAbundantCalls" class="form-label">
+                                Total Abundant Calls
+                            </label>
+
+                            <input type="text"
+                                   id="TotalAbundantCalls"
+                                   name="TotalAbundantCalls"
+                                   class="form-control" />
+
+                        </div>
+
+                        <div class="col-md-4">
+
+                            <label for="TotalReceivedCalls" class="form-label">
+                                Total Received Calls
+                            </label>
+
+                            <input type="text"
+                                   id="TotalReceivedCalls"
+                                   name="TotalReceivedCalls"
+                                   class="form-control" />
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="card-footer">
+
+                    <div class="d-flex justify-content-end">
+
+                        <button type="button"
+                                class="btn btn-sm btn-success"
+                                onclick="addItem()">
+
+                            <i class="align-middle me-1" data-lucide="save"></i>
+                            Save
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card">
+
+                <div class="card-body">
+
+                    <div class="table-responsive">
+
+                        <table id="dataTable"
+                               class="table table-striped table-hover align-middle">
+
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th class="text-end">Online Hrs</th>
+                                    <th class="text-end">Received Calls</th>
+                                    <th class="text-end">Missed Calls</th>
+                                    <th class="text-end">Total Abundant Calls</th>
+                                    <th class="text-end">Total Received Calls</th>
+                                    <th>Updated By</th>
+                                    <th>Updated Date</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+
+                                        <td>
+                                            @if (item.User != null)
+                                            {
+                                                <span>
+                                                    @item.User.EmpNo - @item.User.FullName
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span>N/A</span>
+                                            }
+                                        </td>
+
+                                        <td class="text-end">
+                                            @item.OnlineHrs
+                                        </td>
+
+                                        <td class="text-end">
+                                            @item.ReceivedCalls
+                                        </td>
+
+                                        <td class="text-end">
+                                            @item.MissedCalls
+                                        </td>
+
+                                        <td class="text-end">
+                                            @item.TotalAbundantCalls
+                                        </td>
+
+                                        <td class="text-end">
+                                            @item.TotalReceivedCalls
+                                        </td>
+
+                                        <td>
+                                            @item.UpdatedBy
+                                        </td>
+
+                                        <td>
+                                            @item.UpdatedDate
+                                        </td>
+
+                                    </tr>
+                                }
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+}
+
+
+@section scripts {
+
+    <script src="~/Scripts/jquery.validate.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $("#dataTable").DataTable({
+                paging: false,
+                lengthChange: true,
+                searching: true,
+                ordering: true,
+                info: true,
+                responsive: true,
+                autoWidth: false
+            });
+
+            loadTeams();
+            loadTeamsCall();
+
+        });
+
+
+        function parseJsonResult(data) {
+
+            if (typeof data === "string") {
+
+                try {
+                    return JSON.parse(data);
+                }
+                catch (e) {
+                    return [];
+                }
+
+            }
+
+            return data || [];
+        }
+
+
+        function addItem() {
+
+            var valid = true;
+
+            var empNo = $("#CallUserEmpNo").val();
+            var date = $("#CallDate").val();
+            var onlineHrs = $("#OnlineHrs").val();
+            var missedCalls = $("#MissedCalls").val();
+            var receivedCalls = $("#ReceivedCalls").val();
+            var abundantCallsTot = $("#TotalAbundantCalls").val();
+            var receivedCallsTot = $("#TotalReceivedCalls").val();
+
+
+            if (!empNo || empNo == "0") {
+
+                valid = false;
+                showError("Please select a User.");
+
+            }
+            else if (!date) {
+
+                valid = false;
+                showError("Please select a date.");
+
+            }
+            else if (
+                onlineHrs == "" ||
+                missedCalls == "" ||
+                receivedCalls == "" ||
+                abundantCallsTot == "" ||
+                receivedCallsTot == ""
+            ) {
+
+                valid = false;
+                showError("Please enter valid data.");
+
+            }
+
+
+            if (!valid) {
+                return;
+            }
+
+
+            Swal.fire({
+
+                title: "Are you sure?",
+                text: "Do you want to add this call data?",
+                icon: "warning",
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                showCancelButton: true,
+                reverseButtons: true
+
+            }).then(function (result) {
+
+                if (result.isConfirmed || result.value) {
+
+                    $.ajax({
+
+                        url: '@Url.Action("AddCallData", "CallLog")',
+
+                        type: "GET",
+
+                        dataType: "json",
+
+                        data: {
+                            empNo: empNo,
+                            date: date,
+                            onlineHrs: onlineHrs,
+                            missedCalls: missedCalls,
+                            receivedCalls: receivedCalls,
+                            abundantCallsTot: abundantCallsTot,
+                            receivedCallsTot: receivedCallsTot
+                        },
+
+                        success: function (data) {
+
+                            if (data == "1" || data == 1) {
+
+                                Swal.fire(
+                                    "Updated!",
+                                    "Call Data has been updated",
+                                    "success"
+                                ).then(function () {
+                                    window.location.reload();
+                                });
+
+                            }
+                            else if (data == "2" || data == 2) {
+
+                                Swal.fire(
+                                    "Something went wrong!",
+                                    "Please enter valid data.",
+                                    "error"
+                                );
+
+                            }
+                            else {
+
+                                Swal.fire(
+                                    "Something went wrong!",
+                                    "Data is not updated. Please try again",
+                                    "error"
+                                );
+
+                            }
+
+                        },
+
+                        error: function () {
+
+                            Swal.fire(
+                                "Something went wrong!",
+                                "Data is not updated. Please try again",
+                                "error"
+                            );
+
+                        }
+
+                    });
+
+                }
+
+            });
+
+        }
+
+
+        $("#TeamId").on("change", function () {
+            loadUsers();
+        });
+
+
+        function loadTeams() {
+
+            var dropDown = $("#TeamId");
+
+            dropDown.empty();
+            dropDown.append("<option value='0'>-- All --</option>");
+
+
+            $.getJSON(
+                '@Url.Action("GetTeamUserListJsonResult", "Team")',
+                function (data) {
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.TeamId,
+                                    text: item.TeamName
+                                })
+                            );
+
+                        }
+                    );
+
+
+                    var selectedTeamId = '@ViewBag.TeamId';
+
+                    if (selectedTeamId) {
+                        dropDown.val(selectedTeamId);
+                    }
+
+                    loadUsers();
+
+                }
+            );
+
+        }
+
+
+        function loadUsers() {
+
+            var teamId = $("#TeamId").val();
+            var dropDown = $("#UserEmpNo");
+
+            dropDown.empty();
+            dropDown.append("<option value='0'>-- All --</option>");
+
+
+            $.getJSON(
+                '@Url.Action("GetUsersByTeamIdJsonResult", "User")',
+                {
+                    teamId: teamId
+                },
+                function (data) {
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.EmpNo,
+                                    text:
+                                        item.EmpNo +
+                                        " - " +
+                                        item.FullName +
+                                        " (" +
+                                        (item.DesignationName || "") +
+                                        ")"
+                                })
+                            );
+
+                        }
+                    );
+
+
+                    var selectedEmpNo = '@ViewBag.UserEmpNo';
+
+                    if (selectedEmpNo) {
+                        dropDown.val(selectedEmpNo);
+                    }
+
+                }
+            );
+
+        }
+
+
+        $("#CallTeamId").on("change", function () {
+            loadUsersCall();
+        });
+
+
+        function loadTeamsCall() {
+
+            var dropDown = $("#CallTeamId");
+
+            dropDown.empty();
+            dropDown.append("<option value='0'>-- Select --</option>");
+
+
+            $.getJSON(
+                '@Url.Action("GetTeamUserListJsonResult", "Team")',
+                function (data) {
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.TeamId,
+                                    text: item.TeamName
+                                })
+                            );
+
+                        }
+                    );
+
+                    loadUsersCall();
+
+                }
+            );
+
+        }
+
+
+        function loadUsersCall() {
+
+            var teamId = $("#CallTeamId").val();
+            var dropDown = $("#CallUserEmpNo");
+
+            dropDown.empty();
+            dropDown.append("<option value='0'>-- Select --</option>");
+
+
+            $.getJSON(
+                '@Url.Action("GetUsersByTeamIdJsonResult", "User")',
+                {
+                    teamId: teamId
+                },
+                function (data) {
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.EmpNo,
+                                    text:
+                                        item.EmpNo +
+                                        " - " +
+                                        item.FullName +
+                                        " (" +
+                                        (item.DesignationName || "") +
+                                        ")"
+                                })
+                            );
+
+                        }
+                    );
+
+                }
+            );
+
+        }
+
+
+        function showError(errorDescription) {
+
+            Swal.fire({
+                title: "Error",
+                text: errorDescription,
+                icon: "error"
+            });
+
+        }
+
+    </script>
+}

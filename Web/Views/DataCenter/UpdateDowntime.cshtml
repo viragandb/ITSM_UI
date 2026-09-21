@@ -1,0 +1,235 @@
+﻿@model Domain.DowntimeLog
+@using Service
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card box-danger">
+            <div class="card-header with-border">
+                <h3 class="card-title">Update Downtime  </h3>
+                <div class="card-tools pull-right">
+                    <a href="@Url.Action("DowntimeReview", "DataCenter")" class="btn btn-social btn-cancel">
+                        <i class="fa fa-arrow-left"></i>Back
+                    </a>
+                </div>
+            </div>
+
+            @using (Html.BeginForm("UpdateDowntime", "DataCenter", FormMethod.Post, new { @class = "form-horizontal" }))
+            {
+
+                @Html.HiddenFor(model => model.AssetId)
+                @Html.HiddenFor(model => model.TicketId)
+                @Html.HiddenFor(model => model.ApplicableDate)
+
+                <div class="card-body">
+
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="card ">
+                                <div class="card-header">
+                                    <h3 class="card-title">
+                                        <b>Asset Code @Model.Asset.AssetCode </b> | @Model.Asset.AssetName
+                                    </h3>
+                                    <div class="card-tools pull-right">
+
+
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="col-lg-12 ">
+                                        <div class="form-group row">
+                                            @Html.LabelFor(model => Model.Asset.AssetName, new { @class = "col-lg-3 text-right" })
+                                            <div class="col-lg-9">
+                                                @Model.Asset.AssetName
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            @Html.LabelFor(model => Model.Asset.AssetTypeName, new { @class = "col-lg-3 text-right" })
+                                            <div class="col-lg-9">
+                                                @Model.Asset.AssetTypeName
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group row">
+                                            @Html.LabelFor(model => Model.Asset.ModelName, new { @class = "col-lg-3 text-right" })
+                                            <div class="col-lg-9">
+                                                @Model.Asset.ModelName
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            @Html.LabelFor(model => Model.Asset.SerialNo, new { @class = "col-lg-3 text-right" })
+                                            <div class="col-lg-9">
+                                                @Model.Asset.SerialNo
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            @Html.LabelFor(model => Model.Asset.Description, new { @class = "col-lg-3 text-right" })
+                                            <div class="col-lg-9">
+                                                @Model.Asset.Description
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="col-lg-12">
+
+                                        <div class="form-group row">
+                                            <div class="col-md-4">
+                                                <i class="fa fa-plug"></i> &nbsp;&nbsp; @Model.Asset.AssetCategory.EnumDisplayName()
+                                            </div>
+
+
+                                            <div class="col-md-4">
+                                                <i class="fa fa-building"></i> &nbsp;&nbsp; @Model.Asset.Company
+                                            </div>
+
+
+                                            <div class="col-md-4">
+                                                <i class="fa fa-map-marker"></i> &nbsp;&nbsp; @Model.Asset.Location
+                                            </div>
+
+                                        </div>
+                                        <div class="form-group row">
+                                            <div class="col-md-4">
+                                                <i class="fa fa-user"></i> &nbsp;&nbsp; @Model.Asset.UpdatedBy
+                                            </div>
+
+
+                                            <div class="col-md-4">
+                                                <i class="fa fa-calendar"></i> &nbsp;&nbsp; @Model.Asset.UpdatedDate
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="col-lg-6 ">
+                            <div class="card">
+                                <div class="card-header with-border">
+                                    <h3 class="card-title">Update </h3>
+                                    <div class="card-tools pull-right">
+
+                                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="" data-original-title="Collapse">
+                                            <i class="fa fa-minus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="card-body">
+
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.Comment, new { @class = "col-md-3 control-label" })
+                                        <div class="col-md-9">
+                                            @Html.TextAreaFor(model => model.Comment, new { @class = "form-control", rows = "3" })
+                                            @Html.ValidationMessageFor(model => model.Comment, null, new { @class = "help-block" })
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        @Html.LabelFor(model => model.DowntimeHrs, new { @class = "col-md-3 control-label" })
+                                        <div class="col-md-3">
+                                            @Html.TextBoxFor(model => model.DowntimeHrs, new { @class = "form-control" })
+                                        </div>
+                                        <div class="col-md-6">
+
+                                            @Html.ValidationMessageFor(model => model.DowntimeHrs, null, new { @class = "help-block" })
+                                        </div>
+                                    </div>
+
+
+
+                                </div>
+                                <div class="card-footer">
+                                    <div class="text-right">
+                                        <button type="submit" class="btn btn-sm btn-social btn-primary"><i class="fa fa-floppy-o"></i>Update</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+
+
+
+                </div>
+
+                <div class="row">
+
+                    <div class="col-md-12">
+                        <div class="card box-default">
+                            <div class="card-header with-border">
+                                <h3 class="card-title"><i class="fa fa-history"></i>&nbsp;History</h3>
+
+                            </div>
+                            <div class="card-body">
+
+                                <table id="dataTable" class="table table-bordered table-striped table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Ticket</th>
+                                            <th>Type</th>
+                                            <th>Date/Time</th>
+                                            <th>Comment</th>
+                                            <th>Downtime Hrs</th>
+
+                                            <th>Updated By</th>
+                                            <th>Updated Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            foreach (var item in Model.Asset.DowntimeLogs)
+                                            {
+                                                <tr>
+
+                                                    <td>
+                                                        @if (item.TicketId != 0)
+                                                        {
+                                                            <a href="@Html.EncodedActionLink("", "TicketInfo", "Ticket", "", new { id = item.TicketId }, null)" target="_blank">
+                                                                Ticket
+                                                            </a>
+                                                        }
+                                                    </td>
+
+                                                    <td>@item.DowntimeType.EnumDisplayName()</td>
+                                                    <td>@item.ApplicableDate</td>
+                                                    <td>@item.Comment</td>
+                                                    <td>@item.DowntimeHrs</td>
+                                                    <td>@item.UpdatedBy</td>
+                                                    <td>@item.UpdatedDate</td>
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+
+                                </table>
+
+                            </div>
+                            <!-- /.box-body -->
+
+                        </div>
+
+                    </div>
+                </div>
+
+
+            }
+        </div>
+        <!-- /.box -->
+    </div>
+</div>
+
+@section scripts {
+
+
+}
+

@@ -1,0 +1,317 @@
+﻿@model Domain.Item
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="card">
+
+            <div class="card-header d-flex justify-content-between align-items-center">
+
+                <h5 class="card-title mb-0">
+                    <i class="align-middle me-2" data-lucide="box"></i>
+                    Asset Details
+                </h5>
+
+                <a href="@Url.Action("Index", "Item")"
+                   class="btn btn-sm btn-light">
+
+                    <i class="align-middle me-1" data-lucide="arrow-left"></i>
+                    Back
+
+                </a>
+
+            </div>
+
+            @using (Html.BeginForm("Edit", "Item", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true)
+
+                @Html.HiddenFor(model => model.ItemId)
+
+                <div class="card-body">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+
+                            @Html.LabelFor(
+                                model => model.CompanyId,
+                                new { @class = "form-label" }
+                            )
+
+                            <select id="CompanyId"
+                                    name="CompanyId"
+                                    class="form-select">
+                                <option value=""></option>
+                            </select>
+
+                            <span class="text-danger"
+                                  data-valmsg-for="CompanyId"
+                                  data-valmsg-replace="true">
+                            </span>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            @Html.LabelFor(
+                                model => model.LocationId,
+                                new { @class = "form-label" }
+                            )
+
+                            <select id="LocationId"
+                                    name="LocationId"
+                                    class="form-select">
+                                <option value=""></option>
+                            </select>
+
+                            <span class="text-danger"
+                                  data-valmsg-for="LocationId"
+                                  data-valmsg-replace="true">
+                            </span>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            @Html.LabelFor(
+                                model => model.ItemName,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.TextBoxFor(
+                                model => model.ItemName,
+                                new { @class = "form-control" }
+                            )
+
+                            @Html.ValidationMessageFor(
+                                model => model.ItemName,
+                                "",
+                                new { @class = "text-danger" }
+                            )
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            @Html.LabelFor(
+                                model => model.ItemSerialNo,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.TextBoxFor(
+                                model => model.ItemSerialNo,
+                                new { @class = "form-control" }
+                            )
+
+                            @Html.ValidationMessageFor(
+                                model => model.ItemSerialNo,
+                                "",
+                                new { @class = "text-danger" }
+                            )
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            @Html.LabelFor(
+                                model => model.ItemBarCode,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.TextBoxFor(
+                                model => model.ItemBarCode,
+                                new { @class = "form-control" }
+                            )
+
+                            @Html.ValidationMessageFor(
+                                model => model.ItemBarCode,
+                                "",
+                                new { @class = "text-danger" }
+                            )
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            @Html.LabelFor(
+                                model => model.ItemModelNo,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.TextBoxFor(
+                                model => model.ItemModelNo,
+                                new { @class = "form-control" }
+                            )
+
+                            @Html.ValidationMessageFor(
+                                model => model.ItemModelNo,
+                                "",
+                                new { @class = "text-danger" }
+                            )
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="card-footer">
+
+                    <div class="d-flex justify-content-end gap-2">
+
+                        <button type="reset"
+                                class="btn btn-sm btn-danger">
+
+                            <i class="align-middle me-1" data-lucide="rotate-ccw"></i>
+                            Cancel
+
+                        </button>
+
+                        <button type="submit"
+                                class="btn btn-sm btn-primary">
+
+                            <i class="align-middle me-1" data-lucide="save"></i>
+                            Save
+
+                        </button>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+</div>
+
+
+@section scripts {
+
+    <script src="~/Scripts/jquery.validate.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            loadCompanies();
+
+            $("#CompanyId").on("change", function () {
+                loadLocation();
+            });
+
+        });
+
+
+        function parseJsonResult(data) {
+
+            if (typeof data === "string") {
+
+                try {
+                    return JSON.parse(data);
+                }
+                catch (e) {
+                    return [];
+                }
+
+            }
+
+            return data || [];
+        }
+
+
+        function loadCompanies() {
+
+            $.getJSON(
+                '@Url.Action("GetCompanyListJsonResult", "Company")',
+                function (data) {
+
+                    var companyDropDown = $("#CompanyId");
+
+                    companyDropDown.empty();
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            companyDropDown.append(
+                                $("<option/>", {
+                                    value: item.CompanyId,
+                                    text: item.CompanyName
+                                })
+                            );
+
+                        }
+                    );
+
+                    var selectedId = '@ViewBag.CompanyId';
+
+                    if (selectedId) {
+                        companyDropDown.val(selectedId);
+                    }
+
+                    loadLocation();
+
+                }
+            );
+
+        }
+
+
+        function loadLocation() {
+
+            var companyId = $("#CompanyId").val();
+
+            if (!companyId) {
+                companyId = 1;
+            }
+
+            $.getJSON(
+                '@Url.Action("GetLocationListJsonResult", "Location")',
+                {
+                    CompanyId: companyId
+                },
+                function (data) {
+
+                    var dropDown = $("#LocationId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- Select --</option>"
+                    );
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.LocationId,
+                                    text: item.LocationName
+                                })
+                            );
+
+                        }
+                    );
+
+                    var selectedId = '@ViewBag.LocationId';
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+                }
+            );
+
+        }
+
+    </script>
+}

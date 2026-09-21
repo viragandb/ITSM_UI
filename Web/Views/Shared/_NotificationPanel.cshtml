@@ -1,0 +1,99 @@
+﻿@model IEnumerable<Domain.NotificationCategory>
+
+@{
+    var notificationCount = Model != null ? Model.Count() : 0;
+}
+
+<li class="nav-item dropdown">
+
+    <a class="nav-icon dropdown-toggle"
+       href="#"
+       id="notificationDropdown"
+       data-bs-toggle="dropdown"
+       aria-expanded="false">
+
+        <div class="position-relative">
+
+            <i class="align-middle text-body"
+               data-lucide="shield"></i>
+
+            @if (notificationCount > 0)
+            {
+                <span class="indicator">
+                    @notificationCount
+                </span>
+            }
+
+        </div>
+
+    </a>
+
+
+    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end py-0"
+         aria-labelledby="notificationDropdown">
+
+        <div class="dropdown-menu-header">
+
+            <div class="position-relative">
+
+                <i class="fas fa-bullhorn me-2"></i>
+
+                New Notifications
+
+            </div>
+
+        </div>
+
+
+        @if (Model != null && Model.Any())
+        {
+            <div class="list-group">
+
+                @foreach (var item in Model)
+                {
+                    <a href="@Url.Action(item.Action, item.Controller)"
+                       class="list-group-item">
+
+                        <div class="row g-0 align-items-center">
+
+                            <div class="col-2">
+
+                                <i class="@item.Icon text-@item.Color"></i>
+
+                            </div>
+
+                            <div class="col-8">
+
+                                <div>
+                                    @item.Subject
+                                </div>
+
+                            </div>
+
+                            <div class="col-2 text-end">
+
+                                <span class="badge bg-@item.Color">
+                                    @item.NotificationCount
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </a>
+                }
+
+            </div>
+        }
+        else
+        {
+            <div class="p-3 text-center text-muted">
+
+                No new notifications
+
+            </div>
+        }
+
+    </div>
+
+</li>

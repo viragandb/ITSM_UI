@@ -1,0 +1,383 @@
+﻿@model Domain.GRNote
+@using Service
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="card">
+
+            <div class="card-header">
+
+                <h5 class="card-title mb-0">
+                    <i class="align-middle me-2" data-lucide="file-text"></i>
+                    GRN Info
+                </h5>
+
+            </div>
+
+            <div class="card-body">
+
+                <div class="row g-4">
+
+                    <div class="col-lg-9">
+
+                        <dl class="row mb-0">
+
+                            <dt class="col-lg-3">
+                                @Html.LabelFor(model => Model.PONumber)
+                            </dt>
+
+                            <dd class="col-lg-3">
+                                @Model.PONumber
+                            </dd>
+
+                            <dt class="col-lg-3">
+                                @Html.LabelFor(model => Model.PurchaseDate)
+                            </dt>
+
+                            <dd class="col-lg-3">
+                                @Model.PurchaseDate.ToShortDateString()
+                            </dd>
+
+                            <dt class="col-lg-3">
+                                @Html.LabelFor(model => Model.GRNNumber)
+                            </dt>
+
+                            <dd class="col-lg-3">
+                                @Model.GRNNumber
+                            </dd>
+
+                            <dt class="col-lg-3">
+                                @Html.LabelFor(model => Model.ReceivedDate)
+                            </dt>
+
+                            <dd class="col-lg-3">
+                                @Model.ReceivedDate.ToShortDateString()
+                            </dd>
+
+                            <dt class="col-lg-3">
+                                @Html.LabelFor(model => Model.InvoiceNumber)
+                            </dt>
+
+                            <dd class="col-lg-3">
+                                @Model.InvoiceNumber
+                            </dd>
+
+                        </dl>
+
+                        <hr />
+
+                        <dl class="row mb-0">
+
+                            <dt class="col-lg-3">
+                                @Html.LabelFor(model => Model.Description)
+                            </dt>
+
+                            <dd class="col-lg-9">
+                                @Model.Description
+                            </dd>
+
+                        </dl>
+
+                        <hr />
+
+                        <dl class="row mb-0">
+
+                            <dt class="col-lg-3">
+
+                                <i class="align-middle me-1"
+                                   data-lucide="user"></i>
+
+                                Updated By
+
+                            </dt>
+
+                            <dd class="col-lg-3">
+                                @Model.UpdatedBy
+                            </dd>
+
+                            <dt class="col-lg-3">
+
+                                <i class="align-middle me-1"
+                                   data-lucide="calendar"></i>
+
+                                Date
+
+                            </dt>
+
+                            <dd class="col-lg-3">
+                                @Model.UpdatedDate
+                            </dd>
+
+                        </dl>
+
+                    </div>
+
+                    <div class="col-lg-3">
+
+                        <div class="card h-100">
+
+                            <div class="card-header">
+
+                                <h5 class="card-title mb-0">
+
+                                    <i class="align-middle me-2"
+                                       data-lucide="building-2"></i>
+
+                                    Vendor
+
+                                </h5>
+
+                            </div>
+
+                            <div class="card-body">
+
+                                <div class="d-flex align-items-start mb-3">
+
+                                    <i class="align-middle me-2 mt-1"
+                                       data-lucide="building"></i>
+
+                                    <span>
+                                        @Model.Vendor.VendorName
+                                    </span>
+
+                                </div>
+
+                                <div class="d-flex align-items-start mb-3">
+
+                                    <i class="align-middle me-2 mt-1"
+                                       data-lucide="map-pin"></i>
+
+                                    <span>
+                                        @Model.Vendor.Address
+                                    </span>
+
+                                </div>
+
+                                <div class="d-flex align-items-start mb-3">
+
+                                    <i class="align-middle me-2 mt-1"
+                                       data-lucide="phone"></i>
+
+                                    <span>
+                                        @Model.Vendor.ContactNo
+                                    </span>
+
+                                </div>
+
+                                <div class="d-flex align-items-start">
+
+                                    <i class="align-middle me-2 mt-1"
+                                       data-lucide="mail"></i>
+
+                                    <span>
+                                        @Model.Vendor.Email
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="row g-4 mt-1">
+
+                    <div class="col-lg-9">
+
+                        <div class="card">
+
+                            <div class="card-header">
+
+                                <h5 class="card-title mb-0">
+
+                                    <i class="align-middle me-2"
+                                       data-lucide="boxes"></i>
+
+                                    Assets
+
+                                </h5>
+
+                            </div>
+
+                            <div class="card-body">
+
+                                <div class="table-responsive">
+
+                                    <table id="dataTable"
+                                           class="table table-striped table-hover align-middle w-100">
+
+                                        <thead>
+                                            <tr>
+                                                <th>Asset No</th>
+                                                <th>Asset Type</th>
+                                                <th>Make</th>
+                                                <th>Model</th>
+                                                <th>Serial No</th>
+                                                <th>Barcode</th>
+                                                <th>Branch</th>
+                                                <th>Department</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+
+                                            @foreach (var item in Model.Assets)
+                                            {
+                                                <tr>
+
+                                                    <td>
+
+                                                        <a href="@Html.EncodedActionLink(
+                                                                     "",
+                                                                     "Info",
+                                                                     "Asset",
+                                                                     "",
+                                                                     new { id = item.AssetId },
+                                                                     null
+                                                                 )"
+                                                           target="_blank"
+                                                           class="text-decoration-none">
+
+                                                            <i class="align-middle me-1"
+                                                               data-lucide="external-link"></i>
+
+                                                            @item.AssetNo
+
+                                                        </a>
+
+                                                    </td>
+
+                                                    <td>
+                                                        @item.AssetType.AssetTypeName
+                                                    </td>
+
+                                                    <td>
+                                                        @item.AssetMake.Name
+                                                    </td>
+
+                                                    <td>
+                                                        @item.ModelName
+                                                    </td>
+
+                                                    <td>
+                                                        @item.SerialNo
+                                                    </td>
+
+                                                    <td>
+                                                        @item.Barcode
+                                                    </td>
+
+                                                    <td>
+                                                        @item.Branch.Name
+                                                    </td>
+
+                                                    <td>
+                                                        @item.Department.DepartmentName
+                                                    </td>
+
+                                                    <td>
+                                                        @item.Status.EnumDisplayName()
+                                                    </td>
+
+                                                </tr>
+                                            }
+
+                                        </tbody>
+
+                                    </table>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-lg-3">
+
+                        <div class="card">
+
+                            <div class="card-header">
+
+                                <h5 class="card-title mb-0">
+
+                                    <i class="align-middle me-2"
+                                       data-lucide="paperclip"></i>
+
+                                    Documents
+
+                                </h5>
+
+                            </div>
+
+                            <div class="card-body">
+
+                                @foreach (var item in Model.ItemDocs)
+                                {
+                                    <div class="mb-2">
+
+                                        <a href="@item.FileUrl"
+                                           target="_blank"
+                                           class="text-decoration-none">
+
+                                            <i class="align-middle me-1"
+                                               data-lucide="file-text"></i>
+
+                                            @item.DocumentName
+
+                                        </a>
+
+                                    </div>
+                                }
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            if ($.fn.DataTable) {
+
+                $("#dataTable").DataTable({
+                    paging: true,
+                    lengthChange: true,
+                    searching: true,
+                    ordering: true,
+                    info: true,
+                    autoWidth: false,
+                    responsive: true
+                });
+
+            }
+
+        });
+
+    </script>
+
+}

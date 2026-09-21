@@ -1,0 +1,231 @@
+﻿@model IList<Domain.UserGroup>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="card">
+
+            <div class="card-header">
+
+                <h5 class="card-title mb-0">
+                    <i class="align-middle me-2" data-lucide="users"></i>
+                    Assign Group
+                </h5>
+
+            </div>
+
+            @using (Html.BeginForm("Create", "UserGroup", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true)
+
+                <div class="card-body">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-8">
+
+                            <label for="EmpNo" class="form-label">
+                                User
+                            </label>
+
+                            <select id="EmpNo"
+                                    name="EmpNo"
+                                    class="form-select select2">
+                                <option value=""></option>
+                            </select>
+
+                            <span class="text-danger"
+                                  data-valmsg-for="EmpNo"
+                                  data-valmsg-replace="true">
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                    <hr class="my-4" />
+
+                    <div class="row">
+
+                        <div class="col-12">
+
+                            <label class="form-label fw-semibold">
+                                Groups
+                            </label>
+
+                            <div id="groups"></div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="card-footer">
+
+                    <div class="d-flex justify-content-end gap-2">
+
+                        <a href="@Url.Action("Create", "UserGroup")"
+                           class="btn btn-sm btn-danger">
+
+                            <i class="align-middle me-1" data-lucide="rotate-ccw"></i>
+                            Reset
+
+                        </a>
+
+                        <button type="submit"
+                                class="btn btn-sm btn-primary">
+
+                            <i class="align-middle me-1" data-lucide="save"></i>
+                            Save
+
+                        </button>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+</div>
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $("#EmpNo").select2({
+                width: "100%"
+            });
+
+            loadUsers();
+
+            $("#EmpNo").on("change", function () {
+                getUserGroups();
+            });
+
+        });
+
+
+        function parseJsonResult(data) {
+
+            if (typeof data === "string") {
+
+                try {
+                    return JSON.parse(data);
+                }
+                catch (e) {
+                    return [];
+                }
+
+            }
+
+            return data || [];
+        }
+
+
+        function loadUsers() {
+
+            var dropDown = $("#EmpNo");
+
+            dropDown.empty();
+
+            dropDown.append(
+                "<option value='0'>-- Select --</option>"
+            );
+
+
+            $.getJSON(
+                '@Url.Action("GetUsersAllListJsonResult", "User")',
+                function (data) {
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.EmpNo,
+                                    text: item.EmpNo + " | " + item.FullName
+                                })
+                            );
+
+                        }
+                    );
+
+
+                    var selectedEmpNo = '@ViewBag.EmpNo';
+
+                    if (selectedEmpNo) {
+                        dropDown.val(selectedEmpNo);
+                    }
+
+                    dropDown.trigger("change.select2");
+
+                    getUserGroups();
+
+                }
+            );
+
+        }
+
+
+        function getUserGroups() {
+
+            var empNo = $("#EmpNo").val();
+
+            $("#groups").empty();
+
+
+            if (!empNo || empNo == "0") {
+                return;
+            }
+
+
+            $.ajax({
+
+                url: '@Url.Action("GetUserGroups", "UserGroup")',
+
+                contentType: "application/html;charset=utf-8",
+
+                type: "GET",
+
+                dataType: "html",
+
+                data: {
+                    empNo: empNo
+                },
+
+                success: function (data) {
+
+                    $("#groups").html(data);
+
+                    if (window.lucide) {
+                        lucide.createIcons();
+                    }
+
+                },
+
+                error: function () {
+
+                    $("#groups").html(
+                        '<div class="alert alert-danger mb-0">Unable to load groups.</div>'
+                    );
+
+                }
+
+            });
+
+        }
+
+    </script>
+}

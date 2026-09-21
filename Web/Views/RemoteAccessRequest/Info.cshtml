@@ -1,0 +1,757 @@
+﻿@model Domain.RA.RemoteAccessRequest
+@using Service.AR
+@using Service
+@using Domain
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var WorkflowTeams = ViewBag.WorkflowTeams as List<long>;
+    var riskTeamId = ViewBag.RiskTeamId;
+
+    var updates = Model.RemoteAccessRequestUpdates
+        .Where(u => !u.IsDeleted && u.TeamId != null)
+        .OrderBy(u => u.UpdatedDate)
+        .ToList();
+
+    var updateByTeam = updates
+        .GroupBy(u => u.TeamId)
+        .ToDictionary(g => g.Key, g => g.Last());
+
+    long? activeTeamId = Model.TeamId;
+
+    
+    string GetManualTeamName(long id)
+    {
+        switch (id)
+        {
+            case 19: return "Risk Team";
+            case 20: return "HR Department";
+            case 21: return "IT Security Head";
+            case 13: return "IT SVP";
+            case 22: return "DCEO";
+            case 7: return "Implementer - IT Security";
+            case 4: return "Implementer - Network Team";
+            case 2: return "Help Desk";
+            default: return "Reviewer";
+        }
+    }
+    
+
+
+}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card card-primary card-outline">
+
+            <div class="card-header">
+                <h4 class="card-title">
+                    <b>Request# @Model.RemoteAccessRequestId</b>
+                    &nbsp; &nbsp; Remote Access
+                </h4>
+                <div class="text-right">
+
+                    <span class="badge bg-@AccessRequestService.GetStatusColor(Model.Status) text-sm">
+                        @Model.Status.EnumDisplayName()
+                        @*@if (Model.Status == Domain.AR.AccessRequestStatusEnum.Pending)
+                            {
+                                <i class="fas fa-angle-double-right"></i>
+                                <span>@Model.WorkflowLevelType.EnumDisplayName()&nbsp;-&nbsp;@(Model.TeamId !=null ? Model.Team.TeamName : "N/A") </span>
+                            }*@
+                    </span>&nbsp;&nbsp;
+                </div>
+            </div>
+            <div class="card-body">
+
+                <div class="bs-stepper linear card">
+                    <div class="bs-stepper-header" role="tablist">
+                        @{
+                            int index = 0;
+                        }
+                        @foreach (var teamId in WorkflowTeams)
+                        {
+                            index++;
+
+                            // 1. Determine State
+                            bool isCompleted = updateByTeam.ContainsKey(teamId);
+                            bool isActive = (activeTeamId == teamId && Model.Status == Domain.AR.AccessRequestStatusEnum.Pending);
+
+                            // 2. Assign Classes
+                            string stepClass = isActive ? "active" : "";
+                            string circleClass = "bg-secondary"; // Default (Upcoming)
+
+                            if (isActive)
+                            {
+                                circleClass = "bg-primary"; // Current stage color
+                            }
+                            else if (isCompleted)
+                            {
+                                var lastUpd = updateByTeam[teamId];
+                                circleClass = (lastUpd.Status == Domain.AR.AccessRequestStatusEnum.Rejected ||
+                                               lastUpd.Status == Domain.AR.AccessRequestStatusEnum.Revoked)
+                                              ? "bg-danger"
+                                              : "bg-success";
+                            }
+
+                            if (index > 1)
+                            {<div class="line"></div> }
+
+                            <div class="step @stepClass">
+                                <button type="button" class="step-trigger">
+                                    <span class="bs-stepper-circle @circleClass">@index</span>
+                                    <span class="bs-stepper-label" style="font-size:x-small">
+                                        @GetManualTeamName(teamId)
+                                    </span>
+                                </button>
+                            </div>
+                        }
+
+                    </div>
+
+                </div>
+
+                <div class="row">
+
+                    <div class="col-sm-8">
+
+                        <strong>@Html.LabelFor(model => Model.BusinessJustification)</strong>
+                        <p class="text-muted">
+
+                            @(string.IsNullOrEmpty(Model?.BusinessJustification) ? "N/A" : Model?.BusinessJustification)
+                        </p>
+                        <hr />
+                        <strong>@Html.LabelFor(model => Model.BelowAMJustification)</strong>
+                        <p class="text-muted">
+
+                            @(string.IsNullOrEmpty(Model?.BelowAMJustification) ? "N/A" : Model?.BelowAMJustification)
+                        </p>
+
+                        <hr />
+                        <strong>@Html.LabelFor(model => Model.ToleranceLimitExceededJustification)</strong> 
+                        <p class="text-muted">
+                            @(string.IsNullOrEmpty(Model?.ToleranceLimitExceededJustification) ? "N/A" : Model?.ToleranceLimitExceededJustification)                            
+                        </p>
+                        
+                        <hr />
+                        @*@if (ViewBag.LatestClarificationRequest != null)
+        {
+            <div class="card card-warning card-outline mt-3">
+                <div class="card-header">
+                    <strong>HR Clarification</strong>
+                </div>
+                <div class="card-body">
+
+                    <p>
+                        <strong>@Html.LabelFor(model => Model.ReasonForHRClarification)</strong><br />
+                        @ViewBag.LatestClarificationRequest.Comment
+                    </p>
+
+                    @if (ViewBag.LatestClarificationReply != null)
+                    {
+                        <hr />
+                        <p>
+                            <strong>@Html.LabelFor(model => Model.HRClarification)</strong>
+                            <br />
+                            @ViewBag.LatestClarificationReply.Comment
+                        </p>
+                    }
+                    else
+                    {
+                        <p class="text-muted">
+                            Awaiting clarification from requester.
+                        </p>
+                    }
+
+                </div>
+            </div>
+            <hr />
+        }*@
+
+                        <div class="card card-warning card-outline mt-3">
+
+                            <div class="card-header">
+                                <h3 class="card-title">
+                                    <i class="fa fa-question-circle"></i>
+                                    Clarification History
+                                </h3>
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+
+                                </div>
+                            </div>
+
+                            <div class="card-body">
+
+                                <!-- HR -->
+                                <div class="mb-4">
+                                    <h6 class="text-primary">
+                                        HR Team
+                                    </h6>
+
+                                    @if (ViewBag.HRRequest != null)
+                                    {
+                                        <div class="alert alert-default-warning">
+                                            <strong>Requested:</strong><br />
+                                            @ViewBag.HRRequest.Comment
+                                        </div>
+
+                                        if (ViewBag.HRReply != null)
+                                        {
+                                            <div class="alert alert-default-success">
+                                                <strong>Provided:</strong><br />
+                                                @ViewBag.HRReply.Comment
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="text-muted">
+                                                Awaiting clarification.
+                                            </div>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <div class="text-muted">
+                                            No clarification requested.
+                                        </div>
+                                    }
+                                </div>
+
+                                <hr />
+
+                                <!-- IT Security Head -->
+                                <div class="mb-4">
+                                    <h6 class="text-primary">
+                                        ITSVP
+                                    </h6>
+
+                                    @if (ViewBag.ITSVPRequest != null)
+                                    {
+                                        <div class="alert alert-default-warning">
+                                            <strong>Requested:</strong><br />
+                                            @ViewBag.ITSVPRequest.Comment
+                                        </div>
+
+                                        if (ViewBag.ITSVPReply != null)
+                                        {
+                                            <div class="alert alert-default-success">
+                                                <strong>Provided:</strong><br />
+                                                @ViewBag.ITSVPReply.Comment
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="text-muted">
+                                                Awaiting clarification.
+                                            </div>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <div class="text-muted">
+                                            No clarification requested.
+                                        </div>
+                                    }
+                                </div>
+
+                                <hr />
+
+                                <!-- DCEO -->
+                                <div>
+                                    <h6 class="text-primary">
+                                        DCEO
+                                    </h6>
+
+                                    @if (ViewBag.DCEORequest != null)
+                                    {
+                                        <div class="alert alert-default-warning">
+                                            <strong>Requested:</strong><br />
+                                            @ViewBag.DCEORequest.Comment
+                                        </div>
+
+                                        if (ViewBag.DCEOReply != null)
+                                        {
+                                            <div class="alert alert-default-success">
+                                                <strong>Provided:</strong><br />
+                                                @ViewBag.DCEOReply.Comment
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="text-muted">
+                                                Awaiting clarification.
+                                            </div>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <div class="text-muted">
+                                            No clarification requested.
+                                        </div>
+                                    }
+                                </div>
+
+                            </div>
+                        </div>
+
+                        @*<dl class="row">
+            <dt class="col-sm-2">Access Type</dt>
+            <dd class="col-sm-4">@Model.RemoteAccessType.EnumDisplayName()</dd>
+            <dt class="col-sm-2">Remote Work Location</dt>
+            <dd class="col-sm-4">@Model.RemoteWorkLocation</dd>
+
+            <dt class="col-sm-2">Start Date</dt>
+            <dd class="col-sm-4">@Model.StartDate.ToShortDateString()</dd>
+            <dt class="col-sm-2">End Date</dt>
+            <dd class="col-sm-4">@Model.EndDate.ToShortDateString()</dd>
+
+            <dt class="col-sm-2">Is Tolerance Limit Exceeded</dt>
+            <dd class="col-sm-4">
+                @if (Model.IsToleranceLimitExceeded)
+                {
+                    <span>Yes</span>
+                }
+                else
+                {
+                    <span>No</span>
+                }
+            </dd>
+            <dt class="col-sm-2">Planned Schedule</dt>
+            <dd class="col-sm-4">@Model.PlannedSchedule.EnumDisplayName()</dd>
+
+
+            @if (Model.RemoteAgreements != null && Model.RemoteAgreements.Any())
+            {
+                foreach (var item in Model.RemoteAgreements)
+                {
+                    <dt class="col-sm-2">Location Type</dt>
+                    <dd class="col-sm-4">@item.LocationType.EnumDisplayName()</dd>
+
+                    <dt class="col-sm-2">Location Status</dt>
+                    <dd class="col-sm-4">@item.LocationStatus.EnumDisplayName()</dd>
+
+                    <dt class="col-sm-2">Currently Residing Address</dt>
+                    <dd class="col-sm-4">@item.CurrentlyResidingAddress</dd>
+
+                    <dt class="col-sm-2"></dt>
+                    <dd class="col-sm-4"></dd>
+
+                    <dt class="col-sm-2">Is Travelling OverSeas</dt>
+                    <dd class="col-sm-4">@(item.WillTravelOverseas ? "Yes" : "No")</dd>
+
+                    if (item.WillTravelOverseas)
+                    {
+                        <dt class="col-sm-2">Destination Country</dt>
+                        <dd class="col-sm-4">@item.DestinationCountry</dd>
+
+                        <dt class="col-sm-2">Duration Of Travel</dt>
+                        <dd class="col-sm-4">@item.DurationOfTravel</dd>
+
+                        <dt class="col-sm-2">Reason For Travel</dt>
+                        <dd class="col-sm-4">@item.ReasonForTtravel</dd>
+
+                        <dt class="col-sm-2">Confirmation that connectivity will comply with Bank security policies, including VPN usage and restrictions on public Wi-Fi.</dt>
+                        <dd class="col-sm-4">@(item.OverseasConnectivityConfirm ? "Yes" : "No")</dd>
+                    }
+
+
+
+                }
+            }
+
+
+
+
+
+
+
+        </dl>*@
+                        <div class="mb-4">
+                            <dl class="row">
+                                <dt class="col-sm-2 py-1">Access Type</dt>
+                                <dd class="col-sm-4 py-1">
+                                    @((int)(Model?.RemoteAccessType ?? 0) == 0 ? "N/A" : Model?.RemoteAccessType.EnumDisplayName())
+                                </dd>
+
+                                <dt class="col-sm-2 py-1">Remote Location</dt>
+                                <dd class="col-sm-4 py-1">
+                                    @(string.IsNullOrEmpty(Model?.RemoteWorkLocation) ? "N/A" : Model?.RemoteWorkLocation)
+                                </dd>
+
+                                <dt class="col-sm-2 py-1">Start Date</dt>
+                                <dd class="col-sm-4 py-1">
+                                    @(Model == null || Model.StartDate == DateTime.MinValue ? "N/A" : Model.StartDate.ToShortDateString())
+                                </dd>
+
+                                <dt class="col-sm-2 py-1">End Date</dt>
+                                <dd class="col-sm-4 py-1">
+                                    @(Model == null || Model.EndDate == DateTime.MinValue ? "N/A" : Model.EndDate.ToShortDateString())
+                                </dd>
+
+                                <dt class="col-sm-2 py-1">Tolerance Exceeded</dt>
+                                <dd class="col-sm-4 py-1">
+                                    <span class="badge @(Model.IsToleranceLimitExceeded ? "bg-danger" : "bg-success") px-2.5 py-1.5" style="font-size: 0.95rem; font-weight: 600;">
+                                        @(Model.IsToleranceLimitExceeded ? "Yes" : "No")
+                                    </span>
+                                </dd>
+
+                                <dt class="col-sm-2 py-1">Planned Schedule</dt>
+                                <dd class="col-sm-4 py-1">
+                                    @((int)(Model?.PlannedSchedule ?? 0) == 0 ? "N/A" : Model.PlannedSchedule.EnumDisplayName())
+                                </dd>
+                            </dl>
+                        </div>
+
+                        @if (Model.RemoteAgreements != null && Model.RemoteAgreements.Any())
+                        {
+
+                            foreach (var item in Model.RemoteAgreements)
+                            {
+                                <div class="card shadow-sm border-light mb-4">
+                                    <div class="card-header bg-light text-primary fw-bold py-2">
+                                        Agreement Details
+                                    </div>
+                                    <div class="card-body pb-1">
+                                        <dl class="row mb-0">
+                                            <dt class="col-sm-2 py-1">Location Type</dt>
+                                            <dd class="col-sm-4 py-1">
+                                                @((int)(item?.LocationType ?? 0) == 0 ? "N/A" : item?.LocationType.EnumDisplayName())
+                                            </dd>
+
+                                            <dt class="col-sm-2 py-1">Location Status</dt>
+                                            <dd class="col-sm-4 py-1">
+                                                @((int)(item?.LocationStatus ?? 0) == 0 ? "N/A" : item?.LocationStatus.EnumDisplayName())
+                                            </dd>
+
+                                            <dt class="col-sm-2 py-1">Residing Address</dt>
+                                            <dd class="col-sm-10 py-1">
+                                                @(string.IsNullOrEmpty(item?.CurrentlyResidingAddress) ? "N/A" : item?.CurrentlyResidingAddress)
+                                            </dd>
+
+                                            <dt class="col-sm-2 py-1">Overseas Travel</dt>
+                                            <dd class="col-sm-10 py-1">
+                                                <span class="badge @(item.WillTravelOverseas ? "bg-warning text-dark" : "bg-secondary")" style="font-size: 0.95rem; font-weight: 600; padding: 4px 8px;">
+                                                    @(item.WillTravelOverseas ? "Yes" : "No")
+                                                </span>
+                                            </dd>
+
+
+                                            @if (item.WillTravelOverseas)
+                                            {
+                                                <!-- Grouped Travel Data for Perfect Grid Flow -->
+                                                <dt class="col-sm-2 py-1 text-muted">Destination</dt>
+                                                <dd class="col-sm-4 py-1">
+                                                    @(string.IsNullOrEmpty(item?.DestinationCountry) ? "N/A" : item?.DestinationCountry)
+                                                </dd>
+
+                                                <dt class="col-sm-2 py-1 text-muted">Duration</dt>
+                                                <dd class="col-sm-4 py-1">
+                                                    @(string.IsNullOrEmpty(item?.DurationOfTravel) ? "N/A" : item?.DurationOfTravel)
+                                                </dd>
+
+                                                <dt class="col-sm-2 py-1 text-muted">Reason</dt>
+                                                <dd class="col-sm-10 py-1">
+                                                    @(string.IsNullOrEmpty(item?.ReasonForTtravel) ? "N/A" : item?.ReasonForTtravel)
+                                                </dd>
+
+                                                <!-- Fix for long text labels using full-width col-12 layout -->
+                                                <div class="col-12 mt-3 pt-3 border-top bg-light-subtle rounded-3 p-3">
+                                                    <!-- Increased from small to normal size, boosted boldness -->
+                                                    <p class="mb-1 text-dark" style="font-size: 1.05rem; font-weight: 700;">
+                                                        Security Policy Confirmation:
+                                                    </p>
+                                                    <!-- Removed small class, used standard text size with gentle mute color -->
+                                                    <p class="text-muted mb-3" style="font-size: 0.95rem; line-height: 1.5;">
+                                                        Confirmation that connectivity will comply with Bank security policies, including VPN usage and restrictions on public Wi-Fi.
+                                                    </p>
+                                                    <!-- Applied matching large badge styles with solid padding -->
+                                                    <span class="badge @(item.OverseasConnectivityConfirm ? "bg-success" : "bg-danger")" style="font-size: 0.95rem; font-weight: 600; padding: 5px 10px;">
+                                                        @(item.OverseasConnectivityConfirm ? "Confirmed" : "Unconfirmed")
+                                                    </span>
+                                                </div>
+
+                                            }
+                                        </dl>
+                                    </div>
+                                </div>
+
+                            }
+                        }
+
+
+                        <hr />
+
+                        <div class="card card-success card-outline">
+                            <div class="card-header">
+                                <h3 class="card-title">
+                                    <b>
+                                        <i class="fa fa-globe"></i> Remote Access (WFH)
+                                    </b>
+                                </h3>
+                                <div class="card-tools pull-right">
+
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <dl class="row">
+                                    <dt class="col-sm-3">&nbsp;Type</dt>
+                                    <dd class="col-sm-9"> @((int)(Model?.RemoteAccessType ?? 0) == 0 ? "N/A" : Model?.RemoteAccessType.EnumDisplayName())</dd>
+
+                                    <dt class="col-sm-3">&nbsp;Asset</dt>
+                                    <dd class="col-sm-9">
+                                        <a href="@Html.EncodedActionLink("","Info", "Asset","", new { id = Model.AssetId },null)" target="_blank">
+                                            @(string.IsNullOrEmpty(Model?.Asset?.AssetNo) ? "N/A" : Model?.Asset?.AssetNo)
+                                            <span> / </span>
+                                            @(string.IsNullOrEmpty(Model?.Asset?.Barcode) ? "N/A" : Model?.Asset?.Barcode)
+                                            <span> - </span>
+                                            @(string.IsNullOrEmpty(Model?.Asset?.AssetName) ? "N/A" : Model?.Asset?.AssetName)
+
+
+                                        </a>
+                                    </dd>
+                                    <dt class="col-sm-3">&nbsp;Business Impact</dt>
+                                    <dd class="col-sm-9">
+                                        @(string.IsNullOrEmpty(Model?.BusinessImpact) ? "N/A" : Model?.BusinessImpact)
+                                    </dd>
+                                </dl>
+
+                                <table id="dataTable" class="table table-bordered table-striped table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>System/Application</th>
+                                            <th>Description</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @{
+                                            foreach (var item in Model.RemoteAccessRequiredSystems)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        @(string.IsNullOrEmpty(item?.AssetType?.AssetTypeName) ? "N/A" : item?.AssetType?.AssetTypeName)
+                                                    </td>
+                                                    <td>
+                                                        @((int)(item?.AssetType?.AssetCategory ?? 0) == 0 ? "N/A" : item?.AssetType?.AssetCategory.EnumDisplayName())
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+
+                                </table>
+                            </div>
+                        </div>
+
+
+                    </div>
+
+                    <div class="col-sm-4">
+                        <div class="callout callout-gray card-outline">
+
+
+                            <strong><i class="fas fa-user-circle mr-1"></i>Requested User</strong>
+                            <p class="text-muted">
+                                @(string.IsNullOrEmpty(Model?.RequestedBy) ? "N/A" : Model?.RequestedBy) -
+                                @(string.IsNullOrEmpty(Model?.RequestedUser?.FullName) ? "N/A" : Model?.RequestedUser?.FullName)
+                            </p>
+                            <strong><i class="fa fa-briefcase mr-1"></i>Designation</strong>
+                            <p class="text-muted">
+                                @(string.IsNullOrEmpty(Model?.RequestedUser?.DesignationName) ? "N/A" : Model?.RequestedUser?.DesignationName)
+                            </p>
+                            <strong><i class="fas fa-phone mr-1"></i>Contact No.</strong>
+                            <p class="text-muted">
+                                @(string.IsNullOrEmpty(Model?.RequestedUser?.ContactNo) ? "N/A" : Model?.RequestedUser?.ContactNo)
+                            </p>
+                            <strong><i class="fas fa-envelope mr-1"></i>Email</strong>
+                            <p class="text-muted">
+                                @(string.IsNullOrEmpty(Model?.RequestedUser?.Email) ? "N/A" : Model?.RequestedUser?.Email)
+                            </p>
+
+
+
+                            <strong>
+                                <i class="fa fa-university mr-1"></i> @(string.IsNullOrEmpty(Model?.Department?.DepartmentName) ? "N/A" : Model?.Department?.DepartmentName)
+                            </strong>
+                            @*<strong><i class="fa fa-university mr-1"></i> @Model.Department.DepartmentName - @Model.Branch.Name</strong>*@
+
+                            @*<strong><i class="fa fa-university mr-1"></i>@Html.LabelFor(model => Model.DepartmentId)</strong>
+                                <p class="text-muted">
+                                    @Model.Department.DepartmentName
+                                </p>
+                                <strong><i class="fa fa-university mr-1"></i>@Html.LabelFor(model => Model.BranchId)</strong>
+                                <p class="text-muted">
+                                    @Model.Branch.Name
+                                </p>*@
+
+                        </div>
+
+                        <div class="card card-widget widget-user-2 card-success mb-2">
+                            <div class="widget-user-header">
+                                <div class="widget-user-image">
+                                    <img class="img-circle elevation-2" src="@Model.CreatedUser.ProImageName" alt="User Avatar">
+                                </div>
+                                <h6 class="widget-user-username text-md">
+                                    @(string.IsNullOrEmpty(Model?.CreatedBy) ? "N/A" : Model?.CreatedBy) -
+                                    @(string.IsNullOrEmpty(Model?.CreatedUser?.FullName) ? "N/A" : Model?.CreatedUser?.FullName)
+                                </h6>
+                                <h6 class="widget-user-username text-md">
+                                    @(string.IsNullOrEmpty(Model?.CreatedUser?.DesignationName) ? "N/A" : Model?.CreatedUser?.DesignationName)
+                                    (
+                                    @(string.IsNullOrEmpty(Model?.CreatedUser?.DepartmentName) ? "N/A" : Model?.CreatedUser?.DepartmentName) 
+                                    )
+                                </h6>
+                                <h5 class="widget-user-desc text-sm">Created By</h5>
+                            </div>
+                        </div>
+
+                        <div class="card card-widget widget-user-2 card-success mb-2">
+                            <div class="widget-user-header">
+                                <div class="widget-user-image">
+                                    <img class="img-circle elevation-2" src="@Model.FinalApprovalByUser.ProImageName" alt="User Avatar">
+                                </div>
+                                <h6 class="widget-user-username text-md">
+                                    @(string.IsNullOrEmpty(Model?.FinalApprovalBy) ? "N/A" : Model?.FinalApprovalBy) -
+                                    @(string.IsNullOrEmpty(Model?.FinalApprovalByUser?.FullName) ? "N/A" : Model?.FinalApprovalByUser?.FullName)
+                                </h6>
+                                <h6 class="widget-user-username text-md">
+                                    @(string.IsNullOrEmpty(Model?.FinalApprovalByUser?.DesignationName) ? "N/A" : Model?.FinalApprovalByUser?.DesignationName)
+                                    (
+                                    @(string.IsNullOrEmpty(Model?.FinalApprovalByUser?.DepartmentName) ? "N/A" : Model?.FinalApprovalByUser?.DepartmentName) 
+                                    )
+                                </h6>
+                                <h5 class="widget-user-desc text-sm">Approval User</h5>
+                            </div>
+                        </div>
+
+                        @*<div class="card card-gray card-outline">
+                                <div class="card-header">
+                                    <h3 class="card-title">Attachments</h3>
+                                    <div class="card-tools">
+
+                                        <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                            <i class="fas fa-minus"></i>
+                                        </button>
+
+                                    </div>
+                                </div>
+                                <div class="card-body card-comments style=" display: block;"">
+
+                                    @if (Model.ApprovalAttachment != null)
+                                    {
+                                        <a href="@Model.ApprovalAttachment" target="_blank">AVP/VP Approval attachment</a>
+                                    }
+                                </div>
+                            </div>*@
+
+                    </div>
+
+
+                </div>
+
+
+
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="card direct-chat direct-chat-warning card-gray card-outline">
+                            <div class="card-header">
+                                <h3 class="card-title">Status</h3>
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+
+                                </div>
+                            </div>
+                            <div class="card-body pb-0">
+                                <div class="row">
+                                    <div class="col-12 p-4">
+                                        @{
+                                            foreach (var status in Model.RemoteAccessRequestUpdates.OrderBy(o => o.UpdatedDate))
+                                            {
+                                                <div class="direct-chat-msg">
+                                                    <div class="direct-chat-infos clearfix">
+                                                    <span class="direct-chat-name float-left">
+                                                        @(string.IsNullOrEmpty(status?.UpdatedUser?.FullName) ? "N/A" : status?.UpdatedUser?.FullName)
+
+                                                        @if (status.Team != null)
+                                                        {
+                                                            if (status.TeamId != 1)
+                                                            {
+                                                                <span>(@status.Team.TeamName)</span>
+                                                            }
+                                                        }
+                                                    </span>
+                                                        <span class="direct-chat-timestamp float-right">@status.UpdatedDate &nbsp;<i class="far fa-calendar"></i> </span>
+                                                    </div>
+                                                    <img class="direct-chat-img" src="@status.UpdatedUser.ProImageName" alt="message user image">
+                                                    <div class="direct-chat-text bg-@AccessRequestService.GetStatusColor(status.Status) ">
+                                                        <div class="row">
+                                                            <div class="col-10">
+                                                                @((int)(status?.Status ?? 0) == 0 ? "N/A" : status?.Status.EnumDisplayName())
+                                                                | @(string.IsNullOrEmpty(status?.Comment) ? "No comment provided." : status?.Comment)
+                                                            </div>
+                                                            <div class="col-2 text-right">
+                                                                <b>@status.SpentTimeFomated (HH:MM)</b>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+                                        }
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-lg-4 ">
+                        <div class="card card-gray card-outline">
+                            <div class="card-header">
+                                <h3 class="card-title">Ticket Log</h3>
+                                <div class="card-tools">
+
+                                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+
+                                </div>
+                            </div>
+                            <div class="card-body card-comments style=" display: block;"">
+                                @{
+                                    foreach (var log in Model.RemoteAccessRequestLogs.OrderBy(o => o.UpdatedDate))
+                                    {
+                                        <div class="row">
+                                            <div class="col-sm-12">
+
+                                                <div class="card-comment">
+                                                    <img class="img-circle img-sm" src="@(log.UpdatedBy!=null? log.UpdatedUser.ProImageName : "/Images/userimage.png")" alt="User Image">
+                                                    <div class="comment-text">
+                                                        <span class="username">
+                                                            @(log.UpdatedBy!=null? log?.UpdatedUser?.FullName : "N/A")
+                                                            <span class="text-muted float-right">@log.UpdatedDate</span>
+                                                        </span>
+                                                        @(string.IsNullOrEmpty(log?.Description) ? "N/A" : log?.Description)
+                                                        
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+

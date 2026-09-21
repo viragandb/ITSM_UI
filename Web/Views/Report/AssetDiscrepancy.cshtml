@@ -1,0 +1,289 @@
+﻿@using Service
+@using Service.IM
+@model IEnumerable<Domain.AssetVerificationItem>
+@{
+    /**/
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@using (Html.BeginForm("AssetDiscrepancy", "Report", FormMethod.Get, new { @class = "form-horizontal" }))
+{
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card card-primary card-outline">
+                <div class="card-header with-border">
+                    <h3 class="card-title">Asset Discrepancies</h3>
+
+                </div>
+                <div class="card-body">
+
+                    <div class="form-group row">
+                        <label class="col-form-label col-md-2 text-right">
+                            Asset Category :
+                        </label>
+                        <div class="col-md-4">
+                            <select id="AssetCategoryId" name="AssetCategoryId" class="form-control form-control-sm"></select>
+                        </div>
+
+
+
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-form-label col-md-2 text-right">
+                            Location :
+                        </label>
+                        <div class="col-md-4">
+                            <select id="BranchId" name="BranchId" class="form-control form-control-sm select2">
+                            </select>
+                        </div>
+                        <label class="col-form-label col-md-2 text-right">
+                            Department :
+                        </label>
+                        <div class="col-md-4">
+                            <select id="DepartmentId" name="DepartmentId" class="form-control form-control-sm select2"></select>
+                        </div>
+
+
+
+                    </div>
+
+
+                    <div class="row">
+                        <div class="col-lg-12">
+
+                            <div class="form-group row">
+                                <label class="control-label col-md-2 text-right">
+                                    Planned Verification Date :
+                                </label>
+                                <div class="col-md-2">
+
+                                    <div class="input-group date datePicker" id="start_date" data-bs-target-input="nearest">
+                                        <input type="text" name="StartDate" id="StartDate" value="@ViewBag.StartDate" class="form-control form-control-sm datetimepicker-input" />
+                                        <div class="input-group-append" data-bs-target="#start_date" data-bs-toggle="datetimepicker">
+                                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <label class="control-label col-md-1 text-right">
+                                    To
+                                </label>
+                                <div class="col-md-2">
+                                    <div class="input-group date datePicker" id="end_date" data-bs-target-input="nearest">
+                                        <input type="text" name="EndDate" id="EndDate" value="@ViewBag.EndDate" class="form-control form-control-sm datetimepicker-input" />
+                                        <div class="input-group-append" data-bs-target="#end_date" data-bs-toggle="datetimepicker">
+                                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+                <div class="card-footer">
+                    <div class="text-right">
+                        <button type="submit" class="btn btn-sm btn-default">
+                            <i class="fa fa-search mr-2"></i>Search
+                        </button>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card box-default">
+                <div class="card-body">
+
+                    <table id="dataTable" class="table table-bordered table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Request #</th>
+                                <th>Asset Category</th>
+                                <th>Branch</th>
+                                <th>Department</th>
+                                <th>Asset #</th>
+                                <th>Barcode</th>
+                                <th>Serial #</th>
+                                <th>Asset Type</th>
+                                <th>Asset Make</th>
+                                <th>Model Name</th>
+                                <th>Requested Date</th>
+                                <th>Planned Verification Date</th>
+                                <th>Verified By</th>
+                                <th>Verified Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                foreach (var item in Model)
+                                {
+                                                        <tr>
+                                                            <td>
+                                                                <a href="@Html.EncodedActionLink("", "Info", "AssetVerification", "", new { id = item.AssetVerificationRequestId }, null)"
+                                                                   target="_blank">
+
+                                                                    Request # @item.AssetVerificationRequestId
+                                                                </a>
+                                                            </td>
+                                                            <td>@item.AssetVerificationRequest.AssetCategory.EnumDisplayName()</td>
+                                                            <td>@item.AssetVerificationRequest.Branch.Name</td>
+                                                            <td>@item.AssetVerificationRequest.Department.DepartmentName</td>
+                                                            <td>
+                                                                <a href="@Html.EncodedActionLink("", "Info", "Asset", "", new { id = item.Asset.AssetId }, null)"
+                                                                   target="_blank">
+                                                                    <span> # </span>
+                                                                    @item.Asset.AssetNo
+                                                                </a>
+                                                            </td>
+                                                            <td>@item.Asset.Barcode</td>
+                                                            <td>@item.Asset.SerialNo</td>
+                                                            <td>@item.Asset.AssetType.AssetTypeName</td>
+                                                            <td>@item.Asset.AssetMake.Name</td>
+                                                            <td>@item.Asset.ModelName</td>
+                                                            <td>@item.AssetVerificationRequest.RequestedUser.FullName</td>
+                                                            <td>@item.AssetVerificationRequest.VerificationDate.ToString("dd/MM/yyyy")</td>
+                                                            <td>@item.AssetVerificationRequest.VerifiedUser.FullName</td>
+                                                            <td>@item.AssetVerificationRequest.RequestedDate.ToString()</td>
+
+                                                        </tr>
+                                }
+                            }
+                        </tbody>
+
+                    </table>
+
+                </div>
+                <!-- /.box-body -->
+
+            </div>
+
+        </div>
+    </div>
+
+}
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $("#dataTable").DataTable({
+                "responsive": true, "lengthChange": false, "autoWidth": false, "paging": false,
+                /* "buttons": ["excel", "pdf", "print", "colvis"]*/
+                "buttons": [
+                    {
+                        extend: 'excelHtml5',
+                        text: 'Excel',
+                        title: 'ITSM - Asset Discrepancies',
+                        exportOptions: {
+                            modifier: {
+                                page: 'current'
+                            }
+                        }
+                    }
+                    , {
+                        extend: 'pdfHtml5',
+                        text: ' PDF',
+                        title: 'ITSM - Asset Discrepancies',
+                        orientation: 'landscape',
+                        exportOptions: {
+                            modifier: {
+                                page: 'current'
+                            }
+                        }
+                    }
+                    ,
+                    {
+                        extend: 'print',
+                        text: '<i class="fa fa-print"></i>',
+                        title: 'ITSM - Asset Discrepancies',
+                        autoPrint: true
+                    }
+                    ,
+                    "colvis"
+                ]
+            }).buttons().container().appendTo('#dataTable_wrapper .col-md-6:eq(0)');
+
+        });
+
+         $(document).ready(function () {
+            loadAssetCategory();
+            loadLocations();
+        });
+
+
+        function loadLocations() {
+            $.getJSON("@Url.Action("GetItemListJsonResult", "Branch")", function (data) {
+                var dropDown = $("#BranchId");
+                dropDown.empty();
+                dropDown.append("<option value='0'>-- All --</option>");
+                $.each(JSON.parse(data), function (index, optionaldata) {
+                    dropDown.append($('<option />', { value: optionaldata.BranchId }).html(optionaldata.Name));
+                });
+
+                 if ('@ViewBag.BranchId') {
+                     $('#BranchId').val('@ViewBag.BranchId').attr("selected", "selected");
+                }
+                loadDepartments();
+            });
+        }
+
+        $("select#BranchId").change(function (evt) {
+            loadDepartments();
+        });
+
+        function loadDepartments() {
+           var _branchId = $('#BranchId').val();
+
+            $.getJSON("@Url.Action("GetDepartmentListBtBranchIdJsonResult", "Department")",
+                {
+                    branchId: _branchId
+                }, function (data) {
+                var dropDown = $("#DepartmentId");
+                dropDown.empty();
+                dropDown.append("<option value='0'>-- All --</option>");
+                $.each(JSON.parse(data), function (index, optionaldata) {
+                    dropDown.append($('<option />', { value: optionaldata.DepartmentId }).html(optionaldata.DepartmentName));
+                });
+
+                if ('@ViewBag.DepartmentId') {
+                     $('#DepartmentId').val('@ViewBag.DepartmentId').attr("selected", "selected");
+                }
+
+            });
+         }
+
+        function loadAssetCategory() {
+
+            $.getJSON("@Url.Action("GetAssetCategoryJsonResult", "AssetType")", function (data) {
+                var dropDown = $("#AssetCategoryId");
+                dropDown.empty();
+                dropDown.append("<option value='0'>-- Select --</option>");
+                $.each(JSON.parse(data), function (index, optionaldata) {
+                    dropDown.append($('<option />', { value: optionaldata.Id }).html(optionaldata.Name));
+                });
+                if ('@ViewBag.AssetCategoryId') {
+                    $('#AssetCategoryId').val('@ViewBag.AssetCategoryId').attr("selected", "selected");
+                }
+            });
+        }
+
+    </script>
+}
+
+
+
+
+

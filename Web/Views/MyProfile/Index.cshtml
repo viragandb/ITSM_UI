@@ -1,0 +1,565 @@
+﻿@model Domain.User
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="card">
+
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="align-middle me-2" data-lucide="user"></i>
+                    My Profile
+                </h5>
+            </div>
+
+            <div class="card-body">
+
+                <div class="row g-4">
+
+                    <div class="col-lg-8">
+
+                        <div class="row g-3">
+
+                            <div class="col-md-6">
+
+                                @Html.LabelFor(
+                                    model => model.EmpNo,
+                                    new { @class = "form-label" }
+                                )
+
+                                <input type="text"
+                                       class="form-control"
+                                       value="@Model.EmpNo"
+                                       readonly />
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                @Html.LabelFor(
+                                    model => model.FullName,
+                                    new { @class = "form-label" }
+                                )
+
+                                <input type="text"
+                                       class="form-control"
+                                       value="@Model.FullName"
+                                       readonly />
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                @Html.LabelFor(
+                                    model => model.DesignationName,
+                                    new { @class = "form-label" }
+                                )
+
+                                <input type="text"
+                                       class="form-control"
+                                       value="@Model.DesignationName"
+                                       readonly />
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                @Html.LabelFor(
+                                    model => model.Email,
+                                    new { @class = "form-label" }
+                                )
+
+                                <input type="text"
+                                       class="form-control"
+                                       value="@Model.Email"
+                                       readonly />
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                @Html.LabelFor(
+                                    model => model.ContactNo,
+                                    new { @class = "form-label" }
+                                )
+
+                                <input type="text"
+                                       class="form-control"
+                                       value="@Model.ContactNo"
+                                       readonly />
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                @Html.LabelFor(
+                                    model => model.BranchId,
+                                    new { @class = "form-label" }
+                                )
+
+                                @Html.DropDownListFor(
+                                    model => model.BranchId,
+                                    new List<SelectListItem>(),
+                                    new
+                                    {
+                                        @class = "form-select select2",
+                                        disabled = "disabled"
+                                    }
+                                )
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                @Html.LabelFor(
+                                    model => model.DepartmentId,
+                                    new { @class = "form-label" }
+                                )
+
+                                @Html.DropDownListFor(
+                                    model => model.DepartmentId,
+                                    new List<SelectListItem>(),
+                                    new
+                                    {
+                                        @class = "form-select select2"
+                                    }
+                                )
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="col-lg-4">
+
+                        <div class="card h-100">
+
+                            <div class="card-body text-center">
+
+                                <img src="@Model.ProImageName"
+                                     alt="User Image"
+                                     class="rounded-circle mb-3"
+                                     style="width: 150px; height: 150px; object-fit: cover;" />
+
+                                <h5 class="mb-1">
+                                    @Model.FullName
+                                </h5>
+
+                                <div class="text-muted mb-3">
+                                    @Model.DesignationName
+                                </div>
+
+                                <a href="@Url.Action("UploadProfile", "MyProfile")"
+                                   class="btn btn-sm btn-primary">
+
+                                    <i class="align-middle me-1" data-lucide="upload"></i>
+                                    Upload Image
+
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+<div class="modal fade"
+     id="modalUpdate"
+     tabindex="-1"
+     aria-labelledby="modalUpdateLabel"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title" id="modalUpdateLabel">
+                    <i class="align-middle me-2" data-lucide="building"></i>
+                    Branch Change Request
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <div class="mb-3">
+
+                    <label for="ChangeBranchId" class="form-label">
+                        Branch
+                    </label>
+
+                    <select id="ChangeBranchId"
+                            name="ChangeBranchId"
+                            class="form-select select2">
+
+                        <option value=""></option>
+
+                    </select>
+
+                </div>
+
+                <div class="mb-3">
+
+                    <label for="textComment" class="form-label">
+                        Comment
+                    </label>
+
+                    <textarea id="textComment"
+                              name="textComment"
+                              placeholder="Comment"
+                              class="form-control"
+                              rows="4"></textarea>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn btn-sm btn-danger"
+                        data-bs-dismiss="modal">
+
+                    <i class="align-middle me-1" data-lucide="x"></i>
+                    Cancel
+
+                </button>
+
+                <button type="button"
+                        class="btn btn-sm btn-info btnClickDisable"
+                        onclick="update()">
+
+                    <i class="align-middle me-1" data-lucide="send"></i>
+                    Request
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $("#BranchId").select2({
+                width: "100%"
+            });
+
+            $("#DepartmentId").select2({
+                width: "100%"
+            });
+
+            $("#ChangeBranchId").select2({
+                width: "100%",
+                dropdownParent: $("#modalUpdate")
+            });
+
+            loadBranches();
+            loadBranchesChange();
+
+
+            $(document).on("click", ".openModalUpdate", function () {
+
+                $("#modalUpdate .btnClickDisable")
+                    .prop("disabled", false);
+
+            });
+
+        });
+
+
+        function parseJsonResult(data) {
+
+            if (typeof data === "string") {
+
+                try {
+                    return JSON.parse(data);
+                }
+                catch (e) {
+                    return [];
+                }
+
+            }
+
+            return data || [];
+        }
+
+
+        function update() {
+
+            var comment =
+                $("#modalUpdate #textComment").val().trim();
+
+            var branchId =
+                $("#ChangeBranchId").val();
+
+            var button =
+                $("#modalUpdate .btnClickDisable");
+
+
+            if (!comment || !branchId || branchId == "0") {
+
+                Swal.fire(
+                    "Error!",
+                    "Please enter the required data",
+                    "error"
+                );
+
+                return;
+            }
+
+
+            button.prop("disabled", true);
+
+
+            $.ajax({
+
+                url: '@Url.Action("BranchChangeRequest", "MyProfile")',
+
+                type: "GET",
+
+                dataType: "json",
+
+                data: {
+                    branchId: branchId,
+                    comment: comment
+                },
+
+                success: function (data) {
+
+                    if (data == "1" || data == 1) {
+
+                        Swal.fire(
+                            "Completed",
+                            "Request has been submitted",
+                            "success"
+                        );
+
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 500);
+
+                    }
+                    else {
+
+                        button.prop("disabled", false);
+
+                        Swal.fire(
+                            "Something went wrong!",
+                            "Please try again",
+                            "error"
+                        );
+
+                    }
+
+                },
+
+                error: function () {
+
+                    button.prop("disabled", false);
+
+                    Swal.fire(
+                        "Something went wrong!",
+                        "Please try again",
+                        "error"
+                    );
+
+                }
+
+            });
+
+        }
+
+
+        function loadBranches() {
+
+            $.getJSON(
+                '@Url.Action("GetItemListJsonResult", "Branch")',
+                function (data) {
+
+                    var dropDown = $("#BranchId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- Select --</option>"
+                    );
+
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.BranchId,
+                                    text: item.Name
+                                })
+                            );
+
+                        }
+                    );
+
+
+                    var selectedId =
+                        '@ViewBag.BranchId';
+
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+
+                    dropDown.trigger("change.select2");
+
+                    loadToDepartments();
+
+                }
+            );
+
+        }
+
+
+        $("#BranchId").on("change", function () {
+
+            loadToDepartments();
+
+        });
+
+
+        function loadToDepartments() {
+
+            var branchId =
+                $("#BranchId").val();
+
+            var dropDown =
+                $("#DepartmentId");
+
+
+            dropDown.empty();
+
+            dropDown.append(
+                "<option value='0'>-- Select --</option>"
+            );
+
+
+            if (!branchId || branchId == "0") {
+
+                dropDown.trigger("change.select2");
+
+                return;
+            }
+
+
+            $.getJSON(
+                '@Url.Action("GetDepartmentListBtBranchIdJsonResult", "Department")',
+                {
+                    branchId: branchId
+                },
+                function (data) {
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.DepartmentId,
+                                    text: item.DepartmentName
+                                })
+                            );
+
+                        }
+                    );
+
+
+                    var selectedId =
+                        '@ViewBag.DepartmentId';
+
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+
+                    dropDown.trigger("change.select2");
+
+                }
+            );
+
+        }
+
+
+        function loadBranchesChange() {
+
+            $.getJSON(
+                '@Url.Action("GetItemListJsonResult", "Branch")',
+                function (data) {
+
+                    var dropDown =
+                        $("#ChangeBranchId");
+
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- Select --</option>"
+                    );
+
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.BranchId,
+                                    text: item.Name
+                                })
+                            );
+
+                        }
+                    );
+
+
+                    dropDown.trigger("change.select2");
+
+                }
+            );
+
+        }
+
+    </script>
+}

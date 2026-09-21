@@ -1,0 +1,925 @@
+﻿@model Web.Models.RemoteAccessRequestVM
+@using Service
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("Create", "RemoteAccessRequest", FormMethod.Post, new { @class = "form-horizontal", enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+
+    @*@Html.HiddenFor(model => model.AccessTypeId)
+    @Html.HiddenFor(model => model.AccessType)*@
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card card-primary card-outline">
+                <div class="card-header with-border">
+                    <h3 class="card-title">New Request - Remote Request Access</h3>
+                    <div class="card-tools pull-right">
+                         
+                    </div>
+
+
+                </div>
+                <div class="card-body">
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.BusinessJustification, new { @class = "control-label" })
+                        <span class="text-danger">*</span>
+                        @Html.TextAreaFor(model => model.BusinessJustification, new { @class = "form-control form-control-sm", @style = "white-space: pre-wrap;", @rows = "2" })
+                        @Html.ValidationMessageFor(model => model.BusinessJustification, null, new { @class = "text-danger" })
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.BusinessImpact, new { @class = "control-label" })
+                        <span class="text-danger">*</span>
+                        @Html.TextAreaFor(model => model.BusinessImpact, new { @class = "form-control form-control-sm" })
+                        @Html.ValidationMessageFor(model => model.BusinessImpact, null, new { @class = "text-danger" })
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-6 mb-3">
+                            <div class="form-group ">
+                                @Html.LabelFor(model => model.PlannedSchedule, new { @class = "control-label" })
+                                <span class="text-danger">*</span>
+                                @Html.EnumDropDownListFor(model => model.PlannedSchedule, "--Select--", new { @class = "form-control form-control-sm" })
+                                @Html.ValidationMessageFor(model => model.PlannedSchedule, "", new { @class = "text-danger" })
+
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6 mb-3">
+                            <div class="form-group ">
+                                @Html.LabelFor(model => model.RemoteAccessType, new { @class = "control-label" })
+                                <span class="text-danger">*</span>
+                                @Html.EnumDropDownListFor(model => model.RemoteAccessType, "--Select--", new { @class = "form-control form-control-sm" })
+                                @Html.ValidationMessageFor(model => model.RemoteAccessType, "", new { @class = "text-danger" })
+
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6 mb-3">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.RemoteWorkLocation, new { @class = "control-label" })
+                                <span class="text-danger">*</span>
+                                @Html.TextBoxFor(model => model.RemoteWorkLocation, new { @class = "form-control form-control-sm" })
+                                @Html.ValidationMessageFor(model => model.RemoteWorkLocation, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+
+                        <div class="col-lg-6 mb-3">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.StartDate, htmlAttributes: new { @class = "control-label" })
+                                <span class="text-danger">*</span>
+                                @Html.TextBoxFor(model => model.StartDate, "{0:yyyy-MM-dd}", new
+                                {
+                                    @class = "form-control form-control-sm",
+                                   @type = "date",
+                                   id = "StartDate",
+                                   min = Model.StartDate.ToString("yyyy-MM-dd"),
+                                   max = Model.MaxEndDate.ToString("yyyy-MM-dd")
+                                })
+                                @Html.ValidationMessageFor(model => model.StartDate, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="col-lg-6 mb-3">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.EndDate, htmlAttributes: new { @class = "control-label" })
+                                <span class="text-danger">*</span>
+                                @Html.TextBoxFor(model => model.EndDate, "{0:yyyy-MM-dd}", new
+                           {
+                               @class = "form-control form-control-sm",
+                               @type = "date",
+                               id = "EndDate",
+                               min = Model.StartDate.ToString("yyyy-MM-dd"),
+                               max = Model.MaxEndDate.ToString("yyyy-MM-dd")
+                           })
+                                @Html.ValidationMessageFor(model => model.EndDate, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+
+                        <div class="col-lg-6 mb-3">
+                            <div class="form-group ">
+
+                                @Html.LabelFor(model => model.AssetId, new { @class = "control-label" })
+                                <span class="text-danger">*</span>
+                                @Html.TextBoxFor(model => model.AssetName, new { placeholder = "Type Asset #", @class = "form-control form-control-sm" })
+                                @Html.HiddenFor(model => model.AssetId, new { @class = "form-control form-control-sm" })
+                                @Html.ValidationMessageFor(model => model.AssetId, "", new { @class = "text-danger" })
+
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6 mb-3">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.ApprovalBy, new { @class = "control-label" })
+                                <span class="text-danger">*</span>
+                                @Html.TextBoxFor(model => model.ApprovalBy, new { placeholder = "Type Name here to search", @class = "form-control form-control-sm" })
+                                @Html.HiddenFor(model => model.ApprovalBy, new { @class = "form-control form-control-sm" })
+                                @Html.ValidationMessageFor(model => model.ApprovalBy, "", new { @class = "text-danger" })
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-8">
+                            <div class="form-group ">
+                                <label class="col-form-label">
+                                    Application / System
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <select id="RemoteAccessItemTypeId" name="RemoteAccessItemTypeId" class="form-control form-control-sm"></select>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <div class="form-group text-right">
+                                <label class="col-form-label"> &nbsp; </label>
+                                <br />
+                                <button type="button" id="addSystemBtn" class="btn btn-info btn-sm "><i class="fa fa-plus"></i>&nbsp;Add</button>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+
+                    <!--Required systems table-->
+                    <table class="table table-bordered mb-4" id="systemsTable">
+                        <thead>
+                            <tr>
+                                <th> Application / System</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @for (int i = 0; i < Model.SelectedSystems.Count; i++)
+                            {
+                                <tr>
+                                    <td>
+                                        @Model.SelectedSystems[i].AssetTypeName
+                                        @Html.HiddenFor(m => m.SelectedSystems[i].AssetTypeId)
+                                        @Html.HiddenFor(m => m.SelectedSystems[i].AssetTypeName)
+                                    </td>
+
+                                    <td>
+                                        <button type="button" class="btn btn-danger removeRow">Remove</button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    @Html.ValidationMessageFor(m => m.SelectedSystems, "", new { @class = "text-danger" })
+
+                    <!--annexure form-->
+                    <hr />
+                     <label class="control-label">
+                        Please Fill The Below Remote Work Location & Environment Compliance Checklist.
+                    </label>
+                    <label class="control-label">
+                        Select the CheckBoxes and fill the form wherever appropriate
+                    </label>
+                     <br />  <br />
+                    <div class="row">
+                        <div class="col-lg-6 mb-3">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.CurrentlyResidingAddress, new { @class = "control-label" })
+                                @Html.TextBoxFor(model => model.CurrentlyResidingAddress, new { @class = "form-control form-control-sm" })
+                                @Html.ValidationMessageFor(model => model.CurrentlyResidingAddress, null, new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <h6>Remote Location Details</h6>
+                    <div class="row">
+                        <div class="col-lg-6 mb-3">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.LocationType, new { @class = "control-label" })
+                                @Html.EnumDropDownListFor(model => model.LocationType, "--Select--", new { @class = "form-control form-control-sm" })
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6 mb-3">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.LocationStatus, new { @class = "control-label" })
+                                @Html.EnumDropDownListFor(model => model.LocationStatus, "--Select--", new { @class = "form-control form-control-sm" })
+                            </div>
+                        </div>
+                        <div class="col-lg-6 mb-3">
+                            <div class="form-check">
+                                @Html.CheckBoxFor(model => model.IsNoiseFree, new { @class = "form-check-input" })
+                                @Html.LabelFor(model => model.IsNoiseFree, new { @class = "form-check-label" })
+                            </div>
+                        </div>
+
+
+                    </div>
+                    <br />
+
+                    <h6>Overseas Travel & Remote Connectivity</h6>
+                    <div class="row">
+                        <!-- Always Visible -->
+                        <div class="col-lg-12 mb-3">
+                            <div class="form-check">
+                                @Html.CheckBoxFor(model => model.WillTravelOverseas, new { @class = "form-check-input", id = "chkWillTravel" })
+                                @Html.LabelFor(model => model.WillTravelOverseas, new { @class = "form-check-label" })
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hidden by default -->
+                    <div id="overseasFields" style="display: none;">
+                        <div class="row">
+                            <div class="col-lg-6 mb-3">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.DestinationCountry, new { @class = "control-label" })
+                                    @Html.TextBoxFor(model => model.DestinationCountry, new { @class = "form-control form-control-sm" })
+                                    @Html.ValidationMessageFor(model => model.DestinationCountry, null, new { @class = "text-danger" })
+                                </div>
+                            </div>
+                            <div class="col-lg-6 mb-3">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.DurationOfTravel, new { @class = "control-label" })
+                                    @Html.TextBoxFor(model => model.DurationOfTravel, new { @class = "form-control form-control-sm" })
+                                    @Html.ValidationMessageFor(model => model.DurationOfTravel, null, new { @class = "text-danger" })
+                                </div>
+                            </div>
+                            <div class="col-lg-6 mb-3">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ReasonForTtravel, new { @class = "control-label" })
+                                    @Html.TextBoxFor(model => model.ReasonForTtravel, new { @class = "form-control form-control-sm" })
+                                    @Html.ValidationMessageFor(model => model.ReasonForTtravel, null, new { @class = "text-danger" })
+                                </div>
+                            </div>
+                            <div class="col-lg-6 mb-3">
+                                <div class="form-check">
+                                    @Html.CheckBoxFor(model => model.OverseasConnectivityConfirm, new { @class = "form-check-input" })
+                                    @Html.LabelFor(model => model.OverseasConnectivityConfirm, new { @class = "form-check-label" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+
+                    <h6> Physical Safety & Environment</h6>
+                    <div class="form-check mb-2">
+                        <input type="checkbox"
+                               class="form-check-input select-all"
+                               data-group="physical-safety"
+                               id="selectAllPhysicalSafety" />
+                        <label class="form-check-label" for="selectAllPhysicalSafety">
+                            Select all
+                        </label>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6 mb-3">
+                            <div class="form-check">
+                                @Html.CheckBoxFor(model => model.IsFreeFromHazards, new { @class = "form-check-input physical-safety" })
+                                @Html.LabelFor(model => model.IsFreeFromHazards, new { @class = "form-check-label" })
+                            </div>
+                        </div>
+                        <div class="col-lg-6 mb-3">
+                            <div class="form-check">
+                                @Html.CheckBoxFor(model => model.IsLightingVentilation, new { @class = "form-check-input physical-safety" })
+                                @Html.LabelFor(model => model.IsLightingVentilation, new { @class = "form-check-label" })
+                            </div>
+                        </div>
+                        <div class="col-lg-6 mb-3">
+                            <div class="form-check">
+                                @Html.CheckBoxFor(model => model.IsErgonomicSeating, new { @class = "form-check-input physical-safety" })
+                                @Html.LabelFor(model => model.IsErgonomicSeating, new { @class = "form-check-label" })
+                            </div>
+                        </div>
+                        <div class="col-lg-6 mb-3">
+                            <div class="form-check">
+                                @Html.CheckBoxFor(model => model.IsLocationSecure, new { @class = "form-check-input physical-safety" })
+                                @Html.LabelFor(model => model.IsLocationSecure, new { @class = "form-check-label" })
+                            </div>
+                        </div>
+                        <div class="col-lg-6 mb-3">
+                            <div class="form-check">
+                                @Html.CheckBoxFor(model => model.IsFireSafety, new { @class = "form-check-input physical-safety" })
+                                @Html.LabelFor(model => model.IsFireSafety, new { @class = "form-check-label" })
+                            </div>
+                        </div>
+
+
+                    </div>
+                    <br />
+
+                    <h6> Confidentiality & Information Security</h6>
+                    <div class="form-check mb-2">
+                        <input type="checkbox"
+                               class="form-check-input select-all"
+                               data-group="info-sec"
+                               id="selectAllInfoSec" />
+                        <label class="form-check-label" for="selectAllInfoSec">
+                            Select all
+                        </label>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6 mb-3">
+                            <div class="form-check">
+                                @Html.CheckBoxFor(model => model.IsConfidentialDiscussion, new { @class = "form-check-input info-sec" })
+                                @Html.LabelFor(model => model.IsConfidentialDiscussion, new { @class = "form-check-label" })
+                            </div>
+                        </div>
+                        <div class="col-lg-6 mb-3">
+                            <div class="form-check">
+                                @Html.CheckBoxFor(model => model.IsSeperateFromFamilySpace, new { @class = "form-check-input info-sec" })
+                                @Html.LabelFor(model => model.IsSeperateFromFamilySpace, new { @class = "form-check-label" })
+                            </div>
+                        </div>
+                        <div class="col-lg-6 mb-3">
+                            <div class="form-check">
+                                @Html.CheckBoxFor(model => model.IsDocStoredSecurely, new { @class = "form-check-input info-sec" })
+                                @Html.LabelFor(model => model.IsDocStoredSecurely, new { @class = "form-check-label" })
+                            </div>
+                        </div>
+                        <div class="col-lg-6 mb-3">
+                            <div class="form-check">
+                                @Html.CheckBoxFor(model => model.IsCabinetAvailable, new { @class = "form-check-input info-sec" })
+                                @Html.LabelFor(model => model.IsCabinetAvailable, new { @class = "form-check-label" })
+                            </div>
+                        </div>
+                        <div class="col-lg-6 mb-3">
+                            <div class="form-check">
+                                @Html.CheckBoxFor(model => model.IsUnauthorizedVisibility, new { @class = "form-check-input info-sec" })
+                                @Html.LabelFor(model => model.IsUnauthorizedVisibility, new { @class = "form-check-label" })
+                            </div>
+                        </div>
+                        <div class="col-lg-6 mb-3">
+                            <div class="form-check">
+                                @Html.CheckBoxFor(model => model.IsUseBankApprovedDevice, new { @class = "form-check-input info-sec" })
+                                @Html.LabelFor(model => model.IsUseBankApprovedDevice, new { @class = "form-check-label" })
+                            </div>
+                        </div>
+                        <div class="col-lg-6 mb-3">
+                            <div class="form-check">
+                                @Html.CheckBoxFor(model => model.IsUseBankApprovedVPN, new { @class = "form-check-input info-sec" })
+                                @Html.LabelFor(model => model.IsUseBankApprovedVPN, new { @class = "form-check-label" })
+                            </div>
+                        </div>
+                        <div class="col-lg-6 mb-3">
+                            <div class="form-check">
+                                @Html.CheckBoxFor(model => model.IsSecureWifiNetwork, new { @class = "form-check-input info-sec" })
+                                @Html.LabelFor(model => model.IsSecureWifiNetwork, new { @class = "form-check-label" })
+                            </div>
+                        </div>
+                        <div class="col-lg-6 mb-3">
+                            <div class="form-check">
+                                @Html.CheckBoxFor(model => model.IsAntivirusProtected, new { @class = "form-check-input info-sec" })
+                                @Html.LabelFor(model => model.IsAntivirusProtected, new { @class = "form-check-label" })
+                            </div>
+                        </div>
+                        <div class="col-lg-6 mb-3">
+                            <div class="form-check">
+                                @Html.CheckBoxFor(model => model.IsPublicWifiUse, new { @class = "form-check-input info-sec" })
+                                @Html.LabelFor(model => model.IsPublicWifiUse, new { @class = "form-check-label" })
+                            </div>
+                        </div>
+
+                    </div>
+                    <br />
+
+                    <h6> Power & Internet Connectivity</h6>
+                    <div class="form-check mb-2">
+                        <input type="checkbox"
+                               class="form-check-input select-all"
+                               data-group="internet-conn"
+                               id="selectAllInternetConnectivity" />
+                        <label class="form-check-label" for="selectAllInternetConnectivity">
+                            Select all
+                        </label>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6 mb-3">
+                            <div class="form-check">
+                                @Html.CheckBoxFor(model => model.IsInternetConnStable, new { @class = "form-check-input internet-conn" })
+                                @Html.LabelFor(model => model.IsInternetConnStable, new { @class = "form-check-label" })
+                            </div>
+                        </div>
+                        <div class="col-lg-6 mb-3">
+                            <div class="form-check">
+                                @Html.CheckBoxFor(model => model.IsBackupPower, new { @class = "form-check-input internet-conn" })
+                                @Html.LabelFor(model => model.IsBackupPower, new { @class = "form-check-label" })
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+
+                    <h6> Use of Office Materials</h6>
+                    <div class="form-check mb-2">
+                        <input type="checkbox"
+                               class="form-check-input select-all"
+                               data-group="office-materials"
+                               id="selectAllOfficeMaterials" />
+                        <label class="form-check-label" for="selectAllOfficeMaterials">
+                            Select all
+                        </label>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6 mb-3">
+                            <div class="form-check">
+                                @Html.CheckBoxFor(model => model.IsOfficeMaterialUsed, new { @class = "form-check-input office-materials" })
+                                @Html.LabelFor(model => model.IsOfficeMaterialUsed, new { @class = "form-check-label" })
+                            </div>
+                        </div>
+                        <div class="col-lg-6 mb-3">
+                            <div class="form-check">
+                                @Html.CheckBoxFor(model => model.IsLockAndKeyStorage, new { @class = "form-check-input office-materials" })
+                                @Html.LabelFor(model => model.IsLockAndKeyStorage, new { @class = "form-check-label" })
+                            </div>
+                        </div>
+                        <div class="col-lg-6 mb-3">
+                            <div class="form-check">
+                                @Html.CheckBoxFor(model => model.IsShared, new { @class = "form-check-input office-materials" })
+                                @Html.LabelFor(model => model.IsShared, new { @class = "form-check-label" })
+                            </div>
+                        </div>
+                        <div class="col-lg-6 mb-3">
+                            <div class="form-check">
+                                @Html.CheckBoxFor(model => model.IsReturnedPromptly, new { @class = "form-check-input office-materials" })
+                                @Html.LabelFor(model => model.IsReturnedPromptly, new { @class = "form-check-label" })
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+
+                    <h6> General Commitments</h6>
+                    <div class="form-check mb-2">
+                        <input type="checkbox"
+                               class="form-check-input select-all"
+                               data-group="general-commitments"
+                               id="selectAllGeneralCommitment" />
+                        <label class="form-check-label" for="selectAllGeneralCommitment">
+                            Select all
+                        </label>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6 mb-3">
+                            <div class="form-check">
+                                @Html.CheckBoxFor(model => model.AdherenceToInfoSecConfidentiality, new { @class = "form-check-input general-commitments" })
+                                @Html.LabelFor(model => model.AdherenceToInfoSecConfidentiality, new { @class = "form-check-label" })
+                            </div>
+                        </div>
+                        <div class="col-lg-6 mb-3">
+                            <div class="form-check">
+                                @Html.CheckBoxFor(model => model.Notifysupervisorofchanges, new { @class = "form-check-input general-commitments" })
+                                @Html.LabelFor(model => model.Notifysupervisorofchanges, new { @class = "form-check-label" })
+                            </div>
+                        </div>
+                        <div class="col-lg-6 mb-3">
+                            <div class="form-check">
+                                @Html.CheckBoxFor(model => model.Preserveconfidentiality, new { @class = "form-check-input general-commitments" })
+                                @Html.LabelFor(model => model.Preserveconfidentiality, new { @class = "form-check-label" })
+                            </div>
+                        </div>
+
+                    </div>
+                    <br />
+
+
+                </div>
+                <div class="card-footer">
+                    <div class="text-right">
+                        <button type="submit" id="btnSave" class="btn btn-sm btn-primary btnSubmitDisable">
+                            <i class="fa fa-paper-plane btn-icon"></i>
+                            <span class="spinner-border spinner-border-sm d-none btn-spinner" role="status" aria-hidden="true"></span>
+
+                            <!-- Button Text -->
+                            <span class="btn-text">Submit</span>
+
+                        </button>
+                    
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!--side card-->
+        <div class="col-md-4">
+            <div class="card card-primary card-outline">
+                <div class="card-header with-border">
+                    <h3 class="card-title"><i class="fa fa-user"></i>&nbsp;Requested By</h3>
+                  
+                </div>
+
+                <div class="card-body">
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.LAN_ID, new { @class = "control-label" })
+                        <span class="text-danger">*</span>
+                        @Html.TextBoxFor(model => model.LAN_ID, new { placeholder = "Type Name here to search", @class = "form-control form-control-sm" })
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.FullName, new { @class = "control-label" })
+                        @Html.TextBoxFor(model => model.FullName, new { @class = "form-control form-control-sm", @readonly = "true" })
+                    </div>
+
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Designation, new { @class = "control-label" })
+                        @Html.TextBoxFor(model => model.Designation, new { @class = "form-control form-control-sm", @readonly = "true" })
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-form-label"> Select Location </label>
+                        <span class="text-danger">*</span>
+                        <select id="BranchId" name="BranchId" class="form-control form-control-sm"></select>
+                        @Html.ValidationMessageFor(m => m.BranchId, null, new { @class = "text-danger" })
+                        @Html.HiddenFor(m => m.BranchId, new { id = "SelectedBranchId" })
+
+                    </div>
+
+
+                    <div class="form-group">
+                        <div class="form-group ">
+                            <label class="col-form-label"> Select Department </label>
+                            <span class="text-danger">*</span>
+                            <select id="SelectedDepartmentId" name="SelectedDepartmentId" class="form-control form-control-sm"></select>
+                            @Html.ValidationMessageFor(m => m.SelectedDepartmentId, null, new { @class = "text-danger" })
+                            @Html.HiddenFor(m => m.SelectedDepartmentId, new { id = "SelectedDeptId" })
+
+                        </div>
+                    </div>
+
+
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+
+}
+
+@section scripts {
+
+    <script type="text/javascript">
+
+
+        document.addEventListener('DOMContentLoaded', function () {
+            loadUserDepartments();
+            loadRemoteAccessSysTypes();
+            SearchADUserApproval();
+            SearchADUser();
+            loadLocations();
+            SearchAssets();
+
+            // When select-all is clicked
+            document.querySelectorAll(".select-all").forEach(selectAll => {
+                selectAll.addEventListener("change", function () {
+                    const group = this.dataset.group;
+                    document.querySelectorAll("." + group).forEach(cb => {
+                        cb.checked = this.checked;
+                    });
+                });
+            });
+
+            // When individual checkbox is changed
+            document.querySelectorAll(".form-check-input").forEach(cb => {
+                cb.addEventListener("change", function () {
+                    this.classList.forEach(cls => {
+                        const selectAll = document.querySelector(
+                            `.select-all[data-group="${cls}"]`
+                        );
+                        if (!selectAll) return;
+
+                        const all = document.querySelectorAll("." + cls);
+                        const checked = document.querySelectorAll("." + cls + ":checked");
+
+                        selectAll.checked = all.length === checked.length;
+                    });
+                });
+            });
+
+            function toggleOverseasFields() {
+                if ($('#chkWillTravel').is(':checked')) {
+                    $('#overseasFields').slideDown(400); // Slide down animation
+                } else {
+                    $('#overseasFields').slideUp(400);   // Slide up animation
+                    // Optional: Clear the values if unticked
+                    $('#overseasFields').find('input[type="text"]').val('');
+                    $('#overseasFields').find('input[type="checkbox"]').prop('checked', false);
+                }
+            }
+
+            // Run on page load 
+            if ($('#chkWillTravel').is(':checked')) {
+                $('#overseasFields').show();
+            }
+
+            $('#chkWillTravel').change(function () {
+                toggleOverseasFields();
+            });
+        })
+
+        $("#BranchId").on("change", function () {
+            $("#SelectedBranchId").val($(this).val());
+        })
+        $("#SelectedDepartmentId").on("change", function () {
+            $("#SelectedDeptId").val($(this).val());
+        })
+
+        function loadUserDepartments() {
+
+            const selectedDept = $("#SelectedDeptId").val();
+
+            $.getJSON("@Url.Action("GetDepartmentsForAUser", "Department")", function (data) {
+                var dropDown = $("#SelectedDepartmentId");
+                dropDown.empty();
+                dropDown.append("<option value='0'>-- Select --</option>");
+
+                $.each(data, function (index, optionaldata) {
+                    dropDown.append($('<option />', { value: optionaldata.departmentId }).html(optionaldata.name));
+                });
+
+                if (selectedDept) {
+                    dropDown.val(selectedDept);
+                }
+
+            });
+        }
+
+        function loadRemoteAccessSysTypes() {
+
+
+            $.getJSON("@Url.Action("GetAssetTypeSystemAppListJsonResult", "AssetType")", function (data) {
+                var dropDown = $("#RemoteAccessItemTypeId");
+                dropDown.empty();
+                dropDown.append("<option value='0'>-- Select --</option>");
+                $.each(JSON.parse(data), function (index, optionaldata) {
+                    dropDown.append($('<option />', { value: optionaldata.AssetTypeId }).html(optionaldata.AssetTypeName));
+                });
+
+               
+                });
+        }
+
+        function SearchADUserApproval() {
+
+            
+                $("#ApprovalBy").autocomplete({
+            source: function (request, response) {
+                $.ajax({
+                    url: '@Url.Action("GetSearchUserByNameJsonResult", "User")',
+                    datatype: "json",
+                    data: {
+                        term: request.term
+
+                    },
+                    success: function (data) {
+
+                        var requesterEmpNo = $("#LAN_ID").val(); 
+
+                        //filter out the requester from approval list
+                        var filteredData = data.filter(function (user) {
+                            return user.EmpNo != requesterEmpNo;
+                        });
+
+                        response($.map(filteredData, function (val, item) {
+                            return {
+                                label: val.EmpNo + " - " + val.FullName + " | " + val.DepartmentName,
+                                value: val.EmpNo,
+                                itemId: val.EmpNo
+                            }
+                        }))
+                    }
+                })
+                    },
+                    minLength: 1,
+                    select: function (event, ui) {
+                        $("#ApprovalBy").val(ui.item.itemId);
+                     }
+            });
+       }
+
+       function SearchADUser() {
+           $("#LAN_ID").autocomplete({
+          source: function (request, response) {
+              $.ajax({
+                  url: '@Url.Action("GetSearchUserByNameJsonResult", "User")',
+                  datatype: "json",
+                  data: {
+                      term: request.term
+                  },
+                  success: function (data) {
+                      response($.map(data, function (val, item) {
+                          return {
+                              label: val.EmpNo + " - " + val.FullName + " | " + val.DepartmentName,
+                              value: val.EmpNo ,
+                              itemId: val.EmpNo,
+                              itemName: val.FullName,
+                              itemDepartment: val.DepartmentName,
+                              itemDesignation: val.DesignationName,
+                              itemEmail: val.Email
+                          }
+                      }))
+                  }
+              })
+               },
+               minLength: 1,
+              select: function (event, ui) {
+              $("#FullName").val(ui.item.itemName);
+              $("#Designation").val(ui.item.itemDesignation);
+
+              //    loadSysUserData(ui.item.itemId);
+              }
+          });
+
+        }
+
+        function loadLocations() {
+
+            const selectedBranch = $("#SelectedBranchId").val();
+
+            $.getJSON("@Url.Action("GetItemListJsonResult", "Branch")", function (data) {
+                var dropDown = $("#BranchId");
+                dropDown.empty();
+                dropDown.append("<option value='0'>-- Select --</option>");
+                $.each(JSON.parse(data), function (index, optionaldata) {
+                    dropDown.append($('<option />', { value: optionaldata.BranchId }).html(optionaldata.Name));
+                });
+
+                if (selectedBranch) {
+                    dropDown.val(selectedBranch);
+                }
+
+             });
+        }
+
+         function SearchAssets() {
+            $("#AssetName").autocomplete({
+             source: function (request, response) {
+                 $.ajax({
+                     url: '@Url.Action("GetSearchByIdJsonResult", "Asset")',
+                     datatype: "json",
+                     data: {
+                         term: request.term
+                     },
+                     success: function (data) {
+                         response($.map(data, function (val, item) {
+
+                             return {
+                                 label: val.Barcode + " - " + val.AssetName,
+                                 value: val.Barcode + " - " + val.AssetName,
+                                 itemId: val.AssetId
+                             }
+                         }))
+                     }
+                 })
+                     },
+                     minLength: 6,
+                     select: function (event, ui) {
+                         $("#AssetId").val(ui.item.itemId);
+                  }
+             });
+}
+        // Log when user selects an option
+        $('#BranchId').on('change', function () {
+            const val = $(this).val();
+            $("#BranchId").val(val);
+            const text = $(this).find('option:selected').text();
+            console.log('Selected BranchId:', $("#BranchId").val() , 'Text:', text);
+        });
+
+
+
+        $("#addSystemBtn").click(function () {
+
+            var AssetTypeId = $("#RemoteAccessItemTypeId").val();
+            var AssetTypeName = $("#RemoteAccessItemTypeId option:selected").text();
+
+            if (!AssetTypeId || AssetTypeId === "0") {
+                Swal.fire("Warning", "Please select a system.", "warning");
+                return;
+            }
+
+            var exists = false;
+            $('#systemsTable tbody input[name$=".AssetTypeId"]').each(function () {
+                if ($(this).val() === AssetTypeId) {
+                    exists = true;
+                    return false; // Break the .each loop
+                }
+            });
+
+            if (exists) {
+                Swal.fire("Warning", "This System/Application has already been added", "warning");
+                return;
+            }
+
+            // Append row
+            var index = $("#systemsTable tbody tr").length;
+
+            var row = `
+            <tr>
+                <td>
+                    ${AssetTypeName}
+                    <input type="hidden" name="SelectedSystems[${index}].AssetTypeId" value="${AssetTypeId}" />
+                    <input type="hidden" name="SelectedSystems[${index}].AssetTypeName" value="${AssetTypeName}" />
+                </td>
+                <td>
+                    <button type="button" class="btn btn-danger removeRow">Remove</button>
+                </td>
+            </tr>
+        `;
+
+            $("#systemsTable tbody").append(row);
+        });
+
+        // Remove row
+        $(document).on("click", ".removeRow", function () {
+            $(this).closest("tr").remove();
+
+            // Re-index hidden inputs to avoid model binding errors
+            $("#systemsTable tbody tr").each(function (i, row) {
+                $(row).find("input[type=hidden]").each(function () {
+                    var oldName = $(this).attr("name");
+                    var newName = oldName.replace(/\[\d+\]/, "[" + i + "]");
+                    $(this).attr("name", newName);
+                });
+            });
+        });
+
+
+        // dynamic date changing
+        //$('#StartDate').on('change', function () {
+        //    const startDate = this.value;
+
+        //    if (startDate) {
+        //        const start = new Date(startDate);
+        //        const max = new Date(start);
+        //        max.setMonth(max.getMonth() + 6);
+
+        //        const maxDate = max.toISOString().split('T')[0];
+
+        //        $('#EndDate')
+        //            .attr('min', startDate)
+        //            .attr('max', maxDate);
+
+        //        // auto-fix invalid end date
+        //        if ($('#EndDate').val() < startDate) {
+        //            $('#EndDate').val(startDate);
+        //        }
+        //    }
+        //});
+
+        const startInput = document.getElementById("StartDate");
+        const endInput = document.getElementById("EndDate");
+
+        function addMonths(date, months) {
+            const d = new Date(date);
+            const day = d.getDate();
+
+            d.setMonth(d.getMonth() + months);
+
+            // Handle month-end edge cases (e.g. Jan 31 → Jul 31)
+            if (d.getDate() !== day) {
+                d.setDate(0);
+            }
+
+            return d;
+        }
+
+        startInput.addEventListener("change", function () {
+            if (!this.value) return;
+
+            const startDate = new Date(this.value);
+            const maxEndDate = addMonths(startDate, 6);
+
+            const min = startDate.toISOString().split("T")[0];
+            const max = maxEndDate.toISOString().split("T")[0];
+
+            endInput.min = min;
+            endInput.max = max;
+            endInput.value = max; 
+        });
+
+        $('form').on('submit', function (e) {
+           
+
+            let $btn = $('#btnSave');
+
+            
+            $btn.find('.btn-icon').addClass('d-none');
+            $btn.find('.btn-spinner').removeClass('d-none');
+
+           
+
+           
+        });
+
+    </script>
+
+}
+
+

@@ -1,0 +1,253 @@
+﻿@using Service
+@model IEnumerable<Domain.Problem>
+@{
+    /**/
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@using (Html.BeginForm("Index", "Problem", FormMethod.Get, new { @class = "form-horizontal" }))
+{
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card box-danger">
+                <div class="card-header with-border">
+                    <h3 class="card-title">Problems</h3>
+                    <div class="card-tools pull-right">
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <div class="form-group row">
+                        <label class="control-label col-md-2">
+                            Team :
+                        </label>
+                        <div class="col-md-4">
+                            <select id="TeamId" name="TeamId" class="form-control">
+                                <option value=""></option>
+                            </select>
+                            <span class="help-block" data-valmsg-for="TeamId" data-valmsg-replace="true"></span>
+                        </div>
+                        <label class="control-label col-md-2">
+                            Category :
+                        </label>
+                        <div class="col-md-4">
+                            <select id="CategoryId" name="CategoryId" class="form-control">
+                                <option value=""></option>
+                            </select>
+                            <span class="help-block" data-valmsg-for="CategoryId" data-valmsg-replace="true"></span>
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-group row">
+
+                        <label class="control-label col-md-2">
+                            Requested Date :
+                        </label>
+                        <div class="col-md-2">
+                            <div class="input-group date">
+                                <div class="input-group-addon">
+                                    <i class="fa fa-calendar"></i>
+                                </div>
+                                <input type="text" name="StartDate" id="StartDate" value="@ViewBag.StartDate" class="form-control datepicker" />
+                            </div>
+                        </div>
+
+
+                        <label class="control-label col-md-1">
+                            To
+                        </label>
+                        <div class="col-md-2">
+                            <div class="input-group date">
+                                <div class="input-group-addon">
+                                    <i class="fa fa-calendar"></i>
+                                </div>
+                                <input type="text" name="EndDate" id="EndDate" value="@ViewBag.EndDate" class="form-control datepicker" />
+                            </div>
+                        </div>
+                        <label class="control-label col-md-1">
+                            Status :
+                        </label>
+                        <div class="col-md-2">
+
+                            @Html.DropDownList("StatusId", EnumHelper.GetSelectList(typeof(Domain.ProblemStatusEnum)), "-- All --", new { @class = "form-control" })
+                            <span class="help-block" data-valmsg-for="StatusId" data-valmsg-replace="true"></span>
+
+                        </div>
+
+
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="text-right">
+                        <button type="submit" class="btn btn-social">
+                            <i class="fa fa-search"></i>Search
+                        </button>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+
+        <div class="col-md-12">
+            <!-- Horizontal Form -->
+            <div class="card box-default">
+                <div class="card-body">
+
+                    <table id="dataTable" class="table table-bordered table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Team</th>
+                                <th>Category</th>
+                                <th>Asset Type</th>
+                                <th>Subcategory</th>
+                                <th>Subject</th>
+                                <th>Priority</th>
+                                <th>Root Cause</th>
+                                <th>Solution</th>
+                                <th>Created By</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                foreach (var item in Model)
+                                {
+                            <tr>
+                                <td>
+                                    <a href="@Html.EncodedActionLink("", "Info", "Problem", "", new { id = item.ProblemId }, null)" target="_blank" class="">
+                                        Problem @item.ProblemId
+                                    </a>
+                                </td>
+
+                                <td>@item.RequestType.Team.TeamName</td>
+                                <td>@item.RequestType.Category.CategoryName</td>
+                                <td>@item.RequestType.AssetType.AssetTypeName</td>
+                                <td>@item.RequestType.SubCategory.SubCategoryName</td>
+                                <td>@item.Subject</td>
+                                <td>@item.Priority.EnumDisplayName()</td>
+                                <td>@item.RootCause</td>
+                                <td>@item.Solution</td>
+                                <td>@item.RequestedUser.FullName</td>
+                                <td>
+                                    <span class="label text- label-@ProblemService.GetStatusColor(item.Status)">
+                                        @item.Status.EnumDisplayName()
+                                    </span>
+                                </td>
+
+                            </tr>
+                                }
+                            }
+                        </tbody>
+
+                    </table>
+
+                </div>
+                <!-- /.box-body -->
+
+            </div>
+            <!-- /.box -->
+
+        </div>
+    </div>
+}
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $('#dataTable').DataTable({
+                "paging": true,
+                "lengthChange": true,
+                "searching": true,
+                "ordering": true,
+                "info": true,
+                "autoWidth": true
+            });
+
+
+             loadTeams();
+
+                 loadCategory();
+        });
+
+        function loadTeams() {
+
+            $.getJSON("@Url.Action("GetTeamListJsonResult", "Team")", function (data) {
+                var dropDown = $("#TeamId");
+
+                dropDown.empty();
+                dropDown.append("<option value='0'>-- All --</option>");
+
+                $.each(JSON.parse(data), function (index, optionaldata) {
+                    dropDown.append($('<option />', { value: optionaldata.TeamId }).html(optionaldata.TeamName));
+                });
+
+                if ('@ViewBag.TeamId') {
+                      $('#TeamId').val(@ViewBag.TeamId).attr("selected", "selected");
+                 }
+
+
+            });
+
+        }
+
+
+          @*function loadStatus() {
+
+            $.getJSON("@Url.Action("GetStatusJsonResult", "Ticket")", function (data) {
+                var dropDown = $("#StatusId");
+
+                dropDown.empty();
+                dropDown.append("<option value='0'>-- All --</option>");
+
+                $.each(JSON.parse(data), function (index, optionaldata) {
+                    dropDown.append($('<option />', { value: optionaldata.Id }).html(optionaldata.Name));
+                });
+
+                if ('@ViewBag.StatusId') {
+                    $('#StatusId').val(@ViewBag.StatusId).attr("selected", "selected");
+                 }
+            });
+
+        }*@
+
+          function loadCategory() {
+
+            $.getJSON("@Url.Action("GetCategoryListJsonResult", "Category")",function(data) {
+                    var dropDown = $("#CategoryId");
+                dropDown.empty();
+                dropDown.append("<option value='0'>-- All --</option>");
+                $.each(JSON.parse(data), function (index, optionaldata) {
+                    dropDown.append($('<option />', { value: optionaldata.CategoryId }).html(optionaldata.CategoryName));
+                });
+
+                 if ('@ViewBag.CategoryId') {
+                     $('#CategoryId').val('@ViewBag.CategoryId').attr("selected", "selected");
+                }
+                @*else {
+                     $('#CategoryId').val('@categoryId').attr("selected", "selected");
+                }*@
+
+                });
+
+
+         }
+
+    </script>
+}
+
+
+
+
+

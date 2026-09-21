@@ -1,0 +1,129 @@
+﻿@using Service
+@model IEnumerable<Domain.Holiday>
+@{
+    Layout = "~/Views/Shared/_AdminLteLayout.cshtml";
+}
+
+@using (Html.BeginForm("Index", "Holiday", FormMethod.Post, new { @class = "form-horizontal" }))
+{
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box box-danger">
+
+                <div class="box-header with-border">
+                    <h3 class="box-title">Holiday</h3>
+                    <div class="box-tools pull-right">
+                        <a href="@Url.Action("Create", "Holiday")" class="btn btn-social btn-cancel">
+                            <i class="fa fa-plus"></i>Add New
+                        </a>
+                    </div>
+                </div>
+
+                <div class="box-body">
+                    <table id="dataTable" class="table table-bordered table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Date</th>
+                                <th>Updated By</th>
+                                <th>Updated Date</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                foreach (var item in Model)
+                                {
+                                    <tr>
+
+                                        <td>@item.HolidayName</td>
+                                        <td>@item.Date.ToString("dd/MM/yyyy")</td>
+                                        <td>@item.UpdatedBy</td>
+                                        <td>@item.UpdatedDate</td>
+                                        <td>
+                                            <a href="@Url.Action("Edit", "Holiday", new { id = item.HolidayId })" class="btn btn-social-icon btn-edit">
+                                                <i class="fa fa-pencil"></i>
+                                            </a>
+                                            <a onclick="deleteItem('@item.HolidayId', '@item.HolidayName')" class="btn btn-social-icon btn-delete">
+                                                <i class="fa fa-trash-o"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+
+                    </table>
+                </div>
+               
+            </div>
+        </div>
+    </div>
+
+}
+
+
+@section scripts {
+    <script src="~/Scripts/jquery.validate.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
+    <script src="~/Scripts/custom_functions.js"></script>
+
+    <script type="text/javascript">
+
+        function deleteItem(itemId, itemName) {
+
+            swal({
+                title: "Are you sure?",
+                text: "Do you want to delete : " + itemName,
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                closeOnConfirm: true,
+                closeOnCancel: true
+            }, function (isConfirm) {
+                if (isConfirm) {
+                    $.ajax({
+                        url: "@Url.Action("Delete", "Holiday")",
+                        type: 'GET',
+                        dataType: "json",
+                        data: { id: itemId },
+                        success: function (data) {
+                            if (data == "1") {
+                                swal("Deleted!", "Record has been deleted", "success");
+                                setTimeout(function () {
+                                    window.location.reload();
+                                }, 1000);
+                            }
+                            else if(data == "2")
+                                swal("Data in use!", "Data is currently in use and can not be deleted", "error");
+                            else
+                                swal("Something went wrong!", "Data is not deleted, Please try again", "error");
+                        },
+                        error: function (xhr) {
+                            swal("Something went wrong!", "Data is not deleted, Please try again", "error");
+                        }
+                    });
+
+                } else {
+                    swal("Cancelled", "Action canceled, Data is not deleted", "error");
+                }
+            });
+        }
+
+        $(document).ready(function () {
+
+            $('#dataTable').DataTable({
+                "paging": true,
+                "lengthChange": true,
+                "searching": true,
+                "ordering": true,
+                "info": true,
+                "autoWidth": true
+            });
+        });
+
+
+    </script>
+}

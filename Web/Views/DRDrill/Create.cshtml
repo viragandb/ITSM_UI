@@ -1,0 +1,92 @@
+﻿
+@model Domain.DRDrill
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+}
+
+@using (Html.BeginForm("Create", "DRDrill", FormMethod.Post, new { @class = "form-horizontal" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card box-danger">
+                <div class="card-header with-border">
+                    <h3 class="card-title">New DR Drill</h3>
+                    <div class="card-tools pull-right">
+                        <a href="@Url.Action("Index", "DRDrill")" class="btn btn-social btn-cancel">
+                            <i class="fa fa-arrow-left"></i>Back
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+
+
+                    <div class="form-group ">
+                        @Html.LabelFor(model => model.ScheduleDate, new { @class = "col-md-2 control-label" })
+                        <div class="col-md-2">
+                            <div class="input-group date">
+                                <div class="input-group-addon">
+                                    <i class="fa fa-calendar"></i>
+                                </div>
+                                @Html.TextBoxFor(model => model.ScheduleDate, "{0:MM/dd/yyyy}", new { @class = "form-control datepicker", @width = "90px" })
+                                @Html.ValidationMessageFor(model => model.ScheduleDate, null, new { @class = "help-block" })
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Description, new { @class = "col-md-2 control-label" })
+                        <div class="col-md-10">
+                            @Html.TextBoxFor(model => model.Description, new { @class = "form-control", rows = "2" })
+                            @Html.ValidationMessageFor(model => model.Description, null, new { @class = "help-block" })
+                        </div>
+                    </div>
+
+
+
+                </div>
+                <div class="card-footer">
+                    <div class="text-right">
+                        <button type="submit" id="btnSave" class="btn btn-social btn-default btnSumbitDisable"><i class="fa fa-floppy-o"></i>Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+    </div>
+
+
+}
+
+@section scripts {
+    <script src="~/Scripts/jquery.validate.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
+    <script type="text/javascript">
+
+
+        $(document).ready(function () {
+
+            //$('#btnSave').click(function () {
+            //    $("#preloader1").show();
+            //    $(this).prop("disabled", true);
+            //    if (!$('form').valid()) {
+            //        $(this).prop("disabled", false);
+            //        $("#preloader1").hide();
+            //        return false;
+            //    }
+            //    $('form').submit();
+            //});
+        });
+
+
+
+
+
+    </script>
+
+}
+

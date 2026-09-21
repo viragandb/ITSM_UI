@@ -1,0 +1,104 @@
+﻿@model Domain.Event
+@using Service
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="card">
+
+            <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+
+                <h5 class="card-title mb-0">
+                    <strong>Event #@Model.EventId</strong>
+                    <span class="mx-2 text-muted">|</span>
+                    @Model.EventType.EventTypeName
+                </h5>
+
+                <span class="badge bg-@EventService.GetStatusColor(Model.Status)">
+                    @Model.Status.EnumDisplayName()
+                </span>
+
+            </div>
+
+            <div class="card-body">
+
+                <dl class="row mb-0">
+
+                    <dt class="col-lg-2 text-lg-end">
+                        @Html.DisplayNameFor(model => model.Subject)
+                    </dt>
+
+                    <dd class="col-lg-10">
+                        @Model.Subject
+                    </dd>
+
+
+                    <dt class="col-lg-2 text-lg-end">
+                        @Html.DisplayNameFor(model => model.Description)
+                    </dt>
+
+                    <dd class="col-lg-10"
+                        style="white-space: pre-wrap;">
+                        @Model.Description
+                    </dd>
+
+
+                    <dt class="col-lg-2 text-lg-end">
+                        @Html.DisplayNameFor(model => model.EventType)
+                    </dt>
+
+                    <dd class="col-lg-4">
+                        @Model.EventType.EventTypeName
+                    </dd>
+
+
+                    <dt class="col-lg-2 text-lg-end">
+                        @Html.DisplayNameFor(model => model.EventDate)
+                    </dt>
+
+                    <dd class="col-lg-4">
+                        <i class="align-middle me-1" data-lucide="calendar"></i>
+                        @Model.EventDate.ToShortDateString()
+
+                        <span class="mx-1">-</span>
+
+                        <i class="align-middle me-1" data-lucide="clock"></i>
+                        @Model.EventDate.ToShortTimeString()
+                    </dd>
+
+
+                    @if (Model.Status > Domain.EventStatusEnum.Opened)
+                    {
+                        <dt class="col-lg-2 text-lg-end">
+                            @Html.DisplayNameFor(model => model.ActionTaken)
+                        </dt>
+
+                        <dd class="col-lg-10"
+                            style="white-space: pre-wrap;">
+                            @Model.ActionTaken
+                        </dd>
+                    }
+
+
+                    <dt class="col-lg-2 text-lg-end">
+                        Last Updated
+                    </dt>
+
+                    <dd class="col-lg-10">
+                        <i class="align-middle me-1" data-lucide="user"></i>
+                        @Model.UpdatedBy
+
+                        <span class="mx-2 text-muted">|</span>
+
+                        <i class="align-middle me-1" data-lucide="calendar"></i>
+                        @Model.UpdatedDate
+                    </dd>
+
+                </dl>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>

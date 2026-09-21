@@ -1,0 +1,178 @@
+﻿@using Service
+@model IEnumerable<Domain.Policy>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+
+}
+
+<div class="row">
+
+    <div class="col-md-12">
+        <!-- Horizontal Form -->
+        <div class="card box-danger">
+
+            <div class="card-header with-border">
+                <h3 class="card-title">Policies</h3>
+                <div class="card-tools pull-right">
+
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <!-- form start -->
+
+            <div class="card-body">
+
+                <ul class="todo-list ui-sortable">
+
+                    @foreach (var item in Model)
+                    {
+
+
+                        <li>
+                            <span class="handle ui-sortable-handle">
+                                <i class="fa fa-gavel"></i>
+                            </span>
+                            <span class="text"> @item.PolicyName</span>
+
+                            @*<span class="pull-right badge label-@item.Color">
+                                    @Model.Where(w => w.RequestType.CategoryId == @item.CategoryId).Count()
+                                </span>*@
+
+                        </li>
+
+                    }
+                </ul>
+
+
+            </div>
+            <!-- /.box-body -->
+
+
+
+
+
+        </div>
+        <!-- /.box -->
+
+    </div>
+</div>
+
+<div class="row">
+
+    <div class="col-md-12">
+        <div class="card box-danger">
+
+            <div class="card-header with-border">
+                <h3 class="card-title">Priority Matrix</h3>
+
+            </div>
+
+            <div class="card-body">
+                <div class="col-md-7">
+
+                    <table id="dataTable" class="table table-bordered  table-hover dataTable">
+
+                        <tbody>
+                            <tr>
+                                <td rowspan="2" colspan="2" align="center"><b>Priority</b></td>
+                                <td colspan="4" align="center"><b>Urgency</b></td>
+                            </tr>
+                            <tr>
+                                <td align="left" width="80px">Low - 1</td>
+                                <td align="left" width="80px">Moderate - 2</td>
+                                <td align="left" width="80px">High - 3</td>
+                                <td align="left" width="80px">Critical - 4</td>
+                            </tr>
+                            <tr>
+                                <td rowspan="4" align="center"><b>Impact</b></td>
+                                <td align="left">Critical - 4</td>
+                                <td align="center" style="background-color:#F7FE2E">4</td>
+                                <td align="center" style="background-color:#FFBF00">8</td>
+                                <td align="center" style="background-color:#FE2E2E">12</td>
+                                <td align="center" style="background-color:#FE2E2E">16</td>
+                            </tr>
+                            <tr>
+                                <td align="left">High - 3</td>
+                                <td align="center" style="background-color:#9FF781">3</td>
+                                <td align="center" style="background-color:#F7FE2E">6</td>
+                                <td align="center" style="background-color:#FFBF00">9</td>
+                                <td align="center" style="background-color:#FE2E2E">12</td>
+                            </tr>
+                            <tr>
+                                <td align="left">Moderate - 2</td>
+                                <td align="center" style="background-color:#9FF781">2</td>
+                                <td align="center" style="background-color:#F7FE2E">4</td>
+                                <td align="center" style="background-color:#F7FE2E">6</td>
+                                <td align="center" style="background-color:#FFBF00">8</td>
+                            </tr>
+                            <tr>
+                                <td align="left">Low - 1</td>
+                                <td align="center" style="background-color:#9FF781">1</td>
+                                <td align="center" style="background-color:#9FF781">2</td>
+                                <td align="center" style="background-color:#9FF781">3</td>
+                                <td align="center" style="background-color:#F7FE2E">4</td>
+                            </tr>
+                        </tbody>
+
+                    </table>
+
+                </div>
+               
+                <div class="col-md-5" style="padding-top:35px">
+                    <table id="dataTable" class="table table-bordered  table-hover dataTable">
+                        <thead>
+                            <tr>
+                                <th>Priority</th>
+                                <th>Respond Hr.</th>
+                                <th>Resolve Hr.</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td width="120px" style="background-color:#FE2E2E">Urgent</td>
+                                <td align="right">0.25</td>
+                                <td align="right">1</td>
+
+                            </tr>
+                            <tr>
+                                <td width="120px" style="background-color:#FFBF00">High</td>
+                                <td align="right">0.25</td>
+                                <td align="right">6</td>
+                            </tr>
+                            <tr>
+                                <td width="120px" style="background-color:#F7FE2E">Medium</td>
+                                <td align="right">0.25</td>
+                                <td align="right">12</td>
+                            </tr>
+                            <tr>
+                                <td width="120px" style="background-color:#9FF781">Low</td>
+                                <td align="right">0.25</td>
+                                <td align="right">36</td>
+                            </tr>
+                        </tbody>
+
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+@section scripts {
+    <script src="~/Scripts/jquery.validate.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
+
+
+    <script type="text/javascript">
+
+
+    
+    </script>
+}
+

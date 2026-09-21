@@ -1,0 +1,225 @@
+﻿@model IEnumerable<Domain.AR.AccessRequestType>
+@using Service
+@using Domain
+
+@{
+    ViewBag.Title = "ServiceRequest";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="card">
+
+    <div class="card-header">
+
+        <ul class="nav nav-tabs
+            role="tablist">
+
+            <li class="nav-item"
+                role="presentation">
+
+                <a class="nav-link active"
+                   data-bs-toggle="tab"
+                   href="#Internal_Request"
+                   role="tab"
+                   aria-selected="true">
+
+                    <i class="align-middle me-1"
+                       data-lucide="log-in"></i>
+
+                    Internal
+
+                </a>
+
+            </li>
+
+            <li class="nav-item"
+                role="presentation">
+
+                <a class="nav-link"
+                   data-bs-toggle="tab"
+                   href="#External_Request"
+                   role="tab"
+                   aria-selected="false">
+
+                    <i class="align-middle me-1"
+                       data-lucide="log-out"></i>
+
+                    External
+
+                </a>
+
+            </li>
+
+        </ul>
+
+    </div>
+
+    <div class="card-body">
+
+        <div class="tab-content">
+
+            <div class="tab-pane fade show active"
+                 id="Internal_Request"
+                 role="tabpanel">
+
+                <div class="row g-3">
+
+                    @foreach (var request in Model
+                        .Where(w => w.Internal == true)
+                        .OrderBy(o => o.Name))
+                    {
+                        <div class="col-md-6 col-lg-4 col-xl-3">
+
+                            <a href="@Html.EncodedActionLink(
+                                         "",
+                                         "Create",
+                                         "AccessRequest",
+                                         "",
+                                         new
+                                         {
+                                             accessType = (int)AllocatedTypeEnum.Internal,
+                                             accessRequestTypeId = request.AccessRequestTypeId
+                                         },
+                                         null
+                                     )"
+                               class="text-decoration-none">
+
+                                <div class="card h-100 border">
+
+                                    <div class="card-body">
+
+                                        <div class="d-flex align-items-center">
+
+                                            <div class="flex-shrink-0 me-3">
+
+                                                <div class="bg-@(request.Color != null ? request.Color : "primary") text-white rounded d-flex align-items-center justify-content-center"
+                                                     style="width:48px;height:48px;">
+
+                                                    <i class="align-middle"
+                                                       data-lucide="key-round"></i>
+
+                                                </div>
+
+                                            </div>
+
+                                            <div class="flex-grow-1">
+
+                                                <div class="fw-semibold text-body">
+                                                    @request.Name
+                                                </div>
+
+                                                <small class="text-muted">
+                                                    Internal Access
+                                                </small>
+
+                                            </div>
+
+                                            <div class="ms-2">
+
+                                                <i class="align-middle text-muted"
+                                                   data-lucide="chevron-right"></i>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </a>
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+
+            <div class="tab-pane fade"
+                 id="External_Request"
+                 role="tabpanel">
+
+                <div class="row g-3">
+
+                    @foreach (var request in Model
+                        .Where(w => w.External == true)
+                        .OrderBy(o => o.Name))
+                    {
+                        <div class="col-md-6 col-lg-4 col-xl-3">
+
+                            <a href="@Html.EncodedActionLink(
+                                         "",
+                                         "Create",
+                                         "AccessRequest",
+                                         "",
+                                         new
+                                         {
+                                             accessType = (int)AllocatedTypeEnum.External,
+                                             accessRequestTypeId = request.AccessRequestTypeId
+                                         },
+                                         null
+                                     )"
+                               class="text-decoration-none">
+
+                                <div class="card h-100 border">
+
+                                    <div class="card-body">
+
+                                        <div class="d-flex align-items-center">
+
+                                            <div class="flex-shrink-0 me-3">
+
+                                                <div class="bg-@(request.Color != null ? request.Color : "primary") text-white rounded d-flex align-items-center justify-content-center"
+                                                     style="width:48px;height:48px;">
+
+                                                    <i class="align-middle"
+                                                       data-lucide="key-round"></i>
+
+                                                </div>
+
+                                            </div>
+
+                                            <div class="flex-grow-1">
+
+                                                <div class="fw-semibold text-body">
+                                                    @request.Name
+                                                </div>
+
+                                                <small class="text-muted">
+                                                    External Access
+                                                </small>
+
+                                            </div>
+
+                                            <div class="ms-2">
+
+                                                <i class="align-middle text-muted"
+                                                   data-lucide="chevron-right"></i>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </a>
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section scripts {
+}

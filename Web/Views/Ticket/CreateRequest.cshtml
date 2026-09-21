@@ -1,0 +1,1000 @@
+﻿@model Web.Models.TicketVM
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("CreateRequest", "Ticket", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+
+    <div class="row g-3">
+
+        <div class="col-lg-8">
+
+            <div class="card">
+
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="align-middle me-2" data-lucide="ticket"></i>
+                        New Ticket
+                    </h5>
+                </div>
+
+                <div class="card-body">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+
+                            @Html.LabelFor(
+                                model => model.TicketType,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.EnumDropDownListFor(
+                                model => model.TicketType,
+                                "-- Select --",
+                                new { @class = "form-select" }
+                            )
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            @Html.LabelFor(
+                                model => model.TicketMedium,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.EnumDropDownListFor(
+                                model => model.TicketMedium,
+                                "-- Select --",
+                                new { @class = "form-select" }
+                            )
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            @Html.LabelFor(
+                                model => model.CategoryId,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.DropDownListFor(
+                                model => model.CategoryId,
+                                new List<SelectListItem>(),
+                                new { @class = "form-select" }
+                            )
+
+                            @Html.ValidationMessageFor(
+                                model => model.CategoryId,
+                                "",
+                                new { @class = "text-danger" }
+                            )
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            @Html.LabelFor(
+                                model => model.AssetTypeId,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.DropDownListFor(
+                                model => model.AssetTypeId,
+                                new List<SelectListItem>(),
+                                new { @class = "form-select" }
+                            )
+
+                            @Html.ValidationMessageFor(
+                                model => model.AssetTypeId,
+                                "",
+                                new { @class = "text-danger" }
+                            )
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            @Html.LabelFor(
+                                model => model.SubCategoryId,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.DropDownListFor(
+                                model => model.SubCategoryId,
+                                new List<SelectListItem>(),
+                                new { @class = "form-select" }
+                            )
+
+                            @Html.ValidationMessageFor(
+                                model => model.SubCategoryId,
+                                "",
+                                new { @class = "text-danger" }
+                            )
+
+                        </div>
+
+                        <div class="col-12" id="OccurredDateTime">
+
+                            <div class="row g-3">
+
+                                <div class="col-md-4">
+
+                                    @Html.LabelFor(
+                                        model => model.OccurredDate,
+                                        new { @class = "form-label" }
+                                    )
+
+                                    @Html.TextBoxFor(
+                                        model => model.OccurredDate,
+                                        "{0:yyyy-MM-dd}",
+                                        new
+                                        {
+                                            @class = "form-control",
+                                            type = "date"
+                                        }
+                                    )
+
+                                </div>
+
+                                <div class="col-md-4">
+
+                                    @Html.LabelFor(
+                                        model => model.OccurredTime,
+                                        new { @class = "form-label" }
+                                    )
+
+                                    <input type="time"
+                                           id="Occurred_Time"
+                                           name="Occurred_Time"
+                                           class="form-control"
+                                           value="@ViewBag.OccurredTime" />
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-12">
+
+                            @Html.LabelFor(
+                                model => model.Subject,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.TextBoxFor(
+                                model => model.Subject,
+                                new { @class = "form-control" }
+                            )
+
+                            @Html.ValidationMessageFor(
+                                model => model.Subject,
+                                "",
+                                new { @class = "text-danger" }
+                            )
+
+                        </div>
+
+                        <div class="col-12">
+
+                            @Html.LabelFor(
+                                model => model.Description,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.TextAreaFor(
+                                model => model.Description,
+                                new
+                                {
+                                    @class = "form-control",
+                                    rows = "3"
+                                }
+                            )
+
+                            @Html.ValidationMessageFor(
+                                model => model.Description,
+                                "",
+                                new { @class = "text-danger" }
+                            )
+
+                        </div>
+
+                        <div class="col-12" id="In_Priority">
+
+                            <div class="card">
+
+                                <div class="card-header">
+                                    <h6 class="card-title mb-0">
+                                        <i class="align-middle me-2" data-lucide="triangle-alert"></i>
+                                        Priority
+                                    </h6>
+                                </div>
+
+                                <div class="card-body">
+
+                                    <div class="row g-3">
+
+                                        <div class="col-md-4">
+
+                                            @Html.LabelFor(
+                                                model => model.Urgency,
+                                                new { @class = "form-label" }
+                                            )
+
+                                            @Html.EnumDropDownListFor(
+                                                model => model.Urgency,
+                                                "-- Select --",
+                                                new { @class = "form-select" }
+                                            )
+
+                                        </div>
+
+                                        <div class="col-md-4">
+
+                                            @Html.LabelFor(
+                                                model => model.Impact,
+                                                new { @class = "form-label" }
+                                            )
+
+                                            @Html.EnumDropDownListFor(
+                                                model => model.Impact,
+                                                "-- Select --",
+                                                new { @class = "form-select" }
+                                            )
+
+                                        </div>
+
+                                        <div class="col-md-4">
+
+                                            @Html.LabelFor(
+                                                model => model.TicketPriorityId,
+                                                new { @class = "form-label" }
+                                            )
+
+                                            <div id="TicketPriority"
+                                                 class="form-control bg-body-tertiary">
+                                            </div>
+
+                                            @Html.HiddenFor(model => model.TicketPriorityId)
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="card-footer">
+
+                    <div class="d-flex justify-content-end">
+
+                        <button type="submit"
+                                id="btnSave"
+                                class="btn btn-sm btn-primary btnSubmitDisable">
+
+                            <i class="align-middle me-1" data-lucide="save"></i>
+                            Save
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-lg-4">
+
+            <div class="card">
+
+                <div class="card-header">
+
+                    <h5 class="card-title mb-0">
+                        <i class="align-middle me-2" data-lucide="user"></i>
+                        Requested User
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="row g-2 mb-3">
+
+                        <div class="col-sm-8">
+
+                            @Html.LabelFor(
+                                model => model.RequestedBy,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.TextBoxFor(
+                                model => model.RequestedBy,
+                                new
+                                {
+                                    @class = "form-control",
+                                    placeholder = "LAN Id"
+                                }
+                            )
+
+                            @Html.ValidationMessageFor(
+                                model => model.RequestedBy,
+                                "",
+                                new { @class = "text-danger" }
+                            )
+
+                        </div>
+
+                        <div class="col-sm-4 d-flex align-items-end">
+
+                            <button type="button"
+                                    onclick="loadRequestedUser()"
+                                    id="btnSearch"
+                                    class="btn btn-sm btn-light btnSubmitDisable2 w-100">
+
+                                <i class="align-middle me-1" data-lucide="search"></i>
+                                Search
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        @Html.LabelFor(
+                            model => model.RequestedUser.FullName,
+                            new { @class = "form-label" }
+                        )
+
+                        @Html.TextBoxFor(
+                            model => model.RequestedUser.FullName,
+                            new
+                            {
+                                @class = "form-control",
+                                @readonly = "readonly"
+                            }
+                        )
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        @Html.LabelFor(
+                            model => model.DepartmentName,
+                            new { @class = "form-label" }
+                        )
+
+                        @Html.TextBoxFor(
+                            model => model.RequestedUser.DepartmentName,
+                            new
+                            {
+                                @class = "form-control",
+                                @readonly = "readonly"
+                            }
+                        )
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        @Html.LabelFor(
+                            model => model.RequestedUser.DesignationName,
+                            new { @class = "form-label" }
+                        )
+
+                        @Html.TextBoxFor(
+                            model => model.RequestedUser.DesignationName,
+                            new
+                            {
+                                @class = "form-control",
+                                @readonly = "readonly"
+                            }
+                        )
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        @Html.LabelFor(
+                            model => model.RequestedUser.Email,
+                            new { @class = "form-label" }
+                        )
+
+                        @Html.TextBoxFor(
+                            model => model.RequestedUser.Email,
+                            new
+                            {
+                                @class = "form-control",
+                                @readonly = "readonly"
+                            }
+                        )
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        @Html.LabelFor(
+                            model => model.RequestedUser.ContactNo,
+                            new { @class = "form-label" }
+                        )
+
+                        @Html.TextBoxFor(
+                            model => model.RequestedUser.ContactNo,
+                            new { @class = "form-control" }
+                        )
+
+                    </div>
+
+                    <div class="mb-0">
+
+                        @Html.LabelFor(
+                            model => model.BranchId,
+                            new { @class = "form-label" }
+                        )
+
+                        @Html.DropDownListFor(
+                            model => model.BranchId,
+                            new List<SelectListItem>(),
+                            new { @class = "form-select" }
+                        )
+
+                        @Html.ValidationMessageFor(
+                            model => model.BranchId,
+                            "",
+                            new { @class = "text-danger" }
+                        )
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+}
+
+
+@section scripts {
+
+    <script src="~/Scripts/jquery.validate.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            loadCategory();
+            loadPriority();
+            getPriority();
+            loadLocations();
+
+            $("#TicketType").on("change", function () {
+                loadCategory();
+                getPriority();
+            });
+
+            $("#CategoryId").on("change", function () {
+                loadAssetType();
+            });
+
+            $("#AssetTypeId").on("change", function () {
+                loadSubCategory();
+                getSubject();
+            });
+
+            $("#SubCategoryId").on("change", function () {
+                getSubject();
+            });
+
+            $("#Urgency").on("change", function () {
+                loadPriority();
+            });
+
+            $("#Impact").on("change", function () {
+                loadPriority();
+            });
+
+        });
+
+
+        function parseJsonResult(data) {
+
+            if (typeof data === "string") {
+
+                try {
+                    return JSON.parse(data);
+                }
+                catch (e) {
+                    return [];
+                }
+
+            }
+
+            return data || [];
+        }
+
+
+        function loadRequestedUser() {
+
+            var userId =
+                $("#RequestedBy").val();
+
+            var button =
+                $("#btnSearch");
+
+
+            if (!userId) {
+
+                Swal.fire(
+                    "Error!",
+                    "Please enter the requested user LAN Id",
+                    "error"
+                );
+
+                return;
+            }
+
+
+            button.prop("disabled", true);
+
+            button.html(
+                '<span class="spinner-border spinner-border-sm me-1"></span> Please Wait'
+            );
+
+
+            $.getJSON(
+                '@Url.Action("GetADUserJsonResult", "User")',
+                {
+                    lanId: userId
+                },
+                function (data) {
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (key, value) {
+
+                            if (key === "FullName") {
+
+                                $("#RequestedUser_FullName")
+                                    .val(value);
+
+                            }
+                            else if (key === "DepartmentName") {
+
+                                $("#RequestedUser_DepartmentName")
+                                    .val(value);
+
+                            }
+                            else if (key === "DesignationName") {
+
+                                $("#RequestedUser_DesignationName")
+                                    .val(value);
+
+                            }
+                            else if (key === "Email") {
+
+                                $("#RequestedUser_Email")
+                                    .val(value);
+
+                            }
+                            else if (key === "ContactNo") {
+
+                                $("#RequestedUser_ContactNo")
+                                    .val(value);
+
+                            }
+
+                        }
+                    );
+
+
+                    button.prop("disabled", false);
+
+                    button.html(
+                        '<i data-lucide="search" class="align-middle me-1"></i> Search'
+                    );
+
+                    if (window.lucide) {
+                        lucide.createIcons();
+                    }
+
+                }
+            )
+            .fail(function () {
+
+                button.prop("disabled", false);
+
+                button.html(
+                    '<i data-lucide="search" class="align-middle me-1"></i> Search'
+                );
+
+                if (window.lucide) {
+                    lucide.createIcons();
+                }
+
+                Swal.fire(
+                    "Something went wrong!",
+                    "Please try again",
+                    "error"
+                );
+
+            });
+
+        }
+
+
+        function loadCategory() {
+
+            var ticketType =
+                $("#TicketType").val();
+
+            var dropDown =
+                $("#CategoryId");
+
+
+            dropDown.empty();
+
+            dropDown.append(
+                "<option value='0'>-- Select --</option>"
+            );
+
+
+            $.getJSON(
+                '@Url.Action("GetCategoryByTicketTypeListJsonResult", "Category")',
+                {
+                    ticketType: ticketType
+                },
+                function (data) {
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.CategoryId,
+                                    text: item.CategoryName
+                                })
+                            );
+
+                        }
+                    );
+
+
+                    var selectedId =
+                        '@ViewBag.CategoryId';
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+
+                    loadAssetType();
+
+                }
+            );
+
+        }
+
+
+        function loadAssetType() {
+
+            var ticketType =
+                $("#TicketType").val();
+
+            var categoryId =
+                $("#CategoryId").val();
+
+
+            if ((!categoryId || categoryId == "0") &&
+                '@ViewBag.CategoryId' &&
+                '@ViewBag.CategoryId' != '0') {
+
+                categoryId =
+                    '@ViewBag.CategoryId';
+
+            }
+
+
+            var dropDown =
+                $("#AssetTypeId");
+
+
+            dropDown.empty();
+
+            dropDown.append(
+                "<option value='0'>-- Select --</option>"
+            );
+
+
+            $.getJSON(
+                '@Url.Action("GetAssetTypeByTicketTypeListJsonResult", "AssetType")',
+                {
+                    ticketType: ticketType,
+                    categoryId: categoryId
+                },
+                function (data) {
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.AssetTypeId,
+                                    text: item.AssetTypeName
+                                })
+                            );
+
+                        }
+                    );
+
+
+                    var selectedId =
+                        '@ViewBag.AssetTypeId';
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+
+                    loadSubCategory();
+
+                }
+            );
+
+        }
+
+
+        function loadSubCategory() {
+
+            var ticketType =
+                $("#TicketType").val();
+
+            var categoryId =
+                $("#CategoryId").val();
+
+            var assetTypeId =
+                $("#AssetTypeId").val();
+
+
+            if ((!categoryId || categoryId == "0") &&
+                '@ViewBag.CategoryId' &&
+                '@ViewBag.CategoryId' != '0') {
+
+                categoryId =
+                    '@ViewBag.CategoryId';
+
+            }
+
+
+            if ((!assetTypeId || assetTypeId == "0") &&
+                '@ViewBag.AssetTypeId' &&
+                '@ViewBag.AssetTypeId' != '0') {
+
+                assetTypeId =
+                    '@ViewBag.AssetTypeId';
+
+            }
+
+
+            var dropDown =
+                $("#SubCategoryId");
+
+
+            dropDown.empty();
+
+            dropDown.append(
+                "<option value='0'>-- Select --</option>"
+            );
+
+
+            $.getJSON(
+                '@Url.Action("GetSubCategoryByTicketTypeListJsonResult", "SubCategory")',
+                {
+                    ticketType: ticketType,
+                    categoryId: categoryId,
+                    assetTypeId: assetTypeId
+                },
+                function (data) {
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.SubCategoryId,
+                                    text: item.SubCategoryName
+                                })
+                            );
+
+                        }
+                    );
+
+
+                    var selectedId =
+                        '@ViewBag.SubCategoryId';
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+                }
+            );
+
+        }
+
+
+        function loadPriority() {
+
+            var urgency =
+                $("#Urgency").val();
+
+            var impact =
+                $("#Impact").val();
+
+
+            $("#TicketPriority").text("");
+
+
+            $.getJSON(
+                '@Url.Action("GetTicketPriorityListJsonResult", "TicketPriority")',
+                {
+                    urgency: urgency,
+                    impact: impact
+                },
+                function (data) {
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            $("#TicketPriority")
+                                .text(item.TicketPriorityName);
+
+                            $("#TicketPriorityId")
+                                .val(item.TicketPriorityId);
+
+                        }
+                    );
+
+                }
+            );
+
+        }
+
+
+        function getPriority() {
+
+            var ticketType =
+                $("#TicketType").val();
+
+
+            if (ticketType == "2") {
+
+                $("#In_Priority").show();
+                $("#OccurredDateTime").show();
+
+            }
+            else {
+
+                $("#In_Priority").hide();
+                $("#OccurredDateTime").hide();
+
+            }
+
+        }
+
+
+        function getSubject() {
+
+            var assetType = "";
+
+            var subCategory = "";
+
+
+            if ($("#AssetTypeId").val() &&
+                $("#AssetTypeId").val() != "0") {
+
+                assetType =
+                    $("#AssetTypeId option:selected").text();
+
+            }
+
+
+            if ($("#SubCategoryId").val() &&
+                $("#SubCategoryId").val() != "0") {
+
+                subCategory =
+                    $("#SubCategoryId option:selected").text();
+
+            }
+
+
+            if (assetType && subCategory) {
+
+                $("#Subject").val(
+                    assetType + " - " + subCategory
+                );
+
+            }
+            else if (assetType) {
+
+                $("#Subject").val(assetType);
+
+            }
+            else {
+
+                $("#Subject").val("");
+
+            }
+
+        }
+
+
+        function loadLocations() {
+
+            var dropDown =
+                $("#BranchId");
+
+
+            dropDown.empty();
+
+            dropDown.append(
+                "<option value='0'>-- Select --</option>"
+            );
+
+
+            $.getJSON(
+                '@Url.Action("GetItemListJsonResult", "Branch")',
+                function (data) {
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.BranchId,
+                                    text: item.Name
+                                })
+                            );
+
+                        }
+                    );
+
+
+                    var selectedId =
+                        '@ViewBag.BranchId';
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+                }
+            );
+
+        }
+
+    </script>
+}

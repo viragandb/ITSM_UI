@@ -1,0 +1,571 @@
+﻿@model Web.Models.AssignAssetVM
+@using Service
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .ui-autocomplete {
+        position: absolute;
+        cursor: default;
+        z-index: 1100;
+        max-height: 300px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding: 0;
+        margin: 0;
+        list-style: none;
+        background: #fff;
+        border: 1px solid #dee2e6;
+        border-radius: .25rem;
+    }
+
+    .ui-menu .ui-menu-item {
+        margin: 0;
+        padding: 0;
+    }
+
+    .ui-menu .ui-menu-item-wrapper {
+        display: block;
+        padding: .5rem .75rem;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+        .ui-menu .ui-menu-item-wrapper.ui-state-active {
+            margin: 0;
+        }
+</style>
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="card">
+
+            <div class="card-header d-flex justify-content-between align-items-center">
+
+                <h5 class="card-title mb-0">
+                    <i class="align-middle me-2" data-lucide="link"></i>
+                    Assign CI
+                </h5>
+
+                <a href="@Url.Action("AssignItems", "Change")"
+                   class="btn btn-sm btn-light">
+
+                    <i class="align-middle me-1" data-lucide="arrow-left"></i>
+                    Back
+
+                </a>
+
+            </div>
+
+            @using (Html.BeginForm("AssignAsset", "Change", FormMethod.Post))
+            {
+                @Html.HiddenFor(model => model.ItemId)
+
+                <div class="card-body">
+
+                    <div class="card mb-4">
+
+                        <div class="card-body">
+
+                            <div class="row g-3">
+
+                                <div class="col-md-4">
+
+                                    @Html.LabelFor(
+                                        model => model.AssetCategory,
+                                        new { @class = "form-label" }
+                                    )
+
+                                    @Html.EnumDropDownListFor(
+                                        model => model.AssetCategory,
+                                        "-- Select --",
+                                        new { @class = "form-select" }
+                                    )
+
+                                </div>
+
+                                <div class="col-md-3">
+
+                                    @Html.LabelFor(
+                                        model => model.AssetCode,
+                                        new { @class = "form-label" }
+                                    )
+
+                                    @Html.TextBoxFor(
+                                        model => model.AssetCode,
+                                        new
+                                        {
+                                            @class = "form-control",
+                                            @readonly = "readonly"
+                                        }
+                                    )
+
+                                    @Html.ValidationMessageFor(
+                                        model => model.AssetCode,
+                                        "",
+                                        new { @class = "text-danger" }
+                                    )
+
+                                </div>
+
+                                <div class="col-md-5">
+
+                                    <label for="ItemSearch" class="form-label">
+                                        Search Asset
+                                    </label>
+
+                                    <input type="text"
+                                           name="ItemSearch"
+                                           id="ItemSearch"
+                                           class="form-control"
+                                           placeholder="Search by Name / Description / Serial # / Model / Phone #" />
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="card-footer">
+
+                            <div class="d-flex justify-content-end">
+
+                                <button type="button"
+                                        id="btnAssign"
+                                        class="btn btn-success btn-sm"
+                                        onclick="assignItem(document.getElementById('AssetCode').value)">
+
+                                    <i class="align-middle me-1" data-lucide="link"></i>
+                                    Assign
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="card mb-0">
+
+                        <div class="card-header">
+
+                            <h5 class="card-title mb-0">
+                                <i class="align-middle me-2" data-lucide="boxes"></i>
+                                Assigned Assets
+                            </h5>
+
+                        </div>
+
+                        <div class="card-body">
+
+                            <div class="table-responsive">
+
+                                <table id="dataTable"
+                                       class="table table-striped table-hover align-middle w-100">
+
+                                    <thead>
+                                        <tr>
+                                            <th>Asset Code</th>
+                                            <th>Asset Category</th>
+                                            <th>Name</th>
+                                            <th>Description</th>
+                                            <th>Serial #</th>
+                                            <th>Model</th>
+                                            <th>Location</th>
+                                            <th>Company</th>
+                                            <th>Updated By</th>
+                                            <th>Updated Date</th>
+                                            <th class="text-end">Actions</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+
+                                        @if (Model.AssignedItems != null)
+                                        {
+                                            foreach (var item in Model.AssignedItems)
+                                            {
+                                                <tr>
+
+                                                    <td>
+                                                        @item.Asset.AssetCode
+                                                    </td>
+
+                                                    <td>
+                                                        @item.Asset.AssetCategory.EnumDisplayName()
+                                                    </td>
+
+                                                    <td>
+                                                        @item.Asset.AssetName
+                                                    </td>
+
+                                                    <td>
+                                                        @item.Asset.Description
+                                                    </td>
+
+                                                    <td>
+                                                        @item.Asset.SerialNo
+                                                    </td>
+
+                                                    <td>
+                                                        @item.Asset.ModelName
+                                                    </td>
+
+                                                    <td>
+                                                        @item.Asset.Location
+                                                    </td>
+
+                                                    <td>
+                                                        @item.Asset.Company
+                                                    </td>
+
+                                                    <td>
+                                                        @item.UpdatedBy
+                                                    </td>
+
+                                                    <td>
+                                                        @item.UpdatedDate
+                                                    </td>
+
+                                                    <td class="text-end">
+
+                                                        <button type="button"
+                                                                class="btn btn-danger btn-sm"
+                                                                onclick="deleteItem('@item.ItemAssetId')">
+
+                                                            <i class="align-middle me-1" data-lucide="unlink"></i>
+                                                            Remove
+
+                                                        </button>
+
+                                                    </td>
+
+                                                </tr>
+                                            }
+                                        }
+
+                                    </tbody>
+
+                                </table>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+</div>
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            if ($("#AssetCategory").val() == "" ||
+                $("#AssetCategory").val() == "0") {
+
+                $("#AssetCategory").val("1");
+
+            }
+
+            searchIMSItem();
+
+            $("#AssetCategory").on("change", function () {
+
+                $("#AssetCode").val("");
+                $("#ItemSearch").val("");
+
+            });
+
+            $("#dataTable").DataTable({
+                paging: true,
+                lengthChange: true,
+                searching: true,
+                ordering: true,
+                info: true,
+                responsive: true,
+                autoWidth: false
+            });
+
+        });
+
+
+        function searchIMSItem() {
+
+            $("#ItemSearch").autocomplete({
+
+                source: function (request, response) {
+
+                    $.ajax({
+
+                        url: '@Url.Action("GetIMSItemListJsonResult", "ItemAsset")',
+
+                        dataType: "json",
+
+                        data: {
+                            term: request.term,
+                            assetCatId: $("#AssetCategory").val()
+                        },
+
+                        success: function (data) {
+
+                            response(
+                                $.map(data, function (item) {
+
+                                    return {
+                                        label:
+                                            (item.ItemName || "") +
+                                            " - " +
+                                            (item.Description || "") +
+                                            " - " +
+                                            (item.ModelNo || "") +
+                                            " - " +
+                                            (item.Company || "") +
+                                            " " +
+                                            (item.Location || "") +
+                                            " " +
+                                            (item.EmpNo || ""),
+
+                                        value: item.Description,
+                                        assetId: item.IMSCode
+                                    };
+
+                                })
+                            );
+
+                        },
+
+                        error: function () {
+
+                            response([]);
+
+                        }
+
+                    });
+
+                },
+
+                minLength: 4,
+
+                select: function (event, ui) {
+
+                    $("#AssetCode").val(ui.item.assetId);
+
+                }
+
+            });
+
+        }
+
+
+        function deleteItem(itemId) {
+
+            var changeId =
+                $("#ItemId").val();
+
+            Swal.fire({
+
+                title: "Are you sure?",
+                text: "Do you want to remove the asset?",
+                icon: "warning",
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                showCancelButton: true,
+                reverseButtons: true
+
+            }).then(function (result) {
+
+                if (result.isConfirmed || result.value) {
+
+                    $.ajax({
+
+                        url: '@Url.Action("DeleteAsset", "Change")',
+
+                        type: "GET",
+
+                        dataType: "json",
+
+                        data: {
+                            assetItemId: itemId,
+                            changeId: changeId
+                        },
+
+                        success: function (data) {
+
+                            if (data == "1" || data == 1) {
+
+                                Swal.fire(
+                                    "Removed!",
+                                    "Asset has been removed",
+                                    "success"
+                                );
+
+                                setTimeout(function () {
+                                    window.location.reload();
+                                }, 500);
+
+                            }
+                            else {
+
+                                Swal.fire(
+                                    "Something went wrong!",
+                                    "Data is not deleted, Please try again",
+                                    "error"
+                                );
+
+                            }
+
+                        },
+
+                        error: function () {
+
+                            Swal.fire(
+                                "Something went wrong!",
+                                "Data is not deleted, Please try again",
+                                "error"
+                            );
+
+                        }
+
+                    });
+
+                }
+
+            });
+
+        }
+
+
+        function assignItem(itemId) {
+
+            var changeId =
+                $("#ItemId").val();
+
+            var categoryId =
+                $("#AssetCategory").val();
+
+
+            if (!categoryId || categoryId == "0") {
+
+                Swal.fire(
+                    "Invalid!",
+                    "Please select the asset category.",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            if (!itemId) {
+
+                Swal.fire(
+                    "Invalid!",
+                    "Please search and select an asset.",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            Swal.fire({
+
+                title: "Are you sure?",
+                text: "Do you want to assign the asset?",
+                icon: "warning",
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                showCancelButton: true,
+                reverseButtons: true
+
+            }).then(function (result) {
+
+                if (result.isConfirmed || result.value) {
+
+                    var button =
+                        $("#btnAssign");
+
+                    button.prop("disabled", true);
+
+
+                    $.ajax({
+
+                        url: '@Url.Action("AssignAssetJSChange", "ItemAsset")',
+
+                        type: "GET",
+
+                        dataType: "json",
+
+                        data: {
+                            assetCode: itemId,
+                            itemId: changeId,
+                            assetCategory: categoryId
+                        },
+
+                        success: function (data) {
+
+                            if (data == "1" || data == 1) {
+
+                                Swal.fire(
+                                    "Assigned!",
+                                    "Asset has been assigned",
+                                    "success"
+                                );
+
+                                setTimeout(function () {
+                                    window.location.reload();
+                                }, 500);
+
+                            }
+                            else {
+
+                                button.prop("disabled", false);
+
+                                Swal.fire(
+                                    "Something went wrong!",
+                                    "Asset could not be assigned, Please try again",
+                                    "error"
+                                );
+
+                            }
+
+                        },
+
+                        error: function () {
+
+                            button.prop("disabled", false);
+
+                            Swal.fire(
+                                "Something went wrong!",
+                                "Asset could not be assigned, Please try again",
+                                "error"
+                            );
+
+                        }
+
+                    });
+
+                }
+
+            });
+
+        }
+
+    </script>
+}

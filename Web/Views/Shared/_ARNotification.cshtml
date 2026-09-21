@@ -1,0 +1,205 @@
+﻿@model IEnumerable<Domain.AR.AccessRequest>
+
+@using Domain.AR
+@using Domain
+
+@{
+    var currentUserId = Session["UserId"] != null
+        ? Session["UserId"].ToString()
+        : "";
+
+    var approvalCount = Model
+        .Where(w =>
+            w.Status == AccessRequestStatusEnum.Initiated &&
+            w.ApprovalBy == currentUserId)
+        .Count();
+
+    var inputterCount = Model
+        .Where(e =>
+            e.Status == AccessRequestStatusEnum.Pending &&
+            e.WorkflowLevelType == WorkflowLevelTypeEnum.Inputter &&
+            e.Team.UserTeams.Any(u => u.EmpNo == currentUserId))
+        .Count();
+
+    var authorizerCount = Model
+        .Where(e =>
+            e.Status == AccessRequestStatusEnum.Pending &&
+            e.WorkflowLevelType == WorkflowLevelTypeEnum.Authorizer &&
+            e.Team.UserTeams.Any(u => u.EmpNo == currentUserId))
+        .Count();
+
+    var checkerCount = Model
+        .Where(e =>
+            e.Status == AccessRequestStatusEnum.Pending &&
+            e.WorkflowLevelType == WorkflowLevelTypeEnum.Checker &&
+            e.Team.UserTeams.Any(u => u.EmpNo == currentUserId))
+        .Count();
+
+    var implementerCount = Model
+        .Where(e =>
+            e.Status == AccessRequestStatusEnum.Pending &&
+            e.WorkflowLevelType == WorkflowLevelTypeEnum.Implementer &&
+            e.Team.UserTeams.Any(u => u.EmpNo == currentUserId))
+        .Count();
+
+    var totalCount =
+        approvalCount +
+        inputterCount +
+        authorizerCount +
+        checkerCount +
+        implementerCount;
+}
+
+<li class="nav-item dropdown">
+
+    <a class="nav-icon dropdown-toggle"
+       href="#"
+       id="accessRequestDropdown"
+       data-bs-toggle="dropdown"
+       aria-expanded="false">
+
+        <div class="position-relative">
+
+            <i class="align-middle text-body"
+               data-lucide="key"></i>
+
+            @if (totalCount > 0)
+            {
+                <span class="indicator">
+                    @totalCount
+                </span>
+            }
+
+        </div>
+
+    </a>
+
+    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end py-0"
+         aria-labelledby="accessRequestDropdown">
+
+        <div class="dropdown-menu-header">
+
+            <div class="position-relative">
+
+                <i class="fas fa-key me-2"></i>
+
+                Access Requests
+
+            </div>
+
+        </div>
+
+        <div class="list-group">
+
+            @if (approvalCount > 0)
+            {
+                <a href="@Url.Action("ApprovalPending", "AccessRequest")"
+                   class="list-group-item">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <span>
+                            Approval
+                        </span>
+
+                        <span class="badge bg-danger">
+                            @approvalCount
+                        </span>
+
+                    </div>
+
+                </a>
+            }
+
+            @if (inputterCount > 0)
+            {
+                <a href="@Url.Action("Inputter", "AccessRequest")"
+                   class="list-group-item">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <span>
+                            Inputter
+                        </span>
+
+                        <span class="badge bg-danger">
+                            @inputterCount
+                        </span>
+
+                    </div>
+
+                </a>
+            }
+
+            @if (authorizerCount > 0)
+            {
+                <a href="@Url.Action("Authorizer", "AccessRequest")"
+                   class="list-group-item">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <span>
+                            Authorizer
+                        </span>
+
+                        <span class="badge bg-danger">
+                            @authorizerCount
+                        </span>
+
+                    </div>
+
+                </a>
+            }
+
+            @if (checkerCount > 0)
+            {
+                <a href="@Url.Action("Checker", "AccessRequest")"
+                   class="list-group-item">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <span>
+                            Checker
+                        </span>
+
+                        <span class="badge bg-danger">
+                            @checkerCount
+                        </span>
+
+                    </div>
+
+                </a>
+            }
+
+            @if (implementerCount > 0)
+            {
+                <a href="@Url.Action("Implementer", "AccessRequest")"
+                   class="list-group-item">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <span>
+                            Implementer
+                        </span>
+
+                        <span class="badge bg-danger">
+                            @implementerCount
+                        </span>
+
+                    </div>
+
+                </a>
+            }
+
+            @if (totalCount == 0)
+            {
+                <div class="p-3 text-center text-muted">
+                    No pending access requests
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+</li>

@@ -1,0 +1,359 @@
+﻿@using Service
+@model IEnumerable<Domain.AssetType>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("Index", "AssetType", FormMethod.Post))
+{
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card">
+
+                <div class="card-header d-flex justify-content-between align-items-center">
+
+                    <h5 class="card-title mb-0">
+                        <i class="align-middle me-2" data-lucide="boxes"></i>
+                        Asset Types
+                    </h5>
+
+                    <a href="@Url.Action("Create", "AssetType")"
+                       class="btn btn-sm btn-primary">
+
+                        <i class="align-middle me-1" data-lucide="plus"></i>
+                        Add New
+
+                    </a>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-4">
+
+                            <label for="AssetCategoryId" class="form-label">
+                                Asset Category
+                            </label>
+
+                            <select id="AssetCategoryId"
+                                    name="AssetCategoryId"
+                                    class="form-select">
+                                <option value=""></option>
+                            </select>
+
+                            <span class="text-danger"
+                                  data-valmsg-for="AssetCategoryId"
+                                  data-valmsg-replace="true">
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="card-footer">
+
+                    <div class="d-flex justify-content-end">
+
+                        <button type="submit"
+                                class="btn btn-sm btn-primary">
+
+                            <i class="align-middle me-1" data-lucide="search"></i>
+                            Search
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+}
+
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="card">
+
+            <div class="card-body">
+
+                <div class="table-responsive">
+
+                    <table id="dataTable"
+                           class="table table-striped table-hover align-middle w-100">
+
+                        <thead>
+
+                            <tr>
+                                <th>Name</th>
+                                <th>Asset Category</th>
+                                <th>Icon</th>
+                                <th>Is Accessory</th>
+                                <th>Updated By</th>
+                                <th>Updated Date</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+
+                                    <td>
+                                        @item.AssetTypeName
+                                    </td>
+
+                                    <td>
+                                        @item.AssetCategory.EnumDisplayName()
+                                    </td>
+
+                                    <td>
+
+                                        @if (!string.IsNullOrWhiteSpace(item.Icon))
+                                        {
+                                            <i data-lucide="@item.Icon"></i>
+                                        }
+
+                                    </td>
+
+                                    <td>
+
+                                        @if (item.IsAccessory)
+                                        {
+                                            <span class="badge bg-success">
+                                                Yes
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">
+                                                No
+                                            </span>
+                                        }
+
+                                    </td>
+
+                                    <td>
+                                        @item.UpdatedBy
+                                    </td>
+
+                                    <td>
+                                        @item.UpdatedDate
+                                    </td>
+
+                                    <td class="text-end text-nowrap">
+
+                                        <a href="@Url.Action("Edit", "AssetType", new { id = item.AssetTypeId })"
+                                           class="btn btn-sm btn-primary">
+
+                                            <i class="align-middle" data-lucide="pencil"></i>
+
+                                        </a>
+
+                                        <button type="button"
+                                                class="btn btn-sm btn-danger"
+                                                onclick="deleteItem('@item.AssetTypeId')">
+
+                                            <i class="align-middle" data-lucide="trash-2"></i>
+
+                                        </button>
+
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $("#dataTable").DataTable({
+                paging: true,
+                lengthChange: true,
+                searching: true,
+                ordering: true,
+                info: true,
+                autoWidth: false,
+                responsive: true
+            });
+
+            loadAssetCategory();
+
+        });
+
+
+        function parseJsonResult(data) {
+
+            if (typeof data === "string") {
+
+                try {
+                    return JSON.parse(data);
+                }
+                catch (e) {
+                    return [];
+                }
+
+            }
+
+            return data || [];
+
+        }
+
+
+        function loadAssetCategory() {
+
+            $.getJSON(
+                '@Url.Action("GetAssetCategoryJsonResult", "AssetType")',
+                function (data) {
+
+                    var dropDown =
+                        $("#AssetCategoryId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- All --</option>"
+                    );
+
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.Id,
+                                    text: item.Name
+                                })
+                            );
+
+                        }
+                    );
+
+
+                    var selectedId =
+                        '@ViewBag.AssetCategoryId';
+
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+                }
+            );
+
+        }
+
+
+        function deleteItem(itemId) {
+
+            Swal.fire({
+
+                title: "Are you sure?",
+                text: "Do you want to delete?",
+                icon: "warning",
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                showCancelButton: true,
+                reverseButtons: true
+
+            }).then(function (result) {
+
+                if (result.isConfirmed || result.value) {
+
+                    $.ajax({
+
+                        url: '@Url.Action("Delete", "AssetType")',
+
+                        type: "GET",
+
+                        dataType: "json",
+
+                        data: {
+                            id: itemId
+                        },
+
+                        success: function (data) {
+
+                            if (data == "1" || data == 1) {
+
+                                Swal.fire(
+                                    "Deleted!",
+                                    "Record has been deleted",
+                                    "success"
+                                );
+
+                                setTimeout(function () {
+                                    window.location.reload();
+                                }, 1000);
+
+                            }
+                            else if (data == "2" || data == 2) {
+
+                                Swal.fire(
+                                    "Data in use!",
+                                    "Data is currently in use and can not be deleted",
+                                    "error"
+                                );
+
+                            }
+                            else {
+
+                                Swal.fire(
+                                    "Something went wrong!",
+                                    "Data is not deleted, Please try again",
+                                    "error"
+                                );
+
+                            }
+
+                        },
+
+                        error: function () {
+
+                            Swal.fire(
+                                "Something went wrong!",
+                                "Data is not deleted, Please try again",
+                                "error"
+                            );
+
+                        }
+
+                    });
+
+                }
+
+            });
+
+        }
+
+    </script>
+}

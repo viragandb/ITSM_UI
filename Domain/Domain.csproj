@@ -1,0 +1,266 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{825A6A89-A64D-4E69-8A2F-37A5602F4401}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Domain</RootNamespace>
+    <AssemblyName>Domain</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AccessControl.cs" />
+    <Compile Include="Accessory.cs" />
+    <Compile Include="AllocatedTypeEnum.cs" />
+    <Compile Include="AR\AccessApplication.cs" />
+    <Compile Include="AR\AccessLevel.cs" />
+    <Compile Include="AR\AccessPrivilegeCategory.cs" />
+    <Compile Include="AR\AccessRequest.cs" />
+    <Compile Include="AR\AccessRequestLog.cs" />
+    <Compile Include="AR\AccessRequestStatusEnum.cs" />
+    <Compile Include="AR\AccessRequestType.cs" />
+    <Compile Include="AR\AccessRequestUpdate.cs" />
+    <Compile Include="AR\DeviceAccess.cs" />
+    <Compile Include="AR\DeviceAccessItem.cs" />
+    <Compile Include="AR\DeviceAccessItemType.cs" />
+    <Compile Include="AR\FirewallChangeAccess.cs" />
+    <Compile Include="AR\FirewallService.cs" />
+    <Compile Include="AR\PhysicalAccess.cs" />
+    <Compile Include="AR\PhysicalAccessItem.cs" />
+    <Compile Include="AR\PhysicalArea.cs" />
+    <Compile Include="AR\RemoteAccess.cs" />
+    <Compile Include="AR\RemoteAccessItem.cs" />
+    <Compile Include="AR\RemoteAccessTypeEnum.cs" />
+    <Compile Include="AR\SystemAccess.cs" />
+    <Compile Include="AR\SystemAccessItem.cs" />
+    <Compile Include="AR\UserAccess.cs" />
+    <Compile Include="AR\UserAccessItem.cs" />
+    <Compile Include="AR\UserAccessItemType.cs" />
+    <Compile Include="AR\UserAccessTypeEnum.cs" />
+    <Compile Include="AR\UserPrivilegeAccess.cs" />
+    <Compile Include="AR\UserPrivilegeAccessItem.cs" />
+    <Compile Include="Asset.cs" />
+    <Compile Include="AssetCategoryEnum.cs" />
+    <Compile Include="AssetItemDTO.cs" />
+    <Compile Include="AssetLink.cs" />
+    <Compile Include="AssetLinkActionEnum.cs" />
+    <Compile Include="AssetLinkLog.cs" />
+    <Compile Include="AssetLog.cs" />
+    <Compile Include="AssetMake.cs" />
+    <Compile Include="AssetStatusEnum.cs" />
+    <Compile Include="AssetTransferRequest.cs" />
+    <Compile Include="AssetTransactionLog.cs" />
+    <Compile Include="AssetTransactionTypeEnum.cs" />
+    <Compile Include="AssetTransStatusEnum.cs" />
+    <Compile Include="AssetType.cs" />
+    <Compile Include="AssetVerificationItem.cs" />
+    <Compile Include="AssetVerificationRequest.cs" />
+    <Compile Include="AssetVerificationStatusEnum.cs" />
+    <Compile Include="AssignedTypeEnum.cs" />
+    <Compile Include="BackupJobStatusEnum.cs" />
+    <Compile Include="BackupChecklist.cs" />
+    <Compile Include="BackupChecklistItem.cs" />
+    <Compile Include="BackupJob.cs" />
+    <Compile Include="BackupLog.cs" />
+    <Compile Include="BackupReviewLog.cs" />
+    <Compile Include="BackupTask.cs" />
+    <Compile Include="BackupTaskCategory.cs" />
+    <Compile Include="BackupTypeEnum.cs" />
+    <Compile Include="Branch.cs" />
+    <Compile Include="BranchDepartment.cs" />
+    <Compile Include="CallLog.cs" />
+    <Compile Include="Category.cs" />
+    <Compile Include="Change.cs" />
+    <Compile Include="ChangeProblem.cs" />
+    <Compile Include="ChangeRequestType.cs" />
+    <Compile Include="ChangeStatusEnum.cs" />
+    <Compile Include="ChangeTicket.cs" />
+    <Compile Include="ChangeTypeEnum.cs" />
+    <Compile Include="ChecklistTypeEnum.cs" />
+    <Compile Include="CM\ChangeArea.cs" />
+    <Compile Include="CM\ChangeCategoryEnum.cs" />
+    <Compile Include="CM\ChangeImplementData.cs" />
+    <Compile Include="CM\ChangePriorityEnum.cs" />
+    <Compile Include="CM\ChangeRequest.cs" />
+    <Compile Include="CM\ChangeRequestAsset.cs" />
+    <Compile Include="CM\ChangeRequestCategory.cs" />
+    <Compile Include="CM\ChangeRequestDoc.cs" />
+    <Compile Include="CM\ChangeRequestLog.cs" />
+    <Compile Include="CM\ChangeRequestStatusEnum.cs" />
+    <Compile Include="CM\ChangeRequestTask.cs" />
+    <Compile Include="CM\ChangeRequestUpdate.cs" />
+    <Compile Include="CM\ChangeType.cs" />
+    <Compile Include="CM\DowntimeAlertEmail.cs" />
+    <Compile Include="Customer.cs" />
+    <Compile Include="DeliverySLA.cs" />
+    <Compile Include="Department.cs" />
+    <Compile Include="DeviceManagementTypeEnum.cs" />
+    <Compile Include="DM\DeviceManagementRequestLog.cs" />
+    <Compile Include="DM\DeviceManagementStatusEnum.cs" />
+    <Compile Include="DM\DeviceManagementRequest.cs" />
+    <Compile Include="DM\DeviceManagementRequestUpdate.cs" />
+    <Compile Include="DocTypeEnum.cs" />
+    <Compile Include="DowntimeLog.cs" />
+    <Compile Include="DowntimeTypeEnum.cs" />
+    <Compile Include="DRDrill.cs" />
+    <Compile Include="DRDrillStatusEnum.cs" />
+    <Compile Include="DR\DisposalItem.cs" />
+    <Compile Include="DR\DisposalRequest.cs" />
+    <Compile Include="DR\DisposalRequestDoc.cs" />
+    <Compile Include="DR\DisposalRequestLog.cs" />
+    <Compile Include="DR\DisposalRequestUpdate.cs" />
+    <Compile Include="DR\DisposalStatusEnum.cs" />
+    <Compile Include="Event.cs" />
+    <Compile Include="EventStatusEnum.cs" />
+    <Compile Include="EventType.cs" />
+    <Compile Include="GRNote.cs" />
+    <Compile Include="Group.cs" />
+    <Compile Include="Holiday.cs" />
+    <Compile Include="IM\IncidentImpactEnum.cs" />
+    <Compile Include="IM\IncidentRequest.cs" />
+    <Compile Include="IM\IncidentRequestAsset.cs" />
+    <Compile Include="IM\IncidentRequestDoc.cs" />
+    <Compile Include="IM\IncidentRequestLog.cs" />
+    <Compile Include="IM\IncidentRequestTicket.cs" />
+    <Compile Include="IM\IncidentRequestUpdate.cs" />
+    <Compile Include="IM\IncidentStatusEnum.cs" />
+    <Compile Include="Item.cs" />
+    <Compile Include="ItemAsset.cs" />
+    <Compile Include="ItemDoc.cs" />
+    <Compile Include="ItemLog.cs" />
+    <Compile Include="ItemTypeEnum.cs" />
+    <Compile Include="JsTreeViewModel.cs" />
+    <Compile Include="KedbItem.cs" />
+    <Compile Include="KPIRatio.cs" />
+    <Compile Include="LanIdDTO.cs" />
+    <Compile Include="MaintenanceFrequencyEnum.cs" />
+    <Compile Include="Menu.cs" />
+    <Compile Include="MenuItem.cs" />
+    <Compile Include="MenuItemFunction.cs" />
+    <Compile Include="NavAuthTypeEnum.cs" />
+    <Compile Include="NotificationCategory.cs" />
+    <Compile Include="NotificationLog.cs" />
+    <Compile Include="NotificationTypeEnum.cs" />
+    <Compile Include="Policy.cs" />
+    <Compile Include="PriorityEnum.cs" />
+    <Compile Include="Problem.cs" />
+    <Compile Include="ProblemStatusEnum.cs" />
+    <Compile Include="ProblemTicket.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ProtocolTypeEnum.cs" />
+    <Compile Include="RateTypeEnum.cs" />
+    <Compile Include="RA\ClarificationType.cs" />
+    <Compile Include="RA\LocationTypeEnum.cs" />
+    <Compile Include="RA\PlannedSheduleEnum.cs" />
+    <Compile Include="RA\RemoteAccessApprovalStageEnum.cs" />
+    <Compile Include="RA\RemoteAccessRequestLog.cs" />
+    <Compile Include="RA\RemoteAccessRequiredSystem.cs" />
+    <Compile Include="RA\RemoteAgreement.cs" />
+    <Compile Include="RA\RemoteAccessRequest.cs" />
+    <Compile Include="RA\RemoteAccessRequestUpdate.cs" />
+    <Compile Include="Region.cs" />
+    <Compile Include="Release.cs" />
+    <Compile Include="ReleaseChange.cs" />
+    <Compile Include="ReleaseStatusEnum.cs" />
+    <Compile Include="ReleaseTypeEnum.cs" />
+    <Compile Include="RepeatTypeEnum.cs" />
+    <Compile Include="RequestStatusEnum.cs" />
+    <Compile Include="RequestType.cs" />
+    <Compile Include="RequestTypePriority.cs" />
+    <Compile Include="RiskTypeEnum.cs" />
+    <Compile Include="ScheduledDate.cs" />
+    <Compile Include="ScheduledTask.cs" />
+    <Compile Include="ScheduledTaskStatusEnum.cs" />
+    <Compile Include="Serial.cs" />
+    <Compile Include="SubCategory.cs" />
+    <Compile Include="SystemEnvironment.cs" />
+    <Compile Include="SystemEnvironmentTypeEnum.cs" />
+    <Compile Include="TaskCategory.cs" />
+    <Compile Include="TaskProcess.cs" />
+    <Compile Include="TaskStatusEnum.cs" />
+    <Compile Include="TaskTypeEnum.cs" />
+    <Compile Include="TaskUpdate.cs" />
+    <Compile Include="Team.cs" />
+    <Compile Include="TempAsset.cs" />
+    <Compile Include="TempDoc.cs" />
+    <Compile Include="Ticket.cs" />
+    <Compile Include="TicketDoc.cs" />
+    <Compile Include="TicketFlowTypeEnum.cs" />
+    <Compile Include="TicketImpactEnum.cs" />
+    <Compile Include="TicketLog.cs" />
+    <Compile Include="TicketMediumEnum.cs" />
+    <Compile Include="TicketPriority.cs" />
+    <Compile Include="TicketPriorityEnum.cs" />
+    <Compile Include="TicketRate.cs" />
+    <Compile Include="TicketStatus.cs" />
+    <Compile Include="TicketStatusEnum.cs" />
+    <Compile Include="TicketTask.cs" />
+    <Compile Include="TicketTypeEnum.cs" />
+    <Compile Include="TicketUpdate.cs" />
+    <Compile Include="TicketUrgencyEnum.cs" />
+    <Compile Include="TransferItem.cs" />
+    <Compile Include="User.cs" />
+    <Compile Include="UserBranch.cs" />
+    <Compile Include="UserDepartment.cs" />
+    <Compile Include="UserGroup.cs" />
+    <Compile Include="UserLogin.cs" />
+    <Compile Include="UserStatusEnum.cs" />
+    <Compile Include="UserTeam.cs" />
+    <Compile Include="Vendor.cs" />
+    <Compile Include="VendorSLA.cs" />
+    <Compile Include="Workflow.cs" />
+    <Compile Include="WorkflowLevel.cs" />
+    <Compile Include="WorkflowLevelTypeEnum.cs" />
+    <Compile Include="WorkflowTypeEnum.cs" />
+    <Compile Include="WorkTask.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

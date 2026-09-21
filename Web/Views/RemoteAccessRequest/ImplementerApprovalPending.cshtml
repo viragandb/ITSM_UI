@@ -1,0 +1,396 @@
+﻿@model ICollection<Domain.RA.RemoteAccessRequest>
+@using Service.AR
+@using Service
+@using Domain.AR
+@{
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var NetworkTeam = ViewBag.NetworkTeam;
+    var SecurityTeam = ViewBag.SecurityTeam;
+
+}
+
+
+<div class="row">
+    <div class="col-lg-12">
+
+        <div class="card card-danger card-outline">
+            <div class="card-header">
+                <h3 class="card-title m-0">Implementer</h3>
+                <div class="text-right">
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="accordion">
+
+                    @{
+                        var expandShow = "";
+
+                        foreach (var item in Model)
+                        {
+                            <div id="R_@item.RemoteAccessRequestId" class="panel-collapse in collapse show" style="">
+
+                                <div class="card card-primary card-outline">
+                                    <div class="card-header">
+                                        <h4 class="card-title">
+                                            <a data-bs-toggle="collapse" data-parent="#accordion" href="#G_@item.RemoteAccessRequestId" class="collapsed">
+                                                Request# @item.RemoteAccessRequestId
+                                            </a>
+                                            &nbsp; | &nbsp; Remote Access (WFH)
+                                        </h4>
+                                        <div class="text-right">
+                                            @if (item.TeamId == NetworkTeam)
+                                            {
+                                                <span class="badge bg-primary text-sm">Implementer - IT Network</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-primary text-sm">Implementer - IT Security</span>
+                                            }
+                                            <span class="badge bg-danger text-sm">@item.RemoteAccessType.EnumDisplayName()</span>
+
+                                        </div>
+                                    </div>
+
+                                    <div id="G_@item.RemoteAccessRequestId" class="panel-collapse in collapse @expandShow" style="">
+                                        <div class="card-body">
+                                            @Html.Partial("_RequestMin", item)
+                                            <!---checkbox if network implmenter (add to selected grp)-->
+                                            @if (item.TeamId == NetworkTeam)
+                                            {
+                                                // show a checkbox here called add to selected grp
+                                                <div class="form-check">
+                                                    <input type="checkbox" data-id="@item.RemoteAccessRequestId" name="addToSelectedGroup" class="form-check-input update-request-checkbox"
+                                                           data-field="AddToSelectedGroup"
+                                                           @(item.IsAddedToGroup ? "checked" : "") />
+                                                    <label class="form-check-label" for="@item.RemoteAccessRequestId">Add to selected group</label>
+                                                </div>
+                                            }
+                                            <!--checkbox if net implementer and GP selected (Allow accesss to wifi)-->
+                                            @if (item.TeamId == NetworkTeam && item.RemoteAccessType == RemoteAccessTypeEnum.GlobalProtect)
+                                            {
+                                                // show a checkbox here called Allow accesss to wifi
+                                                <div class="form-check">
+                                                    <input type="checkbox" data-id="@item.RemoteAccessRequestId" name="allowWifiAccess" class="form-check-input update-request-checkbox"
+                                                           data-field="AllowWifiAccess"
+                                                           @(item.IsWifiAccessAllow ? "checked" : "") />
+                                                    <label class="form-check-label" for="@item.RemoteAccessRequestId">Allow access to wifi</label>
+                                                </div>
+                                            }
+                                            <!--checkbox if sec implementer and GP selected (provide certificate)-->
+                                            @if (item.TeamId == SecurityTeam && item.RemoteAccessType == RemoteAccessTypeEnum.GlobalProtect)
+                                            {
+                                                // show a checkbox here called provide certificate
+
+                                                <div class="form-check">
+                                                    <input type="checkbox" data-id="@item.RemoteAccessRequestId" name="provideCertificate" class="form-check-input update-request-checkbox"
+                                                           data-field="ProvideCertificate"
+                                                           @(item.IsCertificateProvided ? "checked" : "") />
+                                                    <label class="form-check-label" for="@item.RemoteAccessRequestId">Provide certificate</label>
+                                                </div>
+                                            }
+
+                                        </div>
+                                        <div class="card-footer">
+                                            <div class="row float-right">
+                                                <div class="margin">
+                                                    <a href="@Html.EncodedActionLink("","Info", "RemoteAccessRequest","", new { id = item.RemoteAccessRequestId },null)"
+                                                       target="_blank"><i class="fas fa-info"></i>&nbsp;&nbsp;More.. </a>
+                                                    @*<a class="btn btn-danger btn-sm text-white openModalUpdateReject"
+                                                       data-id="@item.RemoteAccessRequestId"
+                                                       data-bs-toggle="modal"
+                                                       data-bs-target="#modalUpdateReject">
+                                                        <i class="fas fa-thumbs-down"></i> Return
+                                                    </a>*@
+
+                                                    @{
+                                                        bool canApprove = false;
+
+                                                        if (item.TeamId == NetworkTeam)
+                                                        {
+                                                            // Must always be added to group
+                                                            if (item.IsAddedToGroup)
+                                                            {
+                                                                // If GlobalProtect, WiFi must also be allowed
+                                                                if (item.RemoteAccessType == RemoteAccessTypeEnum.GlobalProtect)
+                                                                {
+                                                                    canApprove = item.IsWifiAccessAllow;
+                                                                }
+                                                                else
+                                                                {
+                                                                    canApprove = true;
+                                                                }
+                                                            }
+                                                        }
+                                                        else if (item.TeamId == SecurityTeam   // make sure certificate is provided then can show completr btn
+                                                                 && item.RemoteAccessType == RemoteAccessTypeEnum.GlobalProtect)
+                                                        {
+                                                            canApprove = item.IsCertificateProvided;
+                                                        }
+                                                        else if (item.TeamId == SecurityTeam && item.RemoteAccessType == RemoteAccessTypeEnum.Citrix) // show complete btn if just citrix as no checkbox need fr citrix
+                                                        {
+                                                            canApprove = true;
+                                                        }
+                                                    }
+
+                                                    @if (canApprove)
+                                                    {
+                                                        <a class="btn bg-primary btn-sm text-white openModalUpdateApprove"
+                                                           data-id="@item.RemoteAccessRequestId"
+                                                           data-stage="@((int)item.ApprovalStage)"
+                                                           data-bs-toggle="modal"
+                                                           data-bs-target="#modalUpdateApprove">
+                                                            <i class="fas fa-thumbs-up"></i> Complete
+                                                        </a>
+                                                    }
+
+
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                            </div>
+
+                        }
+                    }
+
+
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+</div>
+
+
+
+<div class="modal fade" id="modalUpdateApprove">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Request #<label id="modelLableId"></label> Complete</h5>
+            </div>
+
+            <div class="modal-body">
+
+                <input type="hidden" id="modalTicketIdApproval" />
+                <input type="hidden" id="modalApprovalStage" />
+
+
+                <div class="form-group">
+                    <label id="commentLabel">Comment</label>
+                    <input type="text" id="textCommentApproval" class="form-control" placeholder="Enter comment" />
+                </div>
+
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" id="generalCancelBtn" class="btn btn-danger btn-sm" data-bs-dismiss="modal">
+                    <i class="fas fa-window-close"></i> Cancel
+                </button>
+                <button type="button" id="generalApproveBtn" class="btn btn-info btn-sm btnClickDisable" onclick="approve()">
+                    <i class="fas fa-thumbs-up"></i> Complete
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="modalUpdateReject">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title ">Request #<label id="modelLableId" name="modelLableId"></label> Return</h5>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="modalTicketIdReject" />
+
+                <div class="form-group">
+                    <input type="text" id="textCommentReject" name="textCommentReject" placeholder="Comment" class="form-control">
+                </div>
+            </div>
+
+            <div class="modal-footer ">
+                <button type="button" class="btn btn-danger btn-sm" data-bs-dismiss="modal"><i class="fas fa-window-close"></i>&nbsp;&nbsp;Cancel</button>
+
+                <button type="button" class="btn btn-info btn-sm btnClickDisable" onclick="reject()"><i class="fas fa-thumbs-down"></i>&nbsp;&nbsp; Return</button>
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section scripts {
+
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            $('.dataTable').DataTable({
+                "paging": true,
+                "lengthChange": true,
+                "searching": true,
+                "ordering": true,
+                "info": true,
+                "autoWidth": true
+            });
+
+        });
+
+
+
+        $('#modalUpdateApprove').on('shown.bs.modal', function () {
+            
+            $('#ApprovalByUserNameModal').focus();
+        });
+
+
+        $('.openModalUpdateReject').on('click', function () {
+            let id = $(this).data("id");
+            $("#modalTicketIdReject").val(id);
+            $('#modalUpdateReject #modelLableId').text(id);
+
+        });
+
+
+        $('.openModalUpdateApprove').on('click', function () {
+            let id = $(this).data("id");
+            let stage = $(this).data("stage");
+            $("#modalTicketIdApproval").val(id);
+            $('#modalUpdateApprove #modelLableId').text(id);
+            $("#modalApprovalStage").val(stage);
+
+        });
+
+        $(document).on('change', '.update-request-checkbox', function () {
+            var $checkbox = $(this);
+            var RequestId = $checkbox.data('id');
+            var fieldName = $checkbox.data('field');
+            var isChecked = $checkbox.is(':checked');
+
+            $.ajax({
+                url: '@Url.Action("UpdateImplementerCheckboxFields", "RemoteAccessRequest")',
+                type: 'POST',
+                data: {
+                    RequestId: RequestId,
+                    field: fieldName,
+                    status: isChecked
+                },
+                success: function (response) {
+                    if (response.success) {
+                        Swal.fire("Updated", "Request has been updated", "success");
+                        setTimeout(() => { window.location.reload(); }, 2000);
+                    } else {
+                        alert("Error: " + response.message);
+                        // Optional: Revert checkbox if update fails
+                        $checkbox.prop('checked', !isChecked);
+                        Swal.fire("Error", "Request failed to update", "success");
+                        setTimeout(() => { window.location.reload(); }, 2000);
+                    }
+                },
+                error: function () {
+                    alert("Server error occurred.");
+                    $checkbox.prop('checked', !isChecked);
+                }
+            });
+        });
+
+
+
+        function reject() {
+
+            var requestId = $("#modalTicketIdReject").val();
+            var comment = $("#textCommentReject").val();
+
+            $('.btnClickDisable').prop('disabled', true);
+
+            const formData = new FormData();
+            formData.append("RequestId", requestId);
+            formData.append("Comment", comment);
+
+            fetch('/RemoteAccessRequest/ImplementerReject', {
+                method: "POST",
+                headers: { "Accept": "application/json" },
+                body: formData
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data === 1) {
+                        Swal.fire("Completed", "Request has been rejected", "success");
+                        setTimeout(() => { window.location.reload(); }, 2000);
+                    }
+                    else if (data === 3) {
+                        Swal.fire("Error", "Please provide comment", "error");
+                        setTimeout(() => { window.location.reload(); }, 2000);
+
+                    }
+                    else {
+                        Swal.fire("Error", "Something went wrong", "error");
+                    }
+                });
+
+        }
+
+
+
+
+
+        function approve() {
+
+
+            var requestId = $("#modalTicketIdApproval").val();
+            var approvalStage = $("#modalApprovalStage").val();
+            var comment = $("#textCommentApproval").val();
+
+
+
+
+            $('.btnClickDisable').prop('disabled', true);
+
+            const formData = new FormData();
+            formData.append("RequestId", requestId);
+            formData.append("ApprovalStage", approvalStage);
+            formData.append("Comment", comment);
+
+
+
+            fetch('/RemoteAccessRequest/ImplementerApprove', {
+                method: "POST",
+                headers: { "Accept": "application/json" },
+                body: formData
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data === 1) {
+                        Swal.fire("Completed", "Request has been approved", "success");
+                        setTimeout(() => { window.location.reload(); }, 2000);
+                    }
+                    else if (data === 3) {
+                        Swal.fire("Error", "Please provide comment", "error");
+                        setTimeout(() => { window.location.reload(); }, 2000);
+
+                    }
+                    else {
+                        Swal.fire("Error", "Something went wrong", "error");
+                    }
+                });
+        }
+
+
+
+
+
+    </script>
+}

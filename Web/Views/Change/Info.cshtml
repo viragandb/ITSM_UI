@@ -1,0 +1,298 @@
+﻿@model Domain.Change
+@using Service
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@Html.HiddenFor(model => model.ChangeId)
+
+@Html.Partial("_Change", Model)
+
+<div class="row g-4">
+
+    <div class="col-md-4">
+
+        <div class="card">
+
+            <div class="card-body text-center">
+
+                <img src="@Model.RequestedUser.ProImageName"
+                     alt="User Avatar"
+                     class="rounded-circle mb-3"
+                     style="width:80px;height:80px;object-fit:cover;" />
+
+                <h5 class="mb-1">
+                    @Model.RequestedUser.FullName
+                </h5>
+
+                <div class="text-muted mb-1">
+                    @Model.RequestedBy
+                </div>
+
+                <div class="badge bg-primary">
+                    Requested By
+                </div>
+
+            </div>
+
+            <div class="card-footer">
+
+                <div class="mb-3">
+
+                    <div class="d-flex align-items-center mb-1">
+                        <i class="align-middle me-2" data-lucide="briefcase"></i>
+                        <span>@Model.RequestedUser.DesignationName</span>
+                    </div>
+
+                    <div class="d-flex align-items-center">
+                        <i class="align-middle me-2" data-lucide="building"></i>
+                        <span>@Model.RequestedUser.DepartmentName</span>
+                    </div>
+
+                </div>
+
+                <div class="d-flex flex-column gap-2">
+
+                    <div>
+                        <span class="badge bg-success">
+                            <i class="align-middle me-1" data-lucide="mail"></i>
+                            @Model.RequestedUser.Email
+                        </span>
+                    </div>
+
+                    <div>
+                        <span class="badge bg-danger">
+                            <i class="align-middle me-1" data-lucide="phone"></i>
+                            @Model.RequestedUser.ContactNo
+                        </span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="align-middle me-2" data-lucide="ticket"></i>
+                    Tickets
+                </h5>
+            </div>
+
+            <div class="card-body">
+
+                <div class="row g-2">
+
+                    @foreach (var ticket in Model.Tickets)
+                    {
+                        <div class="col-sm-6">
+
+                            <a href="@Html.EncodedActionLink("", "Info", "Ticket", "", new { id = ticket.TicketId }, null)"
+                               target="_blank"
+                               class="text-decoration-none">
+
+                                @ticket.Code
+
+                            </a>
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="align-middle me-2" data-lucide="circle-help"></i>
+                    Problems
+                </h5>
+            </div>
+
+            <div class="card-body">
+
+                <div class="row g-2">
+
+                    @foreach (var problem in Model.Problems)
+                    {
+                        <div class="col-sm-6">
+
+                            <a href="@Html.EncodedActionLink("", "Info", "Problem", "", new { id = problem.ProblemId }, null)"
+                               target="_blank"
+                               class="text-decoration-none">
+
+                                Problem @problem.ProblemId
+
+                            </a>
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="align-middle me-2" data-lucide="boxes"></i>
+                    Assets
+                </h5>
+            </div>
+
+            <div class="card-body">
+
+                <div class="list-group list-group-flush">
+
+                    @foreach (var item in Model.ItemAssets)
+                    {
+                        <a href="@Html.EncodedActionLink("", "Info", "Asset", "", new { id = item.AssetId }, null)"
+                           target="_blank"
+                           class="list-group-item list-group-item-action px-0">
+
+                            <i class="align-middle me-2" data-lucide="box"></i>
+
+                            @item.Asset.AssetName - @item.Asset.Description
+
+                        </a>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="align-middle me-2" data-lucide="file-text"></i>
+                    Documents
+                </h5>
+            </div>
+
+            <div class="card-body">
+
+                <div class="list-group list-group-flush">
+
+                    @foreach (var doc in Model.ItemsDocs)
+                    {
+                        <a href="@doc.FileUrl"
+                           target="_blank"
+                           class="list-group-item list-group-item-action px-0">
+
+                            <i class="align-middle me-2" data-lucide="file-text"></i>
+                            @doc.FileName
+
+                        </a>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="col-md-8">
+
+        <div class="card">
+
+            <div class="card-header">
+
+                <h5 class="card-title mb-0">
+                    <i class="align-middle me-2" data-lucide="history"></i>
+                    History
+                </h5>
+
+            </div>
+
+            <div class="card-body">
+
+                <div class="table-responsive">
+
+                    <table id="dataTable"
+                           class="table table-striped table-hover align-middle w-100">
+
+                        <thead>
+                            <tr>
+                                <th>Comment</th>
+                                <th>Updated By</th>
+                                <th>Updated Date</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            @foreach (var item in Model.ItemLogs)
+                            {
+                                <tr>
+
+                                    <td>
+                                        @item.Comment
+                                    </td>
+
+                                    <td>
+                                        @item.UpdatedUser.EmpNo | @item.UpdatedUser.FullName
+                                    </td>
+
+                                    <td class="text-end">
+                                        @item.UpdatedDate
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $("#dataTable").DataTable({
+                paging: true,
+                lengthChange: true,
+                searching: true,
+                ordering: true,
+                info: true,
+                responsive: true,
+                autoWidth: false
+            });
+
+        });
+
+    </script>
+}

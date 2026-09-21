@@ -1,0 +1,332 @@
+﻿@model Domain.AR.AccessRequestType
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="card">
+
+            <div class="card-header d-flex align-items-center justify-content-between">
+
+                <h5 class="card-title mb-0">
+                    <i class="align-middle me-2" data-lucide="plus-circle"></i>
+                    Create New
+                </h5>
+
+                <a href="@Url.Action("Index", "AccessRequestType")"
+                   class="btn btn-sm btn-light">
+
+                    <i class="align-middle me-1"
+                       data-lucide="arrow-left"></i>
+
+                    Back
+
+                </a>
+
+            </div>
+
+            @using (Html.BeginForm("Create", "AccessRequestType", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+
+                @Html.ValidationSummary(
+                    true,
+                    "",
+                    new { @class = "alert alert-danger m-3 mb-0" }
+                )
+
+                <div class="card-body">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+
+                            <div class="mb-3">
+
+                                @Html.LabelFor(
+                                    model => model.Name,
+                                    new { @class = "form-label" }
+                                )
+
+                                @Html.TextBoxFor(
+                                    model => model.Name,
+                                    new { @class = "form-control" }
+                                )
+
+                                @Html.ValidationMessageFor(
+                                    model => model.Name,
+                                    "",
+                                    new { @class = "text-danger" }
+                                )
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <div class="mb-3">
+
+                                @Html.LabelFor(
+                                    model => model.WorkflowId,
+                                    new { @class = "form-label" }
+                                )
+
+                                <select id="WorkflowId"
+                                        name="WorkflowId"
+                                        class="form-select">
+                                </select>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="row g-3 mb-4">
+
+                        <div class="col-md-4">
+
+                            <div class="form-check">
+
+                                @Html.CheckBoxFor(
+                                    model => model.ITOnly,
+                                    new { @class = "form-check-input" }
+                                )
+
+                                @Html.LabelFor(
+                                    model => model.ITOnly,
+                                    new { @class = "form-check-label" }
+                                )
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-4">
+
+                            <div class="form-check">
+
+                                @Html.CheckBoxFor(
+                                    model => model.Internal,
+                                    new { @class = "form-check-input" }
+                                )
+
+                                @Html.LabelFor(
+                                    model => model.Internal,
+                                    new { @class = "form-check-label" }
+                                )
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-4">
+
+                            <div class="form-check">
+
+                                @Html.CheckBoxFor(
+                                    model => model.External,
+                                    new { @class = "form-check-input" }
+                                )
+
+                                @Html.LabelFor(
+                                    model => model.External,
+                                    new { @class = "form-check-label" }
+                                )
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="mb-3">
+
+                        @Html.LabelFor(
+                            model => model.RequestorInstructions,
+                            new { @class = "form-label" }
+                        )
+
+                        @Html.TextAreaFor(
+                            model => model.RequestorInstructions,
+                            new
+                            {
+                                @class = "form-control",
+                                rows = "4",
+                                style = "white-space: pre-wrap;"
+                            }
+                        )
+
+                        @Html.ValidationMessageFor(
+                            model => model.RequestorInstructions,
+                            "",
+                            new { @class = "text-danger" }
+                        )
+
+                    </div>
+
+
+                    <div class="mb-3">
+
+                        @Html.LabelFor(
+                            model => model.ApproverInstructions,
+                            new { @class = "form-label" }
+                        )
+
+                        @Html.TextAreaFor(
+                            model => model.ApproverInstructions,
+                            new
+                            {
+                                @class = "form-control",
+                                rows = "4",
+                                style = "white-space: pre-wrap;"
+                            }
+                        )
+
+                        @Html.ValidationMessageFor(
+                            model => model.ApproverInstructions,
+                            "",
+                            new { @class = "text-danger" }
+                        )
+
+                    </div>
+
+
+                    <div class="mb-0">
+
+                        @Html.LabelFor(
+                            model => model.CompletionEmailInstructions,
+                            new { @class = "form-label" }
+                        )
+
+                        @Html.TextAreaFor(
+                            model => model.CompletionEmailInstructions,
+                            new
+                            {
+                                @class = "form-control",
+                                rows = "4",
+                                style = "white-space: pre-wrap;"
+                            }
+                        )
+
+                        @Html.ValidationMessageFor(
+                            model => model.CompletionEmailInstructions,
+                            "",
+                            new { @class = "text-danger" }
+                        )
+
+                    </div>
+
+                </div>
+
+                <div class="card-footer">
+
+                    <div class="d-flex justify-content-end gap-2">
+
+                        <button type="reset"
+                                class="btn btn-danger">
+
+                            <i class="align-middle me-1"
+                               data-lucide="rotate-ccw"></i>
+
+                            Cancel
+
+                        </button>
+
+                        <button type="submit"
+                                class="btn btn-primary">
+
+                            <i class="align-middle me-1"
+                               data-lucide="save"></i>
+
+                            Save
+
+                        </button>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+</div>
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            loadWorkflows();
+        });
+
+
+        function parseJsonResult(data) {
+
+            if (typeof data === "string") {
+
+                try {
+                    return JSON.parse(data);
+                }
+                catch (e) {
+                    return [];
+                }
+
+            }
+
+            return data || [];
+
+        }
+
+
+        function loadWorkflows() {
+
+            $.getJSON(
+                '@Url.Action("GetItemsAccessRequestJsonResult", "Workflow")',
+                function (data) {
+
+                    var dropDown =
+                        $("#WorkflowId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- Select --</option>"
+                    );
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.WorkflowId,
+                                    text: item.Name
+                                })
+                            );
+
+                        }
+                    );
+
+                    var selectedId =
+                        '@ViewBag.WorkflowId';
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+                }
+            );
+
+        }
+
+    </script>
+
+}

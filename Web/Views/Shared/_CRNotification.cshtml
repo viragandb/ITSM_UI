@@ -1,0 +1,146 @@
+﻿@model IEnumerable<Domain.CM.ChangeRequest>
+
+@using Service
+
+@{
+    var currentUserId = Session["UserId"] != null
+        ? Session["UserId"].ToString()
+        : "";
+
+    var approvalCount = Model
+        .Where(w =>
+            w.Status == Domain.CM.ChangeRequestStatusEnum.Initiated &&
+            w.ApprovalBy == currentUserId)
+        .Count();
+
+    var pendingCount = Model
+        .Where(w =>
+            w.Status == Domain.CM.ChangeRequestStatusEnum.Pending &&
+            w.Team.UserTeams.Any(u => u.EmpNo == currentUserId))
+        .Count();
+
+    var implementCount = Model
+        .Where(w =>
+            w.Status == Domain.CM.ChangeRequestStatusEnum.Approved &&
+            w.ImplementedBy == currentUserId)
+        .Count();
+
+    var totalCount =
+        approvalCount +
+        pendingCount +
+        implementCount;
+}
+
+<li class="nav-item dropdown">
+
+    <a class="nav-icon dropdown-toggle"
+       href="#"
+       id="changeRequestDropdown"
+       data-bs-toggle="dropdown"
+       aria-expanded="false">
+
+        <div class="position-relative">
+
+            <i class="align-middle text-body"
+               data-lucide="settings"></i>
+
+            @if (totalCount > 0)
+            {
+                <span class="indicator">
+                    @totalCount
+                </span>
+            }
+
+        </div>
+
+    </a>
+
+    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end py-0"
+         aria-labelledby="changeRequestDropdown">
+
+        <div class="dropdown-menu-header">
+
+            <div class="position-relative">
+
+                <i class="fas fa-cogs me-2"></i>
+
+                Change Requests
+
+            </div>
+
+        </div>
+
+        <div class="list-group">
+
+            @if (approvalCount > 0)
+            {
+                <a href="@Url.Action("ApprovalPending", "ChangeRequest")"
+                   class="list-group-item">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <span>
+                            Approval
+                        </span>
+
+                        <span class="badge bg-danger">
+                            @approvalCount
+                        </span>
+
+                    </div>
+
+                </a>
+            }
+
+            @if (pendingCount > 0)
+            {
+                <a href="@Url.Action("Pending", "ChangeRequest")"
+                   class="list-group-item">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <span>
+                            Pending
+                        </span>
+
+                        <span class="badge bg-danger">
+                            @pendingCount
+                        </span>
+
+                    </div>
+
+                </a>
+            }
+
+            @if (implementCount > 0)
+            {
+                <a href="@Url.Action("ImplementPending", "ChangeRequest")"
+                   class="list-group-item">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <span>
+                            Implement
+                        </span>
+
+                        <span class="badge bg-danger">
+                            @implementCount
+                        </span>
+
+                    </div>
+
+                </a>
+            }
+
+            @if (totalCount == 0)
+            {
+                <div class="p-3 text-center text-muted">
+                    No pending change requests
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+</li>

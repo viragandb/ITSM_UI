@@ -1,0 +1,122 @@
+﻿@model ICollection<Domain.IM.IncidentRequest>
+@using Service.IM
+@using Service
+@using Domain.IM
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="card">
+
+            <div class="card-header">
+
+                <h5 class="card-title mb-0">
+                    <i class="align-middle me-2" data-lucide="message-square"></i>
+                    Pending Review
+                </h5>
+
+            </div>
+
+            <div class="card-body">
+
+                <div class="accordion" id="incidentReviewAccordion">
+
+                    @foreach (var item in Model)
+                    {
+                        var collapseId = "incidentReview_" + item.IncidentRequestId;
+
+                        <div class="accordion-item">
+
+                            <h2 class="accordion-header"
+                                id="heading_@item.IncidentRequestId">
+
+                                <button class="accordion-button collapsed"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#@collapseId"
+                                        aria-expanded="false"
+                                        aria-controls="@collapseId">
+
+                                    <div class="w-100 d-flex justify-content-between align-items-center me-3 flex-wrap gap-2">
+
+                                        <div>
+
+                                            <strong>
+                                                Request # @item.IncidentRequestId
+                                            </strong>
+
+                                            <span class="mx-2 text-muted">|</span>
+
+                                            @item.OccurredDate.ToShortDateString()
+
+                                        </div>
+
+                                        <span class="badge bg-@IncidentRequestService.GetImpactColor(item.Impact)">
+                                            @item.Impact.EnumDisplayName()
+                                        </span>
+
+                                    </div>
+
+                                </button>
+
+                            </h2>
+
+                            <div id="@collapseId"
+                                 class="accordion-collapse collapse"
+                                 aria-labelledby="heading_@item.IncidentRequestId"
+                                 data-bs-parent="#incidentReviewAccordion">
+
+                                <div class="accordion-body">
+
+                                    @Html.Partial("_RequestMin", item)
+
+                                </div>
+
+                                <div class="card-footer">
+
+                                    <div class="d-flex justify-content-end gap-2">
+
+                                        <a href="@Html.EncodedActionLink("", "Info", "IncidentRequest", "", new { id = item.IncidentRequestId }, null)"
+                                           target="_blank"
+                                           class="btn btn-sm btn-light">
+
+                                            <i class="align-middle me-1"
+                                               data-lucide="info">
+                                            </i>
+
+                                            More
+
+                                        </a>
+
+                                        <a href="@Html.EncodedActionLink("", "Review", "IncidentRequest", "", new { id = item.IncidentRequestId }, null)"
+                                           class="btn btn-sm btn-primary">
+
+                                            <i class="align-middle me-1"
+                                               data-lucide="message-square">
+                                            </i>
+
+                                            Review
+
+                                        </a>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>

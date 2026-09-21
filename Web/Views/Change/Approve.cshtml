@@ -1,0 +1,307 @@
+﻿@model ICollection<Domain.Change>
+@using Service
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="card">
+
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="align-middle me-2" data-lucide="file-text"></i>
+                    Change Requests
+                </h5>
+            </div>
+
+            <div class="card-body">
+
+                <div class="accordion" id="changeAccordion">
+
+                    @foreach (var item in Model)
+                    {
+                        var collapseId = "change_" + item.ChangeId;
+
+                        <div class="accordion-item mb-3">
+
+                            <h2 class="accordion-header" id="heading_@item.ChangeId">
+
+                                <button class="accordion-button collapsed"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#@collapseId"
+                                        aria-expanded="false"
+                                        aria-controls="@collapseId">
+
+                                    <div class="w-100 d-flex flex-wrap justify-content-between align-items-center gap-2">
+
+                                        <div>
+
+                                            <strong>
+                                                Change @item.ChangeId
+                                            </strong>
+
+                                            <span class="mx-2 text-muted">|</span>
+
+                                            <span>
+                                                @item.AssetType.AssetCategory.EnumDisplayName()
+                                            </span>
+
+                                            <i class="align-middle mx-1"
+                                               data-lucide="chevron-right">
+                                            </i>
+
+                                            <span>
+                                                @item.AssetType.AssetTypeName
+                                            </span>
+
+                                            <i class="align-middle mx-1"
+                                               data-lucide="chevron-right">
+                                            </i>
+
+                                            <strong>
+                                                @item.ChangeRequestType.ChangeRequestTypeName
+                                            </strong>
+
+                                        </div>
+
+                                        <div class="d-flex align-items-center gap-2 me-3">
+
+                                            <span class="text-muted">
+                                                @item.RequestedDate.ToShortDateString()
+                                            </span>
+
+                                            <a href="@Html.EncodedActionLink("", "Info", "Change", "", new { id = item.ChangeId }, null)"
+                                               target="_blank"
+                                               class="btn btn-sm btn-light"
+                                               onclick="event.stopPropagation();">
+
+                                                <i class="align-middle" data-lucide="info"></i>
+
+                                            </a>
+
+                                            <a href="@Html.EncodedActionLink("", "UpdateApprove", "Change", "", new { id = item.ChangeId }, null)"
+                                               class="btn btn-sm btn-warning"
+                                               onclick="event.stopPropagation();">
+
+                                                <i class="align-middle me-1" data-lucide="check-check"></i>
+                                                Approve/Reject
+
+                                            </a>
+
+                                        </div>
+
+                                    </div>
+
+                                </button>
+
+                            </h2>
+
+                            <div id="@collapseId"
+                                 class="accordion-collapse collapse"
+                                 aria-labelledby="heading_@item.ChangeId"
+                                 data-bs-parent="#changeAccordion">
+
+                                <div class="accordion-body">
+
+                                    @Html.Partial("_Change", item)
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        function approveItem(itemId, itemName) {
+
+            var comment =
+                $("#comment").val();
+
+            Swal.fire({
+
+                title: "Are you sure?",
+                text: "Do you want to approve: " + itemName + "?",
+                icon: "warning",
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                showCancelButton: true,
+                reverseButtons: true
+
+            }).then(function (result) {
+
+                if (result.isConfirmed || result.value) {
+
+                    $.ajax({
+
+                        url: '@Url.Action("RequestApprove", "Change")',
+
+                        type: "GET",
+
+                        dataType: "json",
+
+                        data: {
+                            id: itemId,
+                            comment: comment
+                        },
+
+                        success: function (data) {
+
+                            if (data == "1" || data == 1) {
+
+                                Swal.fire(
+                                    "Approved!",
+                                    "Request has been approved",
+                                    "success"
+                                );
+
+                                setTimeout(function () {
+                                    window.location.reload();
+                                }, 1000);
+
+                            }
+                            else if (data == "2" || data == 2) {
+
+                                Swal.fire(
+                                    "Invalid!",
+                                    "Please enter the comment.",
+                                    "error"
+                                );
+
+                            }
+                            else {
+
+                                Swal.fire(
+                                    "Something went wrong!",
+                                    "Request cannot be processed, Please try again",
+                                    "error"
+                                );
+
+                            }
+
+                        },
+
+                        error: function () {
+
+                            Swal.fire(
+                                "Something went wrong!",
+                                "Request cannot be processed",
+                                "error"
+                            );
+
+                        }
+
+                    });
+
+                }
+
+            });
+
+        }
+
+
+        function rejectItem(itemId, itemName) {
+
+            var comment =
+                $("#comment").val();
+
+            Swal.fire({
+
+                title: "Are you sure?",
+                text: "Do you want to reject: " + itemName + "?",
+                icon: "warning",
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                showCancelButton: true,
+                reverseButtons: true
+
+            }).then(function (result) {
+
+                if (result.isConfirmed || result.value) {
+
+                    $.ajax({
+
+                        url: '@Url.Action("RequestReject", "Change")',
+
+                        type: "GET",
+
+                        dataType: "json",
+
+                        data: {
+                            id: itemId,
+                            comment: comment
+                        },
+
+                        success: function (data) {
+
+                            if (data == "1" || data == 1) {
+
+                                Swal.fire(
+                                    "Rejected!",
+                                    "Request has been rejected",
+                                    "success"
+                                );
+
+                                setTimeout(function () {
+                                    window.location.reload();
+                                }, 1000);
+
+                            }
+                            else if (data == "2" || data == 2) {
+
+                                Swal.fire(
+                                    "Invalid!",
+                                    "Please enter the comment.",
+                                    "error"
+                                );
+
+                            }
+                            else {
+
+                                Swal.fire(
+                                    "Something went wrong!",
+                                    "Request cannot be processed, Please try again",
+                                    "error"
+                                );
+
+                            }
+
+                        },
+
+                        error: function () {
+
+                            Swal.fire(
+                                "Something went wrong!",
+                                "Request cannot be processed",
+                                "error"
+                            );
+
+                        }
+
+                    });
+
+                }
+
+            });
+
+        }
+
+    </script>
+}

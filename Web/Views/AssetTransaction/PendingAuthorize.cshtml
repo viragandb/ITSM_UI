@@ -1,0 +1,526 @@
+﻿@model ICollection<Domain.AssetTransferRequest>
+@using Service
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("PendingAuthorize", "AssetTransaction", FormMethod.Get))
+{
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card">
+
+                <div class="card-header">
+
+                    <h5 class="card-title mb-0">
+                        <i class="align-middle me-2" data-lucide="clock"></i>
+                        Pendings
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div id="accordion">
+
+                        @foreach (var item in Model)
+                        {
+                            var collapseId =
+                                "G_" + item.AssetTransferRequestId;
+
+                            <div class="card mb-3">
+
+                                <div class="card-header">
+
+                                    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-2">
+
+                                        <div>
+
+                                            <a href="#@collapseId"
+                                               class="text-body text-decoration-none fw-semibold collapsed"
+                                               data-bs-toggle="collapse"
+                                               aria-expanded="false"
+                                               aria-controls="@collapseId">
+
+                                                <i class="align-middle me-1" data-lucide="file-text"></i>
+
+                                                #@item.AssetTransferRequestId
+
+                                            </a>
+
+                                            <span class="ms-2 fw-semibold">
+                                                @item.TransactionType.EnumDisplayName()
+                                            </span>
+
+                                            <span class="ms-2 text-muted">
+
+                                                @item.BranchFrom.Name
+                                                -
+                                                @item.DepartmentFrom.DepartmentName
+
+                                                <i class="align-middle mx-1" data-lucide="chevrons-right"></i>
+
+                                                @if (item.TransactionType == Domain.AssetTransactionTypeEnum.SentToRepair)
+                                                {
+                                                    @item.Vendor.VendorName
+                                                }
+                                                else
+                                                {
+                                                    @item.Branch.Name
+                                                    <span> - </span>
+                                                    @item.Department.DepartmentName
+                                                }
+
+                                            </span>
+
+                                        </div>
+
+                                        <span class="badge bg-@AssetTransferRequestService.GetTransTypeColor(item.TransactionType)">
+                                            @item.TransactionType.EnumDisplayName()
+                                        </span>
+
+                                    </div>
+
+                                </div>
+
+                                <div id="@collapseId"
+                                     class="collapse"
+                                     data-bs-parent="#accordion">
+
+                                    <div class="card-body">
+
+                                        @Html.Partial(
+                                            "~/Views/AssetTransaction/_Min.cshtml",
+                                            item
+                                        )
+
+                                    </div>
+
+                                    <div class="card-footer">
+
+                                        <div class="d-flex justify-content-end gap-2">
+
+                                            <button type="button"
+                                                    data-id="@item.AssetTransferRequestId"
+                                                    data-code="@item.AssetTransferRequestId"
+                                                    class="openModalUpdateReject btn btn-danger btn-sm"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#modalUpdateReject">
+
+                                                <i class="align-middle me-1" data-lucide="thumbs-down"></i>
+                                                Reject
+
+                                            </button>
+
+                                            <button type="button"
+                                                    data-id="@item.AssetTransferRequestId"
+                                                    data-code="@item.AssetTransferRequestId"
+                                                    class="openModalUpdate btn btn-success btn-sm"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#modalUpdate">
+
+                                                <i class="align-middle me-1" data-lucide="thumbs-up"></i>
+                                                Approve
+
+                                            </button>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        }
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+}
+
+
+<div class="modal fade"
+     id="modalUpdate"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title">
+                    #<span id="approveRequestLabel"></span> Approve
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <input type="hidden"
+                       id="approveRequestId"
+                       value="" />
+
+                <div class="mb-3">
+
+                    <label for="approveComment"
+                           class="form-label">
+                        Comment
+                    </label>
+
+                    <textarea id="approveComment"
+                              class="form-control"
+                              rows="3"
+                              placeholder="Enter comment"></textarea>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn btn-light btn-sm"
+                        data-bs-dismiss="modal">
+
+                    <i class="align-middle me-1" data-lucide="x"></i>
+                    Cancel
+
+                </button>
+
+                <button type="button"
+                        class="btn btn-success btn-sm btnClickDisable"
+                        onclick="approveRequest()">
+
+                    <i class="align-middle me-1" data-lucide="thumbs-up"></i>
+                    Approve
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<div class="modal fade"
+     id="modalUpdateReject"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title">
+                    #<span id="rejectRequestLabel"></span> Reject
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <input type="hidden"
+                       id="rejectRequestId"
+                       value="" />
+
+                <div class="mb-3">
+
+                    <label for="rejectComment"
+                           class="form-label">
+                        Comment
+                    </label>
+
+                    <textarea id="rejectComment"
+                              class="form-control"
+                              rows="3"
+                              placeholder="Enter comment"></textarea>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn btn-light btn-sm"
+                        data-bs-dismiss="modal">
+
+                    <i class="align-middle me-1" data-lucide="x"></i>
+                    Cancel
+
+                </button>
+
+                <button type="button"
+                        class="btn btn-danger btn-sm btnClickDisable"
+                        onclick="rejectRequest()">
+
+                    <i class="align-middle me-1" data-lucide="thumbs-down"></i>
+                    Reject
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $(document).on("click", ".openModalUpdate", function () {
+
+                var requestId =
+                    $(this).data("id");
+
+                var code =
+                    $(this).data("code");
+
+                $("#approveRequestId")
+                    .val(requestId);
+
+                $("#approveRequestLabel")
+                    .text(code);
+
+                $("#approveComment")
+                    .val("");
+
+                $("#modalUpdate .btnClickDisable")
+                    .prop("disabled", false);
+
+            });
+
+
+            $(document).on("click", ".openModalUpdateReject", function () {
+
+                var requestId =
+                    $(this).data("id");
+
+                var code =
+                    $(this).data("code");
+
+                $("#rejectRequestId")
+                    .val(requestId);
+
+                $("#rejectRequestLabel")
+                    .text(code);
+
+                $("#rejectComment")
+                    .val("");
+
+                $("#modalUpdateReject .btnClickDisable")
+                    .prop("disabled", false);
+
+            });
+
+        });
+
+
+        function approveRequest() {
+
+            var requestId =
+                $("#approveRequestId").val();
+
+            var comment =
+                $("#approveComment").val();
+
+
+            if (!comment || comment.trim() === "") {
+
+                Swal.fire(
+                    "Error!",
+                    "Please enter the comment",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            $("#modalUpdate .btnClickDisable")
+                .prop("disabled", true);
+
+
+            $.ajax({
+
+                url: '@Url.Action("ApproveAuthorize", "AssetTransaction")',
+
+                type: "GET",
+
+                dataType: "json",
+
+                data: {
+                    requestId: requestId,
+                    comment: comment.trim()
+                },
+
+                success: function (data) {
+
+                    if (data == "1" || data == 1) {
+
+                        Swal.fire(
+                            "Completed",
+                            "Request has been approved",
+                            "success"
+                        );
+
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 500);
+
+                    }
+                    else {
+
+                        $("#modalUpdate .btnClickDisable")
+                            .prop("disabled", false);
+
+                        Swal.fire(
+                            "Something went wrong!",
+                            "Please try again",
+                            "error"
+                        );
+
+                    }
+
+                },
+
+                error: function () {
+
+                    $("#modalUpdate .btnClickDisable")
+                        .prop("disabled", false);
+
+                    Swal.fire(
+                        "Something went wrong!",
+                        "Please try again",
+                        "error"
+                    );
+
+                }
+
+            });
+
+        }
+
+
+        function rejectRequest() {
+
+            var requestId =
+                $("#rejectRequestId").val();
+
+            var comment =
+                $("#rejectComment").val();
+
+
+            if (!comment || comment.trim() === "") {
+
+                Swal.fire(
+                    "Error!",
+                    "Please enter the comment",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            $("#modalUpdateReject .btnClickDisable")
+                .prop("disabled", true);
+
+
+            $.ajax({
+
+                url: '@Url.Action("RejectAuthorize", "AssetTransaction")',
+
+                type: "GET",
+
+                dataType: "json",
+
+                data: {
+                    requestId: requestId,
+                    comment: comment.trim()
+                },
+
+                success: function (data) {
+
+                    if (data == "1" || data == 1) {
+
+                        Swal.fire(
+                            "Completed",
+                            "Request has been rejected",
+                            "success"
+                        );
+
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 500);
+
+                    }
+                    else {
+
+                        $("#modalUpdateReject .btnClickDisable")
+                            .prop("disabled", false);
+
+                        Swal.fire(
+                            "Something went wrong!",
+                            "Please try again",
+                            "error"
+                        );
+
+                    }
+
+                },
+
+                error: function () {
+
+                    $("#modalUpdateReject .btnClickDisable")
+                        .prop("disabled", false);
+
+                    Swal.fire(
+                        "Something went wrong!",
+                        "Please try again",
+                        "error"
+                    );
+
+                }
+
+            });
+
+        }
+
+    </script>
+
+}

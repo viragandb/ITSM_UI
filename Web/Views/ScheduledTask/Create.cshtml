@@ -1,0 +1,452 @@
+﻿
+@model Web.Models.ScheduledTaskVM
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+}
+
+
+@using (Html.BeginForm("Create", "ScheduledTask", FormMethod.Post, new { @class = "form-horizontal" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card box-danger">
+                <div class="card-header with-border">
+                    <h3 class="card-title">New Task</h3>
+                    <div class="card-tools pull-right">
+
+                    </div>
+                </div>
+                <div class="card-body">
+
+                    <div class="form-group ">
+                        <label class="col-md-2 control-label">Team</label>
+                        <div class="col-md-4">
+
+                            <select id="TeamId" name="TeamId" class="form-control ">
+                                <option value=""></option>
+                            </select>
+                            <span class="help-block" data-valmsg-for="TeamId" data-valmsg-replace="true"></span>
+                        </div>
+
+                        @Html.LabelFor(model => model.TaskCategoryId, new { @class = "col-md-2 control-label" })
+                        <div class="col-md-4">
+                            <select id="TaskCategoryId" name="TaskCategoryId" class="form-control"></select>
+                            <span class="help-block" data-valmsg-for="TaskCategoryId" data-valmsg-replace="true"></span>
+                        </div>
+
+
+
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.AssignedTo, new { @class = "col-md-2 control-label" })
+                        <div class="col-md-6">
+                            <select id="AssignedTo" name="AssignedTo" class="form-control"></select>
+                            <span class="help-block" data-valmsg-for="AssignedTo" data-valmsg-replace="true"></span>
+                        </div>
+                     
+                    </div>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.TaskName, new { @class = "col-md-2 control-label" })
+                        <div class="col-md-10">
+                            @Html.TextBoxFor(model => model.TaskName, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.TaskName, null, new { @class = "help-block" })
+                        </div>
+                    </div>
+
+                    <div class="form-group ">
+                        @Html.LabelFor(model => model.Description, new { @class = "col-md-2 control-label" })
+                        <div class="col-md-10">
+                            @Html.TextAreaFor(model => model.Description, new { @class = "form-control", rows = "2" })
+                            @Html.ValidationMessageFor(model => model.Description, null, new { @class = "help-block" })
+                        </div>
+                    </div>
+
+                    <div class="form-group ">
+                        @Html.LabelFor(model => model.StartDate, new { @class = "col-md-2 control-label" })
+                        <div class="col-md-2">
+                            <div class="input-group date">
+                                <div class="input-group-addon">
+                                    <i class="fa fa-calendar"></i>
+                                </div>
+                                @Html.TextBoxFor(model => model.StartDate, "{0:MM/dd/yyyy}", new { @class = "form-control datepicker", @width = "90px" })
+                                @Html.ValidationMessageFor(model => model.StartDate, null, new { @class = "help-block" })
+                            </div>
+                        </div>
+
+                        @Html.LabelFor(model => model.Score, new { @class = "col-md-1 control-label" })
+                        <div class="col-md-1">
+                            @Html.TextBoxFor(model => model.Score, new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.Score, null, new { @class = "help-block" })
+                        </div>
+
+                        @Html.LabelFor(model => model.IsKPI, new { @class = "col-md-2 control-label " })
+                        @Html.CheckBoxFor(model => model.IsKPI, new { @class = "checkbox col-md-1" })
+                        @Html.ValidationMessageFor(model => model.IsKPI, null, new { @class = "help-block" })
+                        @Html.LabelFor(model => model.IsChecklist, new { @class = "col-md-2 control-label " })
+                        @Html.CheckBoxFor(model => model.IsChecklist, new { @class = "checkbox col-md-1" })
+                        @Html.ValidationMessageFor(model => model.IsChecklist, null, new { @class = "help-block" })
+                    </div>
+
+                    <div class="form-group ">
+
+                        @Html.LabelFor(model => model.RepeatType, new { @class = "col-md-2 control-label" })
+                        <div class="col-md-2">
+                            @Html.EnumDropDownListFor(model => model.RepeatType, "--Select--", new { @class = "form-control" })
+                        </div>
+                        <div class="col-lg-5">
+
+                            <div id="weekDays">
+                                @for (int i = 0; i < Model.WeekDays.Count; i++)
+                                {
+                                    <div class="row">
+
+
+                                        @Html.CheckBoxFor(model => Model.WeekDays[i].IsSelected, new { @class = "checkbox col-md-1" })
+                                        <div class="col-md-5">
+                                            <label class="control-label">@Model.WeekDays[i].Day</label>
+
+                                            @Html.HiddenFor(e => Model.WeekDays[i].Day)
+                                            @Html.HiddenFor(e => Model.WeekDays[i].DayNo)
+                                        </div>
+                                    </div>
+
+                                }
+                            </div>
+                            <div id="MonthDays">
+                                @for (int i = 0; i < Model.MonthDays.Count; i++)
+                                {
+
+                                    <div class="form-group2">
+                                        <div class="col-md-1">
+
+                                            @Html.CheckBoxFor(model => Model.MonthDays[i].IsSelected, new { @class = "checkbox control-label" })
+                                            <label class="control-label">@Model.MonthDays[i].Day</label>
+
+                                            @Html.HiddenFor(e => Model.MonthDays[i].Day)
+                                            @Html.HiddenFor(e => Model.MonthDays[i].DayNo)
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                            <div id="YearDays">
+                                <div class="col-md-12">
+                                    @{
+                                        int itemIndex = 0;
+                                    }
+
+                                    <div class="col-md-4">
+                                        <table class="table table-hover table-striped">
+                                            <tbody id="container">
+                                                <tr>
+                                                    <td>
+                                                        <div class="input-group date">
+                                                            <div class="input-group-addon">
+                                                                <i class="fa fa-calendar"></i>
+                                                            </div>
+                                                            <input type="text" id="txtDate" name="txtDate" class="form-control datepicker" style="width: 100px" />
+                                                        </div>
+                                                    </td>
+                                                    <td class='text-center'>
+
+                                                        <button type="button" class="btn btn-social" onclick="addDate()"><i class="fa fa-plus"></i>&nbsp;Add Date</button>
+
+                                                    </td>
+                                                </tr>
+
+                                                @if (Model.Dates != null)
+                                                {
+                                                    try
+                                                    {
+                                                        foreach (var item in Model.Dates)
+                                                        {
+
+                                                            var id = "Dates_" + @itemIndex + "__ScheduledDateId";
+                                                            var taskDay = "Dates[" + @itemIndex + "].TaskDate";
+
+                                                            <tr id='@itemIndex'>
+                                                                <td>
+                                                                    <input id='@id' type='hidden' class='iHidden' name='@id' />
+                                                                    <input class='form-control text-left' id='@taskDay' name='@taskDay' type='text' readonly='readonly' value='@item.TaskDate.ToShortDateString()' />
+                                                                </td>
+                                                                <td class='text-center'></td>
+                                                            </tr>
+
+                                                            itemIndex += 1;
+
+                                                        }
+
+
+                                                    }
+                                                    catch { }
+                                                }
+                                            </tbody>
+                                        </table>
+
+
+                                    </div>
+
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                        <div class="endDate">
+                            @Html.LabelFor(model => model.EndDate, new { @class = "col-md-1 control-label" })
+                            <div class="col-md-2">
+                                <div class="input-group date">
+                                    <div class="input-group-addon">
+                                        <i class="fa fa-calendar"></i>
+                                    </div>
+                                    @Html.TextBoxFor(model => model.EndDate, "{0:MM/dd/yyyy}", new { @class = "form-control datepicker", @width = "90px" })
+                                    @Html.ValidationMessageFor(model => model.EndDate, null, new { @class = "help-block" })
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+
+                <div class="card-footer">
+                    <div class="text-right">
+                        <button type="submit" name="action:Save" class="btn btn-social btn-default btnSumbitDisable"><i class="fa fa-floppy-o"></i>Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+    </div>
+
+
+}
+
+@section scripts {
+    <script src="~/Scripts/jquery.validate.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
+
+    <script type="text/javascript">
+
+
+        function UpdateIndexes(deletedItemIndex) {
+            // Update id indexes
+            $('div[id*="Dates"], input[id*="Dates"], img[id*="Dates"], textarea[id*="Dates"]').filter(function () {
+                var id = this.id.match(/\d+/);
+                return (id > deletedItemIndex && id > deletedItemIndex && name <= $("#container input.iHidden").length);
+            }).attr("name", function () {
+                return this.name.replace(this.name.match(/\d+/), parseInt(this.name.match(/\d+/)) - 1);
+            });
+
+            $('div[id*="Dates"], input[id*="Dates"], img[id*="Dates"], textarea[id*="Dates"]').filter(function () {
+                var id = this.id.match(/\d+/);
+                return (id > deletedItemIndex && id > deletedItemIndex && name <= $("#container input.iHidden").length);
+            }).attr("id", function () {
+                return this.id.replace(this.id.match(/\d+/), parseInt(this.id.match(/\d+/)) - 1);
+            });
+        }
+
+        function addDate() {
+
+            var valid = true;
+
+            var _date = $("#txtDate").val();
+            if (valid == true && _date == '') {
+                valid = false;
+                ShowError("Please select a Date.");
+            }
+            else if (valid == true) {
+                for (var i = 0; i < $("#container input.iHidden").length; i++) {
+                    if (_date == document.getElementsByName("Dates[" + i + "].TaskDate")[0].value) {
+                        valid = false;
+                        ShowError("Selected date already exist. Please select a different date");
+                        return;
+                    }
+                }
+
+            }
+
+
+            if (valid == true) {
+
+                var itemIndex = $("#container input.iHidden").length;
+
+                var newItem = $("<tr id='" + itemIndex + "'>" +
+                    "<td>" +
+                    "<input id='Dates_" + itemIndex + "__ScheduledDateId' type='hidden' value='' class='iHidden'  name='Dates_[" + itemIndex + "]_ScheduledDateId' />" +
+
+                    "<input type='text' id='Dates[" + itemIndex + "].TaskDate' name='Dates[" + itemIndex + "].TaskDate' class='form-control datepicker' value = '" + _date + "' width = '100'/>" +
+                    "</td>" +
+
+                    "<td class='text-right'>" +
+                    "<button type='button' id='btnRemove" + itemIndex + "' name='btnRemove" + itemIndex + "' onclick='deleteRow(" + itemIndex + ")' class='btn btn-social btn-delete'><span class='btn-label'><i class='glyphicon glyphicon-trash'></i></span>Remove</button>" +
+                    "</td>" +
+                    "</tr>");
+
+                $("#container").append(newItem);
+            }
+        }
+
+        function ShowError(errorDescription) {
+            swal({
+                title: "Error",
+                text: errorDescription,
+                type: "error",
+                showCancelButton: false,
+                closeOnConfirm: true,
+            });
+        }
+
+        function deleteRow(index) {
+            swal({
+                title: "Are you sure?",
+                text: "Do you want to delete selected item ? ",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Delete",
+                cancelButtonText: "Cancel",
+                closeOnConfirm: false,
+                closeOnCancel: false
+            }, function (isConfirm) {
+                if (isConfirm) {
+                    $("#" + index).remove();
+                    UpdateIndexes(index);
+                    swal("Deleted!", "Record is deleted", "success");
+                } else {
+                    swal("Cancelled", "Action canceled, Data is not deleted", "error");
+                }
+            });
+        }
+
+
+        $(document).ready(function () {
+
+            loadCategory();
+            loadTeams();
+            GetReapetItems();
+        });
+
+        $('#RepeatType').val('1');
+
+
+        $("select#TeamId").change(function (evt) {
+            loadUsers();
+            loadCategory();
+
+        });
+
+        function loadTeams() {
+
+            $.getJSON("@Url.Action("GetTeamUserListJsonResult", "Team")", function (data) {
+                var dropDown = $("#TeamId");
+
+                dropDown.empty();
+                dropDown.append("<option value='0'>-- Select --</option>");
+
+                $.each(JSON.parse(data), function (index, optionaldata) {
+                    dropDown.append($('<option />', { value: optionaldata.TeamId }).html(optionaldata.TeamName));
+                });
+
+                if ('@ViewBag.TeamId') {
+                      $('#TeamId').val(@ViewBag.TeamId).attr("selected", "selected");
+                 }
+
+                loadUsers();
+                loadCategory();
+            });
+
+        }
+
+         function loadUsers() {
+             var _teamId = $('#TeamId').val();
+
+            $.getJSON("@Url.Action("GetUsersByTeamIdJsonResult", "User")",
+              {
+                  teamId: _teamId
+              }, function (data) {
+                  var dropDown = $("#AssignedTo");
+
+                  dropDown.empty();
+                  dropDown.append("<option value='0'>-- Select --</option>");
+
+                  $.each(JSON.parse(data), function (index, optionaldata) {
+                      dropDown.append($('<option/>', { value: optionaldata.EmpNo }).html(optionaldata.EmpNo + ' - ' +optionaldata.FullName + ' (' + optionaldata.DesignationName + ')' ));
+                  });
+
+                   if ('@ViewBag.AssignedTo') {
+                       $('#AssignedTo').val(@ViewBag.AssignedTo).attr("selected", "selected");
+                 }
+
+              });
+        }
+
+
+          function loadCategory() {
+              var _teamId = $('#TeamId').val();
+
+              $.getJSON("@Url.Action("GetTaskCategoriesListJsonResult", "TaskCategory")",
+                  {
+                      teamId: _teamId
+
+                  }, function (data) {
+                var dropDown = $("#TaskCategoryId");
+
+                dropDown.empty();
+                dropDown.append("<option value='0'>-- Select --</option>");
+
+                $.each(JSON.parse(data), function (index, optionaldata) {
+                    dropDown.append($('<option />', { value: optionaldata.TaskCategoryId }).html(optionaldata.TaskCategoryName + ' ( ' + optionaldata.Weightage + '% ) ' ));
+                });
+
+                if ('@ViewBag.TaskCategoryId') {
+                    $('#TaskCategoryId').val(@ViewBag.TaskCategoryId).attr("selected", "selected");
+                 }
+
+
+            });
+
+        }
+
+        $("select#RepeatType").change(function (evt) {
+            GetReapetItems();
+
+        });
+
+        function GetReapetItems() {
+            var _val = $("#RepeatType").val();
+            $("#weekDays").hide();
+            $("#MonthDays").hide();
+            $("#YearDays").hide();
+            $(".endDate").hide();
+            
+            if (_val == 3) {
+                $("#weekDays").show();
+                $("#MonthDays").hide();
+                $("#YearDays").hide();
+                $(".endDate").show();
+
+            }
+            else if (_val == 4) {
+                $("#weekDays").hide();
+                $("#MonthDays").show();
+                $("#YearDays").hide();
+                $(".endDate").show();
+
+            }
+            else if (_val == 5) {
+                $("#weekDays").hide();
+                $("#MonthDays").hide();
+                $("#YearDays").show();
+            }
+        }
+
+
+    </script>
+}
+

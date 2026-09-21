@@ -1,0 +1,1044 @@
+﻿@model ICollection<Domain.IM.IncidentRequest>
+@using Service.IM
+@using Service
+@using Domain.IM
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="card">
+
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="align-middle me-2" data-lucide="clock"></i>
+                    Pending
+                </h5>
+            </div>
+
+            <div class="card-body">
+
+                <div class="accordion" id="incidentAccordion">
+
+                    @foreach (var item in Model)
+                    {
+                        var collapseId = "incident_" + item.IncidentRequestId;
+
+                        <div class="accordion-item">
+
+                            <h2 class="accordion-header"
+                                id="heading_@item.IncidentRequestId">
+
+                                <button class="accordion-button collapsed"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#@collapseId"
+                                        aria-expanded="false"
+                                        aria-controls="@collapseId">
+
+                                    <div class="w-100 d-flex justify-content-between align-items-center me-3 flex-wrap gap-2">
+
+                                        <div>
+                                            <strong>
+                                                Request # @item.IncidentRequestId
+                                            </strong>
+
+                                            <span class="mx-2 text-muted">|</span>
+
+                                            @item.OccurredDate.ToShortDateString()
+                                        </div>
+
+                                        <span class="badge bg-@IncidentRequestService.GetImpactColor(item.Impact)">
+                                            @item.Impact.EnumDisplayName()
+                                        </span>
+
+                                    </div>
+
+                                </button>
+
+                            </h2>
+
+                            <div id="@collapseId"
+                                 class="accordion-collapse collapse"
+                                 aria-labelledby="heading_@item.IncidentRequestId"
+                                 data-bs-parent="#incidentAccordion">
+
+                                <div class="accordion-body">
+
+                                    @Html.Partial("_RequestMin", item)
+
+                                </div>
+
+                                <div class="card-footer">
+
+                                    <div class="d-flex justify-content-end flex-wrap gap-2">
+
+                                        <a href="@Html.EncodedActionLink("", "Info", "IncidentRequest", "", new { id = item.IncidentRequestId }, null)"
+                                           target="_blank"
+                                           class="btn btn-sm btn-light">
+
+                                            <i class="align-middle me-1" data-lucide="info"></i>
+                                            More
+
+                                        </a>
+
+
+                                        <button type="button"
+                                                class="openModalUpdate btn btn-sm btn-info text-white"
+                                                data-id="@item.IncidentRequestId"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#modalUpdate">
+
+                                            <i class="align-middle me-1" data-lucide="check-square"></i>
+                                            Update
+
+                                        </button>
+
+
+                                        <button type="button"
+                                                class="openModalUpdateEscalation btn btn-sm btn-warning"
+                                                data-id="@item.IncidentRequestId"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#modalUpdateEscalation">
+
+                                            <i class="align-middle me-1" data-lucide="arrow-right-left"></i>
+                                            Escalation
+
+                                        </button>
+
+
+                                        <button type="button"
+                                                class="openModalUpdateImpact btn btn-sm btn-primary"
+                                                data-id="@item.IncidentRequestId"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#modalUpdateImpact">
+
+                                            <i class="align-middle me-1" data-lucide="triangle-alert"></i>
+                                            Change Impact
+
+                                        </button>
+
+
+                                        <button type="button"
+                                                class="openModalUpdateVendor btn btn-sm btn-secondary"
+                                                data-id="@item.IncidentRequestId"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#modalUpdateVendor">
+
+                                            <i class="align-middle me-1" data-lucide="briefcase"></i>
+                                            Vendor Escalation
+
+                                        </button>
+
+
+                                        <a href="@Html.EncodedActionLink("", "Complete", "IncidentRequest", "", new { id = item.IncidentRequestId }, null)"
+                                           class="btn btn-sm btn-success">
+
+                                            <i class="align-middle me-1" data-lucide="check-circle"></i>
+                                            Complete
+
+                                        </a>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+<!-- Update Modal -->
+<div class="modal fade"
+     id="modalUpdate"
+     tabindex="-1"
+     aria-labelledby="modalUpdateLabel"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title" id="modalUpdateLabel">
+
+                    <i class="align-middle me-2" data-lucide="check-square"></i>
+
+                    Update - Incident #
+                    <span class="incidentLabel"></span>
+
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <input type="hidden"
+                       class="modalIncidentId"
+                       value="" />
+
+                <div class="mb-3">
+
+                    <label for="updateComment" class="form-label">
+                        Comment
+                    </label>
+
+                    <textarea id="updateComment"
+                              class="form-control"
+                              rows="4"
+                              placeholder="Comment"></textarea>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn btn-sm btn-danger"
+                        data-bs-dismiss="modal">
+
+                    <i class="align-middle me-1" data-lucide="x"></i>
+                    Cancel
+
+                </button>
+
+                <button type="button"
+                        class="btn btn-sm btn-info btnClickDisable"
+                        onclick="updateIncident()">
+
+                    <i class="align-middle me-1" data-lucide="save"></i>
+                    Update
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- Escalation Modal -->
+<div class="modal fade"
+     id="modalUpdateEscalation"
+     tabindex="-1"
+     aria-labelledby="modalUpdateEscalationLabel"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title"
+                    id="modalUpdateEscalationLabel">
+
+                    <i class="align-middle me-2" data-lucide="arrow-right-left"></i>
+
+                    Escalation - Incident #
+                    <span class="incidentLabel"></span>
+
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <input type="hidden"
+                       class="modalIncidentId"
+                       value="" />
+
+                <div class="mb-3">
+
+                    <label for="modalTeamId" class="form-label">
+                        Team
+                    </label>
+
+                    <select id="modalTeamId"
+                            class="form-select">
+                    </select>
+
+                </div>
+
+                <div class="mb-3">
+
+                    <label for="escalationComment" class="form-label">
+                        Comment
+                    </label>
+
+                    <textarea id="escalationComment"
+                              class="form-control"
+                              rows="4"
+                              placeholder="Comment"></textarea>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn btn-sm btn-danger"
+                        data-bs-dismiss="modal">
+
+                    <i class="align-middle me-1" data-lucide="x"></i>
+                    Cancel
+
+                </button>
+
+                <button type="button"
+                        class="btn btn-sm btn-info btnClickDisable"
+                        onclick="updateEscalation()">
+
+                    <i class="align-middle me-1" data-lucide="save"></i>
+                    Update
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- Impact Modal -->
+<div class="modal fade"
+     id="modalUpdateImpact"
+     tabindex="-1"
+     aria-labelledby="modalUpdateImpactLabel"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title"
+                    id="modalUpdateImpactLabel">
+
+                    <i class="align-middle me-2" data-lucide="triangle-alert"></i>
+
+                    Impact - Incident #
+                    <span class="incidentLabel"></span>
+
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <input type="hidden"
+                       class="modalIncidentId"
+                       value="" />
+
+                <div class="mb-3">
+
+                    <label for="modalImpactId" class="form-label">
+                        Impact
+                    </label>
+
+                    <select id="modalImpactId"
+                            class="form-select">
+                    </select>
+
+                </div>
+
+                <div class="mb-3">
+
+                    <label for="impactComment" class="form-label">
+                        Comment
+                    </label>
+
+                    <textarea id="impactComment"
+                              class="form-control"
+                              rows="4"
+                              placeholder="Comment"></textarea>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn btn-sm btn-danger"
+                        data-bs-dismiss="modal">
+
+                    <i class="align-middle me-1" data-lucide="x"></i>
+                    Cancel
+
+                </button>
+
+                <button type="button"
+                        class="btn btn-sm btn-info btnClickDisable"
+                        onclick="updateImpact()">
+
+                    <i class="align-middle me-1" data-lucide="save"></i>
+                    Update
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- Vendor Modal -->
+<div class="modal fade"
+     id="modalUpdateVendor"
+     tabindex="-1"
+     aria-labelledby="modalUpdateVendorLabel"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title"
+                    id="modalUpdateVendorLabel">
+
+                    <i class="align-middle me-2" data-lucide="briefcase"></i>
+
+                    Vendor Escalation - Incident #
+                    <span class="incidentLabel"></span>
+
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <input type="hidden"
+                       class="modalIncidentId"
+                       value="" />
+
+                <div class="mb-3">
+
+                    <label for="textVendorRefNo" class="form-label">
+                        Vendor Ref. #
+                    </label>
+
+                    <input type="text"
+                           id="textVendorRefNo"
+                           name="textVendorRefNo"
+                           placeholder="Reference #"
+                           class="form-control" />
+
+                </div>
+
+                <div class="mb-3">
+
+                    <label for="vendorComment" class="form-label">
+                        Comment
+                    </label>
+
+                    <textarea id="vendorComment"
+                              class="form-control"
+                              rows="4"
+                              placeholder="Comment"></textarea>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn btn-sm btn-danger"
+                        data-bs-dismiss="modal">
+
+                    <i class="align-middle me-1" data-lucide="x"></i>
+                    Cancel
+
+                </button>
+
+                <button type="button"
+                        class="btn btn-sm btn-info btnClickDisable"
+                        onclick="updateVendor()">
+
+                    <i class="align-middle me-1" data-lucide="save"></i>
+                    Update
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            loadTeams();
+            loadImpacts();
+
+        });
+
+
+        function parseJsonResult(data) {
+
+            if (typeof data === "string") {
+
+                try {
+                    return JSON.parse(data);
+                }
+                catch (e) {
+                    return [];
+                }
+
+            }
+
+            return data || [];
+        }
+
+
+        $(document).on("click", ".openModalUpdate", function () {
+
+            var requestId = $(this).data("id");
+            var modal = $("#modalUpdate");
+
+            modal.find(".modalIncidentId").val(requestId);
+            modal.find(".incidentLabel").text(requestId);
+            modal.find("#updateComment").val("");
+            modal.find(".btnClickDisable").prop("disabled", false);
+
+        });
+
+
+        $(document).on("click", ".openModalUpdateEscalation", function () {
+
+            var requestId = $(this).data("id");
+            var modal = $("#modalUpdateEscalation");
+
+            modal.find(".modalIncidentId").val(requestId);
+            modal.find(".incidentLabel").text(requestId);
+            modal.find("#modalTeamId").val("0");
+            modal.find("#escalationComment").val("");
+            modal.find(".btnClickDisable").prop("disabled", false);
+
+        });
+
+
+        $(document).on("click", ".openModalUpdateImpact", function () {
+
+            var requestId = $(this).data("id");
+            var modal = $("#modalUpdateImpact");
+
+            modal.find(".modalIncidentId").val(requestId);
+            modal.find(".incidentLabel").text(requestId);
+            modal.find("#modalImpactId").val("0");
+            modal.find("#impactComment").val("");
+            modal.find(".btnClickDisable").prop("disabled", false);
+
+        });
+
+
+        $(document).on("click", ".openModalUpdateVendor", function () {
+
+            var requestId = $(this).data("id");
+            var modal = $("#modalUpdateVendor");
+
+            modal.find(".modalIncidentId").val(requestId);
+            modal.find(".incidentLabel").text(requestId);
+            modal.find("#textVendorRefNo").val("");
+            modal.find("#vendorComment").val("");
+            modal.find(".btnClickDisable").prop("disabled", false);
+
+        });
+
+
+        function updateIncident() {
+
+            var modal = $("#modalUpdate");
+
+            var requestId =
+                modal.find(".modalIncidentId").val();
+
+            var comment =
+                modal.find("#updateComment").val().trim();
+
+            var button =
+                modal.find(".btnClickDisable");
+
+
+            if (!comment) {
+
+                Swal.fire(
+                    "Error!",
+                    "Please enter the required data",
+                    "error"
+                );
+
+                return;
+            }
+
+
+            button.prop("disabled", true);
+
+
+            $.ajax({
+
+                url: '@Url.Action("Update", "IncidentRequest")',
+
+                type: "GET",
+
+                dataType: "json",
+
+                data: {
+                    requestId: requestId,
+                    comment: comment
+                },
+
+                success: function (data) {
+
+                    if (data == "1" || data == 1) {
+
+                        Swal.fire(
+                            "Completed",
+                            "Incident has been updated",
+                            "success"
+                        );
+
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 500);
+
+                    }
+                    else {
+
+                        button.prop("disabled", false);
+
+                        Swal.fire(
+                            "Something went wrong!",
+                            "Please try again",
+                            "error"
+                        );
+
+                    }
+
+                },
+
+                error: function () {
+
+                    button.prop("disabled", false);
+
+                    Swal.fire(
+                        "Something went wrong!",
+                        "Please try again",
+                        "error"
+                    );
+
+                }
+
+            });
+
+        }
+
+
+        function updateEscalation() {
+
+            var modal =
+                $("#modalUpdateEscalation");
+
+            var requestId =
+                modal.find(".modalIncidentId").val();
+
+            var teamId =
+                modal.find("#modalTeamId").val();
+
+            var comment =
+                modal.find("#escalationComment").val().trim();
+
+            var button =
+                modal.find(".btnClickDisable");
+
+
+            if (!teamId || teamId == "0" || !comment) {
+
+                Swal.fire(
+                    "Error!",
+                    "Please enter the required data",
+                    "error"
+                );
+
+                return;
+            }
+
+
+            button.prop("disabled", true);
+
+
+            $.ajax({
+
+                url: '@Url.Action("Escalation", "IncidentRequest")',
+
+                type: "GET",
+
+                dataType: "json",
+
+                data: {
+                    requestId: requestId,
+                    teamId: teamId,
+                    comment: comment
+                },
+
+                success: function (data) {
+
+                    if (data == "1" || data == 1) {
+
+                        Swal.fire(
+                            "Completed",
+                            "Incident has been updated",
+                            "success"
+                        );
+
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 500);
+
+                    }
+                    else {
+
+                        button.prop("disabled", false);
+
+                        Swal.fire(
+                            "Something went wrong!",
+                            "Please try again",
+                            "error"
+                        );
+
+                    }
+
+                },
+
+                error: function () {
+
+                    button.prop("disabled", false);
+
+                    Swal.fire(
+                        "Something went wrong!",
+                        "Please try again",
+                        "error"
+                    );
+
+                }
+
+            });
+
+        }
+
+
+        function updateImpact() {
+
+            var modal =
+                $("#modalUpdateImpact");
+
+            var requestId =
+                modal.find(".modalIncidentId").val();
+
+            var impactId =
+                modal.find("#modalImpactId").val();
+
+            var comment =
+                modal.find("#impactComment").val().trim();
+
+            var button =
+                modal.find(".btnClickDisable");
+
+
+            if (!impactId || impactId == "0" || !comment) {
+
+                Swal.fire(
+                    "Error!",
+                    "Please enter the required data",
+                    "error"
+                );
+
+                return;
+            }
+
+
+            button.prop("disabled", true);
+
+
+            $.ajax({
+
+                url: '@Url.Action("Impact", "IncidentRequest")',
+
+                type: "GET",
+
+                dataType: "json",
+
+                data: {
+                    requestId: requestId,
+                    impactId: impactId,
+                    comment: comment
+                },
+
+                success: function (data) {
+
+                    if (data == "1" || data == 1) {
+
+                        Swal.fire(
+                            "Completed",
+                            "Incident has been updated",
+                            "success"
+                        );
+
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 500);
+
+                    }
+                    else {
+
+                        button.prop("disabled", false);
+
+                        Swal.fire(
+                            "Something went wrong!",
+                            "Please try again",
+                            "error"
+                        );
+
+                    }
+
+                },
+
+                error: function () {
+
+                    button.prop("disabled", false);
+
+                    Swal.fire(
+                        "Something went wrong!",
+                        "Please try again",
+                        "error"
+                    );
+
+                }
+
+            });
+
+        }
+
+
+        function updateVendor() {
+
+            var modal =
+                $("#modalUpdateVendor");
+
+            var requestId =
+                modal.find(".modalIncidentId").val();
+
+            var comment =
+                modal.find("#vendorComment").val().trim();
+
+            var button =
+                modal.find(".btnClickDisable");
+
+
+            if (!comment) {
+
+                Swal.fire(
+                    "Error!",
+                    "Please enter the required data",
+                    "error"
+                );
+
+                return;
+            }
+
+
+            button.prop("disabled", true);
+
+
+            $.ajax({
+
+                url: '@Url.Action("Vendor", "IncidentRequest")',
+
+                type: "GET",
+
+                dataType: "json",
+
+                data: {
+                    requestId: requestId,
+                    comment: comment
+                },
+
+                success: function (data) {
+
+                    if (data == "1" || data == 1) {
+
+                        Swal.fire(
+                            "Completed",
+                            "Incident has been updated",
+                            "success"
+                        );
+
+                        setTimeout(function () {
+                            window.location.reload();
+                        }, 500);
+
+                    }
+                    else {
+
+                        button.prop("disabled", false);
+
+                        Swal.fire(
+                            "Something went wrong!",
+                            "Please try again",
+                            "error"
+                        );
+
+                    }
+
+                },
+
+                error: function () {
+
+                    button.prop("disabled", false);
+
+                    Swal.fire(
+                        "Something went wrong!",
+                        "Please try again",
+                        "error"
+                    );
+
+                }
+
+            });
+
+        }
+
+
+        function loadTeams() {
+
+            $.getJSON(
+                '@Url.Action("GetTeamListJsonResult", "Team")',
+                function (data) {
+
+                    var dropDown =
+                        $("#modalTeamId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- Select --</option>"
+                    );
+
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.TeamId,
+                                    text: item.TeamName
+                                })
+                            );
+
+                        }
+                    );
+
+                }
+            );
+
+        }
+
+
+        function loadImpacts() {
+
+            $.getJSON(
+                '@Url.Action("GetImpactTypesJsonResult", "IncidentRequest")',
+                function (data) {
+
+                    var dropDown =
+                        $("#modalImpactId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- Select --</option>"
+                    );
+
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.Id,
+                                    text: item.Name
+                                })
+                            );
+
+                        }
+                    );
+
+                }
+            );
+
+        }
+
+    </script>
+}

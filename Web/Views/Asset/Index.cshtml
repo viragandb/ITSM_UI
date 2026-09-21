@@ -1,0 +1,943 @@
+﻿@using Service
+@model IEnumerable<Domain.Asset>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("Index", "Asset", FormMethod.Get))
+{
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card">
+
+                <div class="card-header">
+
+                    <h5 class="card-title mb-0">
+                        <i class="align-middle me-2" data-lucide="boxes"></i>
+                        Assets
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-3">
+
+                            <label for="AssetCategoryId" class="form-label">
+                                Asset Category
+                            </label>
+
+                            <select id="AssetCategoryId"
+                                    name="AssetCategoryId"
+                                    class="form-select">
+                            </select>
+
+                        </div>
+
+                        <div class="col-md-3">
+
+                            <label for="AssetTypeId" class="form-label">
+                                Asset Type
+                            </label>
+
+                            <select id="AssetTypeId"
+                                    name="AssetTypeId"
+                                    class="form-select">
+                            </select>
+
+                        </div>
+
+                        <div class="col-md-3">
+
+                            <label for="StatusId" class="form-label">
+                                Status
+                            </label>
+
+                            <select id="StatusId"
+                                    name="StatusId"
+                                    class="form-select select2"
+                                    multiple
+                                    data-placeholder="All"
+                                    style="width:100%;">
+                            </select>
+
+                        </div>
+
+                        <div class="col-md-3">
+
+                            <label for="AllocatedTypeId" class="form-label">
+                                Owned By
+                            </label>
+
+                            <select id="AllocatedTypeId"
+                                    name="AllocatedTypeId"
+                                    class="form-select select2">
+                            </select>
+
+                        </div>
+
+                    </div>
+
+                    <div class="row g-3 mt-1">
+
+                        <div class="col-md-3">
+
+                            <label for="BranchId" class="form-label">
+                                Location
+                            </label>
+
+                            <select id="BranchId"
+                                    name="BranchId"
+                                    class="form-select select2">
+                            </select>
+
+                        </div>
+
+                        <div class="col-md-3">
+
+                            <label for="DepartmentId" class="form-label">
+                                Department
+                            </label>
+
+                            <select id="DepartmentId"
+                                    name="DepartmentId"
+                                    class="form-select select2">
+                            </select>
+
+                        </div>
+
+                        <div class="col-md-3"></div>
+
+                        <div class="col-md-3">
+
+                            <div class="form-check mb-2">
+
+                                <input type="checkbox"
+                                       class="form-check-input"
+                                       id="checkboxWarranty"
+                                       name="checkboxWarranty"
+                                       @ViewBag.Warranty />
+
+                                <label class="form-check-label"
+                                       for="checkboxWarranty">
+                                    Warranty Expired
+                                </label>
+
+                            </div>
+
+                            <div class="form-check mb-2">
+
+                                <input type="checkbox"
+                                       class="form-check-input"
+                                       id="checkboxMaintenance"
+                                       name="checkboxMaintenance"
+                                       @ViewBag.Maintenance />
+
+                                <label class="form-check-label"
+                                       for="checkboxMaintenance">
+                                    Maintenance Expired
+                                </label>
+
+                            </div>
+
+                            <div class="form-check">
+
+                                <input type="checkbox"
+                                       class="form-check-input"
+                                       id="checkboxToBeReturned"
+                                       name="checkboxToBeReturned"
+                                       @ViewBag.ToBeReturned />
+
+                                <label class="form-check-label"
+                                       for="checkboxToBeReturned">
+                                    To Be Returned
+                                </label>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="row g-3 mt-1">
+
+                        <div class="col-md-3">
+
+                            <label for="AssetNo" class="form-label">
+                                Asset #
+                            </label>
+
+                            <input type="text"
+                                   id="AssetNo"
+                                   name="AssetNo"
+                                   value="@ViewBag.AssetNo"
+                                   class="form-control" />
+
+                        </div>
+
+                        <div class="col-md-3">
+
+                            <label for="SerialNo" class="form-label">
+                                Serial #
+                            </label>
+
+                            <input type="text"
+                                   id="SerialNo"
+                                   name="SerialNo"
+                                   value="@ViewBag.SerialNo"
+                                   class="form-control" />
+
+                        </div>
+
+                        <div class="col-md-3">
+
+                            <label for="BarcodeNo" class="form-label">
+                                Barcode #
+                            </label>
+
+                            <input type="text"
+                                   id="BarcodeNo"
+                                   name="BarcodeNo"
+                                   value="@ViewBag.BarcodeNo"
+                                   class="form-control" />
+
+                        </div>
+
+                    </div>
+
+                    <div class="row g-3 mt-1">
+
+                        <div class="col-md-4">
+
+                            <label for="AssignTo" class="form-label">
+                                Assigned User
+                            </label>
+
+                            <div class="input-group">
+
+                                <span class="input-group-text">
+                                    <i class="align-middle" data-lucide="user"></i>
+                                </span>
+
+                                <input type="text"
+                                       id="AssignTo"
+                                       name="AssignTo"
+                                       value="@ViewBag.AssignTo"
+                                       placeholder="Type LAN Id here to search"
+                                       class="form-control" />
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="card-footer">
+
+                    <div class="d-flex justify-content-end">
+
+                        <button type="submit"
+                                class="btn btn-primary">
+
+                            <i class="align-middle me-1"
+                               data-lucide="search"></i>
+
+                            Search
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card">
+
+                <div class="card-body">
+
+                    <div class="table-responsive">
+
+                        <table id="dataTable"
+                               class="table table-striped table-hover align-middle w-100">
+
+                            <thead>
+                                <tr>
+                                    <th>Asset No</th>
+                                    <th>Asset Category</th>
+                                    <th>Asset Type</th>
+                                    <th>Make</th>
+                                    <th>Model</th>
+                                    <th>Serial No</th>
+                                    <th>Barcode</th>
+                                    <th>Branch</th>
+                                    <th>Department</th>
+                                    <th>Status</th>
+                                    <th>Description</th>
+                                    <th>Owned By</th>
+                                    <th>Assigned To</th>
+                                    <th>Vendor</th>
+                                    <th>Purchase Price</th>
+                                    <th>Warranty Period</th>
+                                    <th>Warranty Expire</th>
+                                    <th>To Be Returned Date</th>
+                                    <th>Classification</th>
+                                    <th>Responsible Team</th>
+                                    <th>Updated By</th>
+                                    <th>Updated Date</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+
+                                        <td>
+
+                                            <a href="@Html.EncodedActionLink(
+                                                         "",
+                                                         "Info",
+                                                         "Asset",
+                                                         "",
+                                                         new { id = item.AssetId },
+                                                         null
+                                                     )"
+                                               target="_blank"
+                                               class="text-decoration-none">
+
+                                                <i class="align-middle me-1"
+                                                   data-lucide="external-link"></i>
+
+                                                @item.AssetNo
+
+                                            </a>
+
+                                        </td>
+
+                                        <td>
+                                            @item.AssetCategory.EnumDisplayName()
+                                        </td>
+
+                                        <td>
+                                            @item.AssetType.AssetTypeName
+                                        </td>
+
+                                        <td>
+                                            @item.AssetMake.Name
+                                        </td>
+
+                                        <td>
+                                            @item.ModelName
+                                        </td>
+
+                                        <td>
+                                            @item.SerialNo
+                                        </td>
+
+                                        <td>
+                                            @item.Barcode
+                                        </td>
+
+                                        <td>
+                                            @item.Branch.Name
+                                        </td>
+
+                                        <td>
+                                            @item.Department.DepartmentName
+                                        </td>
+
+                                        <td>
+                                            @item.Status.EnumDisplayName()
+                                        </td>
+
+                                        <td>
+                                            @item.Description
+                                        </td>
+
+                                        <td>
+                                            @item.AllocatedType.EnumDisplayName()
+                                        </td>
+
+                                        <td>
+
+                                            @if (item.AssignedTo != null)
+                                            {
+                                                @item.AssignedToUser.FullName
+                                            }
+                                            else
+                                            {
+                                                <span>N/A</span>
+                                            }
+
+                                        </td>
+
+                                        <td>
+                                            @item.Vendor.VendorName
+                                        </td>
+
+                                        <td>
+                                            @item.PurchasePrice
+                                        </td>
+
+                                        <td>
+                                            @item.WarrantyPeriod
+                                        </td>
+
+                                        <td>
+
+                                            @if (item.WarrantyPeriod > 0)
+                                            {
+                                                @item.WarrantyExpire.ToShortDateString()
+                                            }
+                                            else
+                                            {
+                                                <span>N/A</span>
+                                            }
+
+                                        </td>
+
+                                        <td>
+
+                                            @if (item.AllocatedType == Domain.AllocatedTypeEnum.External)
+                                            {
+                                                @item.ToBeReturnedDate.ToShortDateString()
+                                            }
+                                            else
+                                            {
+                                                <span>N/A</span>
+                                            }
+
+                                        </td>
+
+                                        <td>
+                                            @item.Priority.EnumDisplayName()
+                                        </td>
+
+                                        <td>
+
+                                            @if (item.ResponsibleTeam != null)
+                                            {
+                                                @item.ResponsibleTeam.TeamName
+                                            }
+                                            else
+                                            {
+                                                <span>N/A</span>
+                                            }
+
+                                        </td>
+
+                                        <td>
+                                            @item.UpdatedBy
+                                        </td>
+
+                                        <td>
+                                            @item.UpdatedDate
+                                        </td>
+
+                                        <td class="text-end">
+
+                                            <a href="@Html.EncodedActionLink(
+                                                         "",
+                                                         "Update",
+                                                         "Asset",
+                                                         "",
+                                                         new { id = item.AssetId },
+                                                         null
+                                                     )"
+                                               target="_blank"
+                                               class="btn btn-sm btn-primary">
+
+                                                <i class="align-middle me-1"
+                                                   data-lucide="pencil"></i>
+
+                                                Edit
+
+                                            </a>
+
+                                        </td>
+
+                                    </tr>
+                                }
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+}
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        function parseJsonResult(data) {
+
+            if (typeof data === "string") {
+
+                try {
+                    return JSON.parse(data);
+                }
+                catch (e) {
+                    return [];
+                }
+
+            }
+
+            return data || [];
+
+        }
+
+
+        $(document).ready(function () {
+
+            if ($.fn.DataTable) {
+
+                $("#dataTable").DataTable({
+
+                    responsive: true,
+                    lengthChange: true,
+                    autoWidth: false,
+                    paging: true,
+
+                    buttons: [
+
+                        {
+                            extend: "excelHtml5",
+                            text: "Excel",
+                            title: "ITSM - Assets",
+                            exportOptions: {
+                                modifier: {
+                                    page: "all"
+                                }
+                            }
+                        },
+
+                        {
+                            extend: "pdfHtml5",
+                            text: "PDF",
+                            title: "ITSM - Assets",
+                            orientation: "landscape",
+                            exportOptions: {
+                                modifier: {
+                                    page: "all"
+                                }
+                            }
+                        },
+
+                        {
+                            extend: "print",
+                            text: "Print",
+                            title: "ITSM - Assets",
+                            autoPrint: true
+                        },
+
+                        "colvis"
+
+                    ],
+
+                    columnDefs: [
+                        {
+                            targets: -1,
+                            orderable: false,
+                            searchable: false
+                        }
+                    ]
+
+                }).buttons().container()
+                    .appendTo("#dataTable_wrapper .col-md-6:eq(0)");
+
+            }
+
+
+            if ($.fn.select2) {
+
+                $(".select2").select2({
+                    width: "100%"
+                });
+
+            }
+
+
+            loadAssetStatus();
+            loadAssetCategory();
+            loadAssetOwnershipType();
+            loadLocations();
+
+            SearchADUser();
+
+        });
+
+
+        function SearchADUser() {
+
+            $("#AssignTo").autocomplete({
+
+                source: function (request, response) {
+
+                    $.ajax({
+
+                        url: '@Url.Action("GetSearchUserByLanIdJsonResult", "User")',
+
+                        dataType: "json",
+
+                        data: {
+                            term: request.term
+                        },
+
+                        success: function (data) {
+
+                            response(
+                                $.map(
+                                    data,
+                                    function (val) {
+
+                                        return {
+                                            label:
+                                                val.EmpNo +
+                                                " - " +
+                                                val.FullName +
+                                                " | " +
+                                                val.DepartmentName,
+
+                                            value: val.EmpNo,
+                                            itemId: val.EmpNo,
+                                            itemName: val.FullName
+                                        };
+
+                                    }
+                                )
+                            );
+
+                        }
+
+                    });
+
+                },
+
+                minLength: 1
+
+            });
+
+        }
+
+
+        function loadLocations() {
+
+            $.getJSON(
+                '@Url.Action("GetItemListJsonResult", "Branch")',
+                function (data) {
+
+                    var dropDown =
+                        $("#BranchId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- All --</option>"
+                    );
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.BranchId,
+                                    text: item.Name
+                                })
+                            );
+
+                        }
+                    );
+
+                    var selectedId =
+                        '@ViewBag.BranchId';
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+                    if ($.fn.select2) {
+                        dropDown.trigger("change.select2");
+                    }
+
+                    loadDepartments();
+
+                }
+            );
+
+        }
+
+
+        $("select#BranchId").on("change", function () {
+            loadDepartments();
+        });
+
+
+        function loadDepartments() {
+
+            var branchId =
+                $("#BranchId").val();
+
+            $.getJSON(
+                '@Url.Action("GetDepartmentListBtBranchIdJsonResult", "Department")',
+                {
+                    branchId: branchId
+                },
+                function (data) {
+
+                    var dropDown =
+                        $("#DepartmentId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- All --</option>"
+                    );
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.DepartmentId,
+                                    text: item.DepartmentName
+                                })
+                            );
+
+                        }
+                    );
+
+                    var selectedId =
+                        '@ViewBag.DepartmentId';
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+                    if ($.fn.select2) {
+                        dropDown.trigger("change.select2");
+                    }
+
+                }
+            );
+
+        }
+
+
+        function loadAssetStatus() {
+
+            $.getJSON(
+                '@Url.Action("GetAssetStatusJsonResult", "Asset")',
+                function (data) {
+
+                    var dropDown =
+                        $("#StatusId");
+
+                    dropDown.empty();
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.Id,
+                                    text: item.Name
+                                })
+                            );
+
+                        }
+                    );
+
+                    var selectedStatus =
+                        '@ViewBag.StatusId';
+
+                    if (selectedStatus) {
+
+                        var selectedValues =
+                            selectedStatus.split(",");
+
+                        dropDown.val(selectedValues);
+
+                    }
+
+                    if ($.fn.select2) {
+                        dropDown.trigger("change.select2");
+                    }
+
+                }
+            );
+
+        }
+
+
+        function loadAssetCategory() {
+
+            $.getJSON(
+                '@Url.Action("GetAssetCategoryJsonResult", "AssetType")',
+                function (data) {
+
+                    var dropDown =
+                        $("#AssetCategoryId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- Select --</option>"
+                    );
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.Id,
+                                    text: item.Name
+                                })
+                            );
+
+                        }
+                    );
+
+                    var selectedId =
+                        '@ViewBag.AssetCategoryId';
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+                    loadAssetType();
+
+                }
+            );
+
+        }
+
+
+        $("select#AssetCategoryId").on("change", function () {
+            loadAssetType();
+        });
+
+
+        function loadAssetType() {
+
+            var categoryId =
+                $("#AssetCategoryId").val();
+
+            $.getJSON(
+                '@Url.Action("GetAssetTypeByAssetCategoryListJsonResult", "AssetType")',
+                {
+                    assetCategory: categoryId
+                },
+                function (data) {
+
+                    var dropDown =
+                        $("#AssetTypeId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- All --</option>"
+                    );
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.AssetTypeId,
+                                    text: item.AssetTypeName
+                                })
+                            );
+
+                        }
+                    );
+
+                    var selectedId =
+                        '@ViewBag.AssetTypeId';
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+                }
+            );
+
+        }
+
+
+        function loadAssetOwnershipType() {
+
+            $.getJSON(
+                '@Url.Action("GetAssetOwnershipTypeJsonResult", "AssetType")',
+                function (data) {
+
+                    var dropDown =
+                        $("#AllocatedTypeId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- All --</option>"
+                    );
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.Id,
+                                    text: item.Name
+                                })
+                            );
+
+                        }
+                    );
+
+                    var selectedId =
+                        '@ViewBag.AllocatedTypeId';
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+                    if ($.fn.select2) {
+                        dropDown.trigger("change.select2");
+                    }
+
+                }
+            );
+
+        }
+
+    </script>
+
+}

@@ -1,0 +1,35 @@
+﻿@model IList<Domain.UserGroup>
+
+@{
+    Layout = null;
+}
+
+<div class="row g-3">
+
+    @for (int i = 0; i < Model.Count; i++)
+    {
+        <div class="col-lg-3 col-md-4 col-sm-6">
+
+            <div class="form-check">
+
+                @Html.CheckBoxFor(
+                    model => Model[i].IsSelected,
+                    new { @class = "form-check-input" }
+                )
+
+                <label class="form-check-label"
+                       for="@Html.IdFor(model => Model[i].IsSelected)">
+                    @(Model[i].Group != null
+                        ? Model[i].Group.GroupName
+                        : "N/A")
+                </label>
+
+                @Html.HiddenFor(model => Model[i].GroupId)
+                @Html.HiddenFor(model => Model[i].UserGroupId)
+
+            </div>
+
+        </div>
+    }
+
+</div>

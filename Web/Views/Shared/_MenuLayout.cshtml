@@ -1,0 +1,145 @@
+﻿@using Service
+@model IEnumerable<Domain.Menu>
+
+@{
+    var userName = Session["UserName"];
+}
+
+<ul class="sidebar-nav">
+
+    @if (Model != null)
+    {
+        foreach (var menu in Model)
+        {
+            if (menu.MenuItems != null && menu.MenuItems.Count > 0)
+            {
+                /*
+                 * Existing helpers are currently returning AdminLTE-style
+                 * values such as:
+                 *
+                 * GetCurrentMenuOpen -> "menu-open"
+                 * GetCurrentMenu     -> "active"
+                 *
+                 * We reuse them only to determine whether this AppStack
+                 * section should be open/active.
+                 */
+
+                var currentMenu = Html.GetCurrentMenu(menu.MenuId).ToString();
+                var currentMenuOpen = Html.GetCurrentMenuOpen(menu.MenuId).ToString();
+
+                var isActive =
+                    currentMenu.Contains("active") ||
+                    currentMenuOpen.Contains("menu-open") ||
+                    currentMenuOpen.Contains("show");
+
+                var collapseId = "menu_" + menu.MenuId;
+
+                <li class="sidebar-item @(isActive ? "active" : "")">
+
+                    <a href="#@collapseId"
+                       data-bs-target="#@collapseId"
+                       data-bs-toggle="collapse"
+                       class="sidebar-link @(isActive ? "" : "collapsed")"
+                       aria-expanded="@(isActive ? "true" : "false")">
+
+                        @if (!string.IsNullOrWhiteSpace(menu.IconName))
+                        {
+                            <i class="align-middle @menu.IconName"></i>
+                        }
+                        else
+                        {
+                            <i class="align-middle fas fa-circle"></i>
+                        }
+
+                        <span class="align-middle">
+                            @menu.MenuName
+                        </span>
+
+                    </a>
+
+                    <ul id="@collapseId"
+                        class="sidebar-dropdown list-unstyled collapse @(isActive ? "show" : "")"
+                        data-bs-parent="#sidebar">
+
+                        @foreach (var menuItem in menu.MenuItems)
+                        {
+                            var currentPage = Html.GetCurrentPage(
+                                menuItem.Action,
+                                menuItem.Controller,
+                                menuItem.Area
+                            ).ToString();
+
+                            var isCurrentPage =
+                                currentPage.Contains("active");
+
+                            <li class="sidebar-item @(isCurrentPage ? "active" : "")">
+
+                                <a href="@Url.Action(
+                                            menuItem.Action,
+                                            menuItem.Controller,
+                                            new { Area = menuItem.Area }
+                                        )"
+                                   class="sidebar-link">
+
+                                    <span class="align-middle">
+                                        @menuItem.MenuItemName
+                                    </span>
+
+                                </a>
+
+                            </li>
+                        }
+
+                    </ul>
+
+                </li>
+            }
+        }
+    }
+
+
+    <!-- Playbook -->
+    @*<li class="sidebar-header">
+        Resources
+    </li>
+
+    <li class="sidebar-item">
+
+        <a href="#playbookMenu"
+           data-bs-target="#playbookMenu"
+           data-bs-toggle="collapse"
+           class="sidebar-link collapsed"
+           aria-expanded="false">
+
+            <i class="align-middle fas fa-users-cog"></i>
+
+            <span class="align-middle">
+                Playbook
+            </span>
+
+        </a>
+
+        <ul id="playbookMenu"
+            class="sidebar-dropdown list-unstyled collapse"
+            data-bs-parent="#sidebar">
+
+            <li class="sidebar-item">
+
+                <a href="@Url.Content("~/UploadedFiles/Playbook.pdf")"
+                   target="_blank"
+                   class="sidebar-link">
+
+                    <span class="align-middle">
+                        Playbook v
+                    </span>
+
+                </a>
+
+            </li>
+
+        </ul>
+
+    </li>*@
+
+</ul>
+

@@ -1,0 +1,591 @@
+﻿@using Service
+@model IEnumerable<Domain.AssetTransferRequest>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("Index", "AssetTransaction", FormMethod.Get))
+{
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card">
+
+                <div class="card-header">
+
+                    <h5 class="card-title mb-0">
+                        <i class="align-middle me-2" data-lucide="arrow-right-left"></i>
+                        Transactions
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-3">
+
+                            <label for="BranchId" class="form-label">
+                                Location
+                            </label>
+
+                            <select id="BranchId"
+                                    name="BranchId"
+                                    class="form-select select2">
+                            </select>
+
+                        </div>
+
+                        <div class="col-md-3">
+
+                            <label for="DepartmentId" class="form-label">
+                                Department
+                            </label>
+
+                            <select id="DepartmentId"
+                                    name="DepartmentId"
+                                    class="form-select select2">
+                            </select>
+
+                        </div>
+
+                        <div class="col-md-3">
+
+                            <label for="TransactionTypeId" class="form-label">
+                                Transaction Type
+                            </label>
+
+                            <select id="TransactionTypeId"
+                                    name="TransactionTypeId"
+                                    class="form-select select2">
+                            </select>
+
+                        </div>
+
+                        <div class="col-md-3">
+
+                            <label for="StatusId" class="form-label">
+                                Status
+                            </label>
+
+                            <select id="StatusId"
+                                    name="StatusId"
+                                    class="form-select select2">
+                            </select>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="row g-3 mt-1">
+
+                        <div class="col-md-3">
+
+                            <label for="StartDate" class="form-label">
+                                Initiated Date
+                            </label>
+
+                            <div class="input-group">
+
+                                <span class="input-group-text">
+                                    <i class="align-middle" data-lucide="calendar"></i>
+                                </span>
+
+                                <input type="date"
+                                       name="StartDate"
+                                       id="StartDate"
+                                       value="@ViewBag.StartDate"
+                                       class="form-control" />
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-3">
+
+                            <label for="EndDate" class="form-label">
+                                To
+                            </label>
+
+                            <div class="input-group">
+
+                                <span class="input-group-text">
+                                    <i class="align-middle" data-lucide="calendar"></i>
+                                </span>
+
+                                <input type="date"
+                                       name="EndDate"
+                                       id="EndDate"
+                                       value="@ViewBag.EndDate"
+                                       class="form-control" />
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="card-footer">
+
+                    <div class="d-flex justify-content-end">
+
+                        <button type="submit"
+                                class="btn btn-primary">
+
+                            <i class="align-middle me-1" data-lucide="search"></i>
+                            Search
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card">
+
+                <div class="card-body">
+
+                    <div class="table-responsive">
+
+                        <table id="dataTable"
+                               class="table table-striped table-hover align-middle w-100">
+
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Transaction Type</th>
+                                    <th>From Branch</th>
+                                    <th>From Department</th>
+                                    <th>To Branch</th>
+                                    <th>To Department</th>
+                                    <th>Status</th>
+                                    <th>Comment</th>
+                                    <th>Initiated By</th>
+                                    <th>Initiated Date</th>
+                                    <th>Authorized By</th>
+                                    <th>Authorized Date</th>
+                                    <th>Assigned To</th>
+                                    <th>Vendor</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+
+                                        <td>
+
+                                            <a href="@Html.EncodedActionLink("", "Info", "AssetTransaction", "", new { id = item.AssetTransferRequestId }, null)"
+                                               target="_blank">
+
+                                                @item.AssetTransferRequestId
+
+                                            </a>
+
+                                        </td>
+
+                                        <td>
+                                            @item.TransactionType.EnumDisplayName()
+                                        </td>
+
+                                        <td>
+                                            @item.BranchFrom.Name
+                                        </td>
+
+                                        <td>
+                                            @item.DepartmentFrom.DepartmentName
+                                        </td>
+
+                                        <td>
+                                            @item.Branch.Name
+                                        </td>
+
+                                        <td>
+                                            @item.Department.DepartmentName
+                                        </td>
+
+                                        <td>
+                                            @item.Status.EnumDisplayName()
+                                        </td>
+
+                                        <td>
+                                            @item.Comment
+                                        </td>
+
+                                        <td>
+                                            @item.InitiatedUser.FullName
+                                        </td>
+
+                                        <td>
+                                            @item.InitiatedDate
+                                        </td>
+
+                                        @if (item.AuthorizedBy != null)
+                                        {
+                                            <td>
+                                                @item.AuthorizedUser.FullName
+                                            </td>
+
+                                            <td>
+                                                @item.AuthorizedDate
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                            <td>N/A</td>
+                                            <td>N/A</td>
+                                        }
+
+                                        <td>
+
+                                            @if (item.AssignedTo != null)
+                                            {
+                                                @item.AssignedToUser.FullName
+                                            }
+                                            else
+                                            {
+                                                <span>N/A</span>
+                                            }
+
+                                        </td>
+
+                                        <td>
+
+                                            @if (item.VendorId != null)
+                                            {
+                                                @item.Vendor.VendorName
+                                            }
+                                            else
+                                            {
+                                                <span>N/A</span>
+                                            }
+
+                                        </td>
+
+                                    </tr>
+                                }
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+}
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            if ($.fn.select2) {
+
+                $(".select2").select2({
+                    width: "100%"
+                });
+
+            }
+
+            loadStatus();
+            loadTransactionType();
+            loadLocations();
+
+
+            if ($.fn.DataTable) {
+
+                $("#dataTable").DataTable({
+
+                    responsive: true,
+                    lengthChange: false,
+                    autoWidth: false,
+                    paging: false,
+
+                    buttons: [
+
+                        {
+                            extend: "excelHtml5",
+                            text: "Excel",
+                            title: "ITSM - Transactions",
+                            exportOptions: {
+                                modifier: {
+                                    page: "current"
+                                }
+                            }
+                        },
+
+                        {
+                            extend: "pdfHtml5",
+                            text: "PDF",
+                            title: "ITSM - Transactions",
+                            orientation: "landscape",
+                            exportOptions: {
+                                modifier: {
+                                    page: "current"
+                                }
+                            }
+                        },
+
+                        {
+                            extend: "print",
+                            text: "Print",
+                            title: "ITSM - Transactions",
+                            autoPrint: true
+                        },
+
+                        "colvis"
+
+                    ]
+
+                })
+                .buttons()
+                .container()
+                .appendTo("#dataTable_wrapper .col-md-6:eq(0)");
+
+            }
+
+        });
+
+
+        function parseJsonResult(data) {
+
+            if (typeof data === "string") {
+
+                try {
+                    return JSON.parse(data);
+                }
+                catch (e) {
+                    return [];
+                }
+
+            }
+
+            return data || [];
+
+        }
+
+
+        function loadLocations() {
+
+            $.getJSON(
+                '@Url.Action("GetItemListJsonResult", "Branch")',
+                function (data) {
+
+                    var dropDown =
+                        $("#BranchId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- All --</option>"
+                    );
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.BranchId,
+                                    text: item.Name
+                                })
+                            );
+
+                        }
+                    );
+
+                    var selectedId =
+                        '@ViewBag.BranchId';
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+                    if ($.fn.select2) {
+                        dropDown.trigger("change.select2");
+                    }
+
+                    loadDepartments();
+
+                }
+            );
+
+        }
+
+
+        $("#BranchId").on("change", function () {
+
+            loadDepartments();
+
+        });
+
+
+        function loadDepartments() {
+
+            var branchId =
+                $("#BranchId").val();
+
+
+            $.getJSON(
+                '@Url.Action("GetDepartmentListBtBranchIdJsonResult", "Department")',
+                {
+                    branchId: branchId
+                },
+                function (data) {
+
+                    var dropDown =
+                        $("#DepartmentId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- All --</option>"
+                    );
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.DepartmentId,
+                                    text: item.DepartmentName
+                                })
+                            );
+
+                        }
+                    );
+
+                    var selectedId =
+                        '@ViewBag.DepartmentId';
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+                    if ($.fn.select2) {
+                        dropDown.trigger("change.select2");
+                    }
+
+                }
+            );
+
+        }
+
+
+        function loadStatus() {
+
+            $.getJSON(
+                '@Url.Action("GetTransStatusJsonResult", "AssetTransaction")',
+                function (data) {
+
+                    var dropDown =
+                        $("#StatusId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- All --</option>"
+                    );
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.Id,
+                                    text: item.Name
+                                })
+                            );
+
+                        }
+                    );
+
+                    var selectedId =
+                        '@ViewBag.StatusId';
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+                    if ($.fn.select2) {
+                        dropDown.trigger("change.select2");
+                    }
+
+                }
+            );
+
+        }
+
+
+        function loadTransactionType() {
+
+            $.getJSON(
+                '@Url.Action("GetTransTypesJsonResult", "AssetTransaction")',
+                function (data) {
+
+                    var dropDown =
+                        $("#TransactionTypeId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- All --</option>"
+                    );
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.Id,
+                                    text: item.Name
+                                })
+                            );
+
+                        }
+                    );
+
+                    var selectedId =
+                        '@ViewBag.TransactionTypeId';
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+                    if ($.fn.select2) {
+                        dropDown.trigger("change.select2");
+                    }
+
+                }
+            );
+
+        }
+
+    </script>
+
+}

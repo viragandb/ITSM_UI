@@ -1,0 +1,151 @@
+﻿@model Domain.Event
+@using Service
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@Html.HiddenFor(model => model.EventId)
+
+@Html.Partial("_Event", Model)
+
+<div class="row g-3">
+
+    <div class="col-md-4">
+
+        <div class="card h-100">
+
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="align-middle me-2" data-lucide="user"></i>
+                    Requested By
+                </h5>
+            </div>
+
+            <div class="card-body text-center">
+
+                <img src="@Model.RequestedUser.ProImageName"
+                     alt="User Avatar"
+                     class="rounded-circle mb-3"
+                     style="width: 90px; height: 90px; object-fit: cover;" />
+
+                <h5 class="mb-1">
+                    @Model.RequestedUser.FullName
+                </h5>
+
+                <div class="text-muted mb-3">
+                    @Model.RequestedBy
+                </div>
+
+                <hr />
+
+                <div class="text-start">
+
+                    <div class="mb-3">
+                        <div class="fw-semibold">
+                            <i class="align-middle me-1" data-lucide="building-2"></i>
+                            Company
+                        </div>
+                        <div class="text-muted">
+                            @Model.RequestedUser.CompanyName
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="fw-semibold">
+                            <i class="align-middle me-1" data-lucide="briefcase"></i>
+                            Designation
+                        </div>
+                        <div class="text-muted">
+                            @Model.RequestedUser.DesignationName
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="fw-semibold">
+                            <i class="align-middle me-1" data-lucide="building"></i>
+                            Department
+                        </div>
+                        <div class="text-muted">
+                            @Model.RequestedUser.DepartmentName
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="fw-semibold">
+                            <i class="align-middle me-1" data-lucide="mail"></i>
+                            Email
+                        </div>
+                        <div class="text-muted text-break">
+                            @Model.RequestedUser.Email
+                        </div>
+                    </div>
+
+                    <div class="mb-0">
+                        <div class="fw-semibold">
+                            <i class="align-middle me-1" data-lucide="phone"></i>
+                            Contact No
+                        </div>
+                        <div class="text-muted">
+                            @Model.RequestedUser.ContactNo
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="col-md-8">
+
+        <div class="card h-100">
+
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="align-middle me-2" data-lucide="image"></i>
+                    Images
+                </h5>
+            </div>
+
+            <div class="card-body">
+
+                @if (Model.ItemsDocs != null && Model.ItemsDocs.Any())
+                {
+                    <div class="list-group list-group-flush">
+
+                        @foreach (var doc in Model.ItemsDocs)
+                        {
+                            <a href="@doc.FileUrl"
+                               target="_blank"
+                               class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+
+                                <span>
+                                    <i class="align-middle me-2" data-lucide="file-text"></i>
+                                    @doc.FileName
+                                </span>
+
+                                <i class="align-middle" data-lucide="external-link"></i>
+
+                            </a>
+                        }
+
+                    </div>
+                }
+                else
+                {
+                    <div class="text-muted">
+                        No images or documents available.
+                    </div>
+                }
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

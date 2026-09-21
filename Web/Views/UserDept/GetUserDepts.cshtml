@@ -1,0 +1,38 @@
+﻿@model IList<Domain.UserDepartment>
+
+@{
+    Layout = null;
+}
+
+<div class="row g-3">
+
+    @for (int i = 0; i < Model.Count; i++)
+    {
+        <div class="col-lg-3 col-md-4 col-sm-6">
+
+            <div class="form-check">
+
+                @Html.CheckBoxFor(
+                    model => Model[i].IsSelected,
+                    new
+                    {
+                        @class = "form-check-input myCheckbox"
+                    }
+                )
+
+                <label class="form-check-label"
+                       for="@Html.IdFor(model => Model[i].IsSelected)">
+                    @(Model[i].Department != null
+                        ? Model[i].Department.DepartmentName
+                        : "N/A")
+                </label>
+
+                @Html.HiddenFor(model => Model[i].DepartmentId)
+                @Html.HiddenFor(model => Model[i].UserDepartmentId)
+
+            </div>
+
+        </div>
+    }
+
+</div>

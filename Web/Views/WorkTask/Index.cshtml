@@ -1,0 +1,373 @@
+﻿@using Service
+@model IEnumerable<Domain.WorkTask>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("Index", "WorkTask", FormMethod.Get))
+{
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card">
+
+                <div class="card-header">
+
+                    <h5 class="card-title mb-0">
+                        <i class="align-middle me-2" data-lucide="file-text"></i>
+                        Work Notes
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+
+                            <label for="TeamId" class="form-label">
+                                Team
+                            </label>
+
+                            <select id="TeamId"
+                                    name="TeamId"
+                                    class="form-select">
+
+                                <option value=""></option>
+
+                            </select>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <label for="UserEmpNo" class="form-label">
+                                Task Owner
+                            </label>
+
+                            <select id="UserEmpNo"
+                                    name="UserEmpNo"
+                                    class="form-select">
+
+                                <option value=""></option>
+
+                            </select>
+
+                            <span class="text-danger"
+                                  data-valmsg-for="UserEmpNo"
+                                  data-valmsg-replace="true">
+                            </span>
+
+                        </div>
+
+                        <div class="col-md-3">
+
+                            <label for="StartDate" class="form-label">
+                                Task Date
+                            </label>
+
+                            <input type="date"
+                                   name="StartDate"
+                                   id="StartDate"
+                                   value="@ViewBag.StartDate"
+                                   class="form-control" />
+
+                        </div>
+
+                        <div class="col-md-3">
+
+                            <label for="EndDate" class="form-label">
+                                To
+                            </label>
+
+                            <input type="date"
+                                   name="EndDate"
+                                   id="EndDate"
+                                   value="@ViewBag.EndDate"
+                                   class="form-control" />
+
+                        </div>
+
+                        <div class="col-md-3">
+
+                            <label for="StatusId" class="form-label">
+                                Status
+                            </label>
+
+                            @Html.DropDownList(
+                                "StatusId",
+                                EnumHelper.GetSelectList(typeof(Domain.TaskStatusEnum)),
+                                "-- All --",
+                                new { @class = "form-select" }
+                            )
+
+                            <span class="text-danger"
+                                  data-valmsg-for="StatusId"
+                                  data-valmsg-replace="true">
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="card-footer">
+
+                    <div class="d-flex justify-content-end">
+
+                        <button type="submit"
+                                class="btn btn-sm btn-primary">
+
+                            <i class="align-middle me-1" data-lucide="search"></i>
+                            Search
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card">
+
+                <div class="card-body">
+
+                    <div class="table-responsive">
+
+                        <table id="dataTable"
+                               class="table table-striped table-hover align-middle">
+
+                            <thead>
+                                <tr>
+                                    <th>Task Owner</th>
+                                    <th>Task Date</th>
+                                    <th>Subject</th>
+                                    <th>Description</th>
+                                    <th>Start Time</th>
+                                    <th>End Time</th>
+                                    <th>Spent Hrs</th>
+                                    <th>Requested Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                @foreach (var item in Model)
+                                {
+                                    var statusColor = WorkTaskService.GetStatusColor(item.Status);
+
+                                    <tr>
+
+                                        <td>
+                                            @(item.TaskUser != null
+                                                ? item.TaskUser.FullName
+                                                : "N/A")
+                                        </td>
+
+                                        <td>
+                                            @item.TaskDate.ToShortDateString()
+                                        </td>
+
+                                        <td>
+                                            @item.Subject
+                                        </td>
+
+                                        <td>
+                                            @item.Description
+                                        </td>
+
+                                        <td>
+                                            @item.StartTime.ToShortTimeString()
+                                        </td>
+
+                                        <td>
+                                            @item.EndTime.ToShortTimeString()
+                                        </td>
+
+                                        <td>
+                                            @item.SpentTime
+                                        </td>
+
+                                        <td>
+                                            @item.RequestedDate
+                                        </td>
+
+                                        <td>
+                                            <span class="badge bg-@statusColor">
+                                                @item.Status.EnumDisplayName()
+                                            </span>
+                                        </td>
+
+                                    </tr>
+                                }
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+}
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $("#dataTable").DataTable({
+                paging: false,
+                lengthChange: true,
+                searching: true,
+                ordering: true,
+                info: true,
+                responsive: true,
+                autoWidth: false
+            });
+
+            loadTeams();
+
+        });
+
+
+        function parseJsonResult(data) {
+
+            if (typeof data === "string") {
+
+                try {
+                    return JSON.parse(data);
+                }
+                catch (e) {
+                    return [];
+                }
+
+            }
+
+            return data || [];
+        }
+
+
+        $("#TeamId").on("change", function () {
+
+            loadUsers();
+
+        });
+
+
+        function loadTeams() {
+
+            var dropDown = $("#TeamId");
+
+            dropDown.empty();
+
+            dropDown.append(
+                "<option value='0'>-- All --</option>"
+            );
+
+
+            $.getJSON(
+                '@Url.Action("GetTeamUserListJsonResult", "Team")',
+                function (data) {
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.TeamId,
+                                    text: item.TeamName
+                                })
+                            );
+
+                        }
+                    );
+
+
+                    var selectedTeamId = '@ViewBag.TeamId';
+
+                    if (selectedTeamId) {
+                        dropDown.val(selectedTeamId);
+                    }
+
+                    loadUsers();
+
+                }
+            );
+
+        }
+
+
+        function loadUsers() {
+
+            var teamId = $("#TeamId").val();
+
+            var dropDown = $("#UserEmpNo");
+
+            dropDown.empty();
+
+            dropDown.append(
+                "<option value='0'>-- All --</option>"
+            );
+
+
+            $.getJSON(
+                '@Url.Action("GetUsersByTeamIdJsonResult", "User")',
+                {
+                    teamId: teamId
+                },
+                function (data) {
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.EmpNo,
+                                    text:
+                                        item.EmpNo +
+                                        " - " +
+                                        item.FullName +
+                                        " (" +
+                                        (item.DesignationName || "") +
+                                        ")"
+                                })
+                            );
+
+                        }
+                    );
+
+
+                    var selectedEmpNo = '@ViewBag.UserEmpNo';
+
+                    if (selectedEmpNo) {
+                        dropDown.val(selectedEmpNo);
+                    }
+
+                }
+            );
+
+        }
+
+    </script>
+}

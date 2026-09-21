@@ -1,0 +1,1181 @@
+﻿@model Web.Models.TicketVM
+@using Service
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("CreateRequest", "ServiceDesk", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+
+    @Html.ValidationSummary(
+        true,
+        "",
+        new { @class = "alert alert-danger" }
+    )
+
+    @Html.HiddenFor(model => model.TicketType)
+    @Html.HiddenFor(model => model.TicketTypeId)
+    @Html.HiddenFor(model => model.RequestedBy)
+
+    <div class="row">
+
+        <div class="col-12">
+
+            <div class="card">
+
+                <div class="card-header">
+
+                    <h5 class="card-title mb-0">
+                        New @Model.TicketType.EnumDisplayName()
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="row g-4">
+
+                        <div class="col-lg-6">
+
+                            <div class="mb-3">
+
+                                @Html.LabelFor(
+                                    model => model.CategoryId,
+                                    new { @class = "form-label" }
+                                )
+
+                                @Html.DropDownListFor(
+                                    model => model.CategoryId,
+                                    new List<SelectListItem>(),
+                                    new { @class = "form-select" }
+                                )
+
+                                @Html.ValidationMessageFor(
+                                    model => model.CategoryId,
+                                    "",
+                                    new { @class = "text-danger" }
+                                )
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                @Html.LabelFor(
+                                    model => model.AssetTypeId,
+                                    new { @class = "form-label" }
+                                )
+
+                                @Html.DropDownListFor(
+                                    model => model.AssetTypeId,
+                                    new List<SelectListItem>(),
+                                    new { @class = "form-select" }
+                                )
+
+                                @Html.ValidationMessageFor(
+                                    model => model.AssetTypeId,
+                                    "",
+                                    new { @class = "text-danger" }
+                                )
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                @Html.LabelFor(
+                                    model => model.SubCategoryId,
+                                    new { @class = "form-label" }
+                                )
+
+                                @Html.DropDownListFor(
+                                    model => model.SubCategoryId,
+                                    new List<SelectListItem>(),
+                                    new { @class = "form-select" }
+                                )
+
+                                @Html.ValidationMessageFor(
+                                    model => model.SubCategoryId,
+                                    "",
+                                    new { @class = "text-danger" }
+                                )
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                @Html.LabelFor(
+                                    model => model.Subject,
+                                    new { @class = "form-label" }
+                                )
+
+                                @Html.TextBoxFor(
+                                    model => model.Subject,
+                                    new { @class = "form-control" }
+                                )
+
+                                @Html.ValidationMessageFor(
+                                    model => model.Subject,
+                                    "",
+                                    new { @class = "text-danger" }
+                                )
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                @Html.LabelFor(
+                                    model => model.Description,
+                                    new { @class = "form-label" }
+                                )
+
+                                @Html.TextAreaFor(
+                                    model => model.Description,
+                                    new
+                                    {
+                                        @class = "form-control",
+                                        rows = "5"
+                                    }
+                                )
+
+                                @Html.ValidationMessageFor(
+                                    model => model.Description,
+                                    "",
+                                    new { @class = "text-danger" }
+                                )
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-lg-6">
+
+                            <div class="row g-3"
+                                 id="OccurredDateTime">
+
+                                <div class="col-md-6">
+
+                                    <div class="mb-3">
+
+                                        @Html.LabelFor(
+                                            model => model.OccurredDate,
+                                            new { @class = "form-label" }
+                                        )
+
+                                        <div class="input-group">
+
+                                            @Html.TextBoxFor(
+                                                model => model.OccurredDate,
+                                                new
+                                                {
+                                                    @class = "form-control",
+                                                    type = "date"
+                                                }
+                                            )
+
+                                            <span class="input-group-text">
+
+                                                <i data-lucide="calendar"></i>
+
+                                            </span>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="col-md-6">
+
+                                    <div class="mb-3">
+
+                                        @Html.LabelFor(
+                                            model => model.OccurredTime,
+                                            new { @class = "form-label" }
+                                        )
+
+                                        <div class="input-group">
+
+                                            <input type="time"
+                                                   id="Occurred_Time"
+                                                   name="Occurred_Time"
+                                                   value="@ViewBag.OccurredTime"
+                                                   class="form-control" />
+
+                                            <span class="input-group-text">
+
+                                                <i data-lucide="clock"></i>
+
+                                            </span>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            <div id="In_Priority">
+
+                                <div class="card bg-body-tertiary border-0 mb-3">
+
+                                    <div class="card-body">
+
+                                        <div class="row g-3">
+
+                                            <div class="col-md-4">
+
+                                                @Html.LabelFor(
+                                                    model => model.Urgency,
+                                                    new { @class = "form-label" }
+                                                )
+
+                                                @Html.EnumDropDownListFor(
+                                                    model => model.Urgency,
+                                                    "-- Select --",
+                                                    new { @class = "form-select" }
+                                                )
+
+                                            </div>
+
+                                            <div class="col-md-4">
+
+                                                @Html.LabelFor(
+                                                    model => model.Impact,
+                                                    new { @class = "form-label" }
+                                                )
+
+                                                @Html.EnumDropDownListFor(
+                                                    model => model.Impact,
+                                                    "-- Select --",
+                                                    new { @class = "form-select" }
+                                                )
+
+                                            </div>
+
+                                            <div class="col-md-4">
+
+                                                @Html.LabelFor(
+                                                    model => model.TicketPriorityId,
+                                                    new { @class = "form-label" }
+                                                )
+
+                                                <div class="form-control bg-body">
+
+                                                    <span id="TicketPriority"
+                                                          class="fw-semibold">
+                                                    </span>
+
+                                                </div>
+
+                                                @Html.HiddenFor(
+                                                    model => model.TicketPriorityId
+                                                )
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                @Html.LabelFor(
+                                    model => model.BranchId,
+                                    new { @class = "form-label" }
+                                )
+
+                                @Html.DropDownListFor(
+                                    model => model.BranchId,
+                                    new List<SelectListItem>(),
+                                    new { @class = "form-select" }
+                                )
+
+                                @Html.ValidationMessageFor(
+                                    model => model.BranchId,
+                                    "",
+                                    new { @class = "text-danger" }
+                                )
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                @Html.LabelFor(
+                                    model => model.DepartmentId,
+                                    new { @class = "form-label" }
+                                )
+
+                                @Html.DropDownListFor(
+                                    model => model.DepartmentId,
+                                    new List<SelectListItem>(),
+                                    new { @class = "form-select" }
+                                )
+
+                                @Html.ValidationMessageFor(
+                                    model => model.DepartmentId,
+                                    "",
+                                    new { @class = "text-danger" }
+                                )
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                @Html.LabelFor(
+                                    model => model.ContactNo,
+                                    new { @class = "form-label" }
+                                )
+
+                                @Html.TextBoxFor(
+                                    model => model.ContactNo,
+                                    new { @class = "form-control" }
+                                )
+
+                                @Html.ValidationMessageFor(
+                                    model => model.ContactNo,
+                                    "",
+                                    new { @class = "text-danger" }
+                                )
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                @Html.LabelFor(
+                                    model => model.ContactEmail,
+                                    new { @class = "form-label" }
+                                )
+
+                                @Html.TextBoxFor(
+                                    model => model.ContactEmail,
+                                    new { @class = "form-control" }
+                                )
+
+                                @Html.ValidationMessageFor(
+                                    model => model.ContactEmail,
+                                    "",
+                                    new { @class = "text-danger" }
+                                )
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                @Html.LabelFor(
+                                    model => model.AssetId,
+                                    new { @class = "form-label" }
+                                )
+
+                                @Html.DropDownListFor(
+                                    model => model.AssetId,
+                                    new List<SelectListItem>(),
+                                    new { @class = "form-select select2" }
+                                )
+
+                                @Html.ValidationMessageFor(
+                                    model => model.AssetId,
+                                    "",
+                                    new { @class = "text-danger" }
+                                )
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                <label class="form-label">
+                                    Upload files
+                                </label>
+
+                                <div class="input-group">
+
+                                    <input type="file"
+                                           id="fileInput"
+                                           multiple
+                                           class="form-control" />
+
+                                    <button type="button"
+                                            id="fileButton"
+                                            class="btn btn-info">
+
+                                        <i data-lucide="upload"
+                                           class="me-1"></i>
+
+                                        Upload
+
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+                            <div id="uploadedFiles"
+                                 class="mt-3">
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="card-footer">
+
+                    @if (Model.PendingTickets > 0)
+                    {
+                        <div class="d-flex flex-wrap justify-content-end align-items-center gap-2">
+
+                            <span class="badge bg-danger p-2 fs-6">
+
+                                Please close your @Model.PendingTickets completed ticket/s before raising a new ticket.
+
+                            </span>
+
+                            <a href="@Url.Action("Complete", "MyTicket")"
+                               class="btn btn-primary">
+
+                                <i data-lucide="check-circle"
+                                   class="me-1"></i>
+
+                                Complete
+
+                            </a>
+
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="d-flex justify-content-end">
+
+                            <button type="submit"
+                                    id="btnSave"
+                                    class="btn btn-primary btnSubmitDisable">
+
+                                <i data-lucide="save"
+                                   class="me-1"></i>
+
+                                Save
+
+                            </button>
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+}
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            loadCategory();
+            loadPriority();
+            GetPriority();
+            loadLocations();
+            loadTempDocs();
+
+            $("#fileButton").on("click", function () {
+
+                var files = $("#fileInput").get(0).files;
+                var fileData = new FormData();
+
+                if (files.length > 0) {
+
+                    for (var i = 0; i < files.length; i++) {
+                        fileData.append("fileInput", files[i]);
+                    }
+
+                    $.ajax({
+                        type: "POST",
+                        url: "/Ticket/UploadFiles",
+                        dataType: "json",
+                        contentType: false,
+                        processData: false,
+                        data: fileData,
+                        success: function (result) {
+
+                            Swal.fire(
+                                "Completed",
+                                result,
+                                "success"
+                            );
+
+                            loadTempDocs();
+
+                        },
+                        error: function () {
+
+                            Swal.fire(
+                                "Something went wrong!",
+                                "Please try again",
+                                "error"
+                            );
+
+                        }
+                    });
+
+                }
+                else {
+
+                    Swal.fire(
+                        "Something went wrong!",
+                        "Please select the files.",
+                        "error"
+                    );
+
+                }
+
+            });
+
+        });
+
+
+        function parseJsonResult(data) {
+
+            if (typeof data === "string") {
+
+                try {
+                    return JSON.parse(data);
+                }
+                catch (e) {
+                    return [];
+                }
+
+            }
+
+            return data || [];
+
+        }
+
+
+        function loadTempDocs() {
+
+            $.getJSON(
+                '@Url.Action("GetTempDocListJsonResult", "Ticket")',
+                function (data) {
+
+                    var tempDocDiv = $("#uploadedFiles");
+
+                    tempDocDiv.empty();
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            var row = $('<div/>', {
+                                class: 'd-flex align-items-center gap-2 mb-2'
+                            });
+
+                            var deleteButton = $('<button/>', {
+                                type: 'button',
+                                class: 'btn btn-sm btn-danger',
+                                html: '<i data-lucide="trash-2"></i>'
+                            });
+
+                            deleteButton.on(
+                                'click',
+                                function () {
+                                    deleteDoc(item.TempDocId);
+                                }
+                            );
+
+                            var fileLink = $('<a/>', {
+                                href: item.FileUrl,
+                                target: '_blank',
+                                text: item.DocumentName
+                            });
+
+                            row.append(deleteButton);
+                            row.append(fileLink);
+
+                            tempDocDiv.append(row);
+
+                        }
+                    );
+
+                    if (window.lucide) {
+                        lucide.createIcons();
+                    }
+
+                }
+            );
+
+        }
+
+
+        function deleteDoc(itemId) {
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'Do you want to delete?',
+                icon: 'warning',
+                confirmButtonText: 'Yes',
+                cancelButtonText: 'No',
+                showCancelButton: true,
+                reverseButtons: true
+            }).then(function (result) {
+
+                if (result.isConfirmed || result.value) {
+
+                    $.ajax({
+                        url: '@Url.Action("DeleteTempDoc", "Ticket")',
+                        type: 'GET',
+                        dataType: 'json',
+                        data: {
+                            id: itemId
+                        },
+                        success: function (data) {
+
+                            if (data == "1") {
+
+                                Swal.fire(
+                                    "Deleted!",
+                                    "Record has been deleted",
+                                    "success"
+                                );
+
+                                loadTempDocs();
+
+                            }
+                            else {
+
+                                Swal.fire(
+                                    "Something went wrong!",
+                                    "Data is not deleted, Please try again",
+                                    "error"
+                                );
+
+                            }
+
+                        },
+                        error: function () {
+
+                            Swal.fire(
+                                "Something went wrong!",
+                                "Data is not deleted, Please try again",
+                                "error"
+                            );
+
+                        }
+                    });
+
+                }
+
+            });
+
+        }
+
+
+        function loadCategory() {
+
+            var valId = $('#TicketTypeId').val();
+
+            $.getJSON(
+                '@Url.Action("GetCategoryByTicketTypeListJsonResult", "Category")',
+                {
+                    ticketType: valId
+                },
+                function (data) {
+
+                    var dropDown = $("#CategoryId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- Select --</option>"
+                    );
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $('<option/>', {
+                                    value: item.CategoryId,
+                                    text: item.CategoryName
+                                })
+                            );
+
+                        }
+                    );
+
+                    var categoryId = '@ViewBag.CategoryId';
+
+                    if (categoryId) {
+                        dropDown.val(categoryId);
+                    }
+
+                    loadAssetType();
+
+                }
+            );
+
+        }
+
+
+        $("select#CategoryId").on(
+            "change",
+            function () {
+
+                loadAssetType();
+
+            }
+        );
+
+
+        function loadAssetType() {
+
+            var valId = $('#TicketTypeId').val();
+
+            var catId = $('#CategoryId').val();
+
+            var viewCategoryId = '@ViewBag.CategoryId';
+
+            if (viewCategoryId &&
+                viewCategoryId !== '0') {
+
+                catId = viewCategoryId;
+
+            }
+
+            $.getJSON(
+                '@Url.Action("GetAssetTypeByTicketTypeListJsonResult", "AssetType")',
+                {
+                    ticketType: valId,
+                    categoryId: catId
+                },
+                function (data) {
+
+                    var dropDown = $("#AssetTypeId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- Select --</option>"
+                    );
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $('<option/>', {
+                                    value: item.AssetTypeId,
+                                    text: item.AssetTypeName
+                                })
+                            );
+
+                        }
+                    );
+
+                    var assetTypeId = '@ViewBag.AssetTypeId';
+
+                    if (assetTypeId) {
+                        dropDown.val(assetTypeId);
+                    }
+
+                    loadSubCategory();
+
+                }
+            );
+
+        }
+
+
+        $("select#AssetTypeId").on(
+            "change",
+            function () {
+
+                loadSubCategory();
+                GetSubject();
+                loadAssets();
+
+            }
+        );
+
+
+        function loadSubCategory() {
+
+            var valId = $('#TicketTypeId').val();
+            var catId = $('#CategoryId').val();
+            var assetTId = $('#AssetTypeId').val();
+
+            var viewCategoryId = '@ViewBag.CategoryId';
+            var viewAssetTypeId = '@ViewBag.AssetTypeId';
+
+            if (viewCategoryId &&
+                viewCategoryId !== '0') {
+
+                catId = viewCategoryId;
+
+            }
+
+            if (viewAssetTypeId &&
+                viewAssetTypeId !== '0') {
+
+                assetTId = viewAssetTypeId;
+
+            }
+
+            $.getJSON(
+                '@Url.Action("GetSubCategoryByTicketTypeListJsonResult", "SubCategory")',
+                {
+                    ticketType: valId,
+                    categoryId: catId,
+                    assetTypeId: assetTId
+                },
+                function (data) {
+
+                    var dropDown = $("#SubCategoryId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- Select --</option>"
+                    );
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $('<option/>', {
+                                    value: item.SubCategoryId,
+                                    text: item.SubCategoryName
+                                })
+                            );
+
+                        }
+                    );
+
+                    var subCategoryId = '@ViewBag.SubCategoryId';
+
+                    if (subCategoryId) {
+                        dropDown.val(subCategoryId);
+                    }
+
+                    GetSubject();
+
+                }
+            );
+
+        }
+
+
+        $("select#SubCategoryId").on(
+            "change",
+            function () {
+
+                GetSubject();
+
+            }
+        );
+
+
+        $("select#Urgency").on(
+            "change",
+            function () {
+
+                loadPriority();
+
+            }
+        );
+
+
+        $("select#Impact").on(
+            "change",
+            function () {
+
+                loadPriority();
+
+            }
+        );
+
+
+        function loadPriority() {
+
+            var urgencyId = $('#Urgency').val();
+            var impactId = $('#Impact').val();
+
+            $("#TicketPriority").text("");
+            $("#TicketPriorityId").val("");
+
+            if (!urgencyId || !impactId) {
+                return;
+            }
+
+            $.getJSON(
+                '@Url.Action("GetTicketPriorityListJsonResult", "TicketPriority")',
+                {
+                    urgency: urgencyId,
+                    impact: impactId
+                },
+                function (data) {
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            $("#TicketPriority").text(
+                                item.TicketPriorityName
+                            );
+
+                            $("#TicketPriorityId").val(
+                                item.TicketPriorityId
+                            );
+
+                        }
+                    );
+
+                }
+            );
+
+        }
+
+
+        function GetPriority() {
+
+            var ticketType =
+                $("#TicketTypeId").val();
+
+            if (ticketType == 2) {
+
+                $("#In_Priority").show();
+                $("#OccurredDateTime").show();
+
+            }
+            else {
+
+                $("#In_Priority").hide();
+                $("#OccurredDateTime").hide();
+
+            }
+
+        }
+
+
+        function GetSubject() {
+
+            var sub1 = '';
+            var sub2 = '';
+
+            if ($("#AssetTypeId").val() != 0) {
+
+                sub1 =
+                    $("#AssetTypeId option:selected").text();
+
+            }
+
+            if ($("#SubCategoryId").val() != 0) {
+
+                sub2 =
+                    $("#SubCategoryId option:selected").text();
+
+            }
+
+            var subject =
+                $.trim(sub1 + ' - ' + sub2);
+
+            $('#Subject').val(subject);
+
+        }
+
+
+        function loadLocations() {
+
+            $.getJSON(
+                '@Url.Action("GetItemListJsonResult", "Branch")',
+                function (data) {
+
+                    var dropDown = $("#BranchId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- Select --</option>"
+                    );
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $('<option/>', {
+                                    value: item.BranchId,
+                                    text: item.Name
+                                })
+                            );
+
+                        }
+                    );
+
+                    var branchId =
+                        '@ViewBag.BranchId';
+
+                    if (branchId) {
+                        dropDown.val(branchId);
+                    }
+
+                    loadDepartments();
+
+                }
+            );
+
+        }
+
+
+        $("select#BranchId").on(
+            "change",
+            function () {
+
+                loadDepartments();
+
+            }
+        );
+
+
+        function loadDepartments(itemId) {
+
+            var branchId =
+                $('#BranchId').val();
+
+            $.getJSON(
+                '@Url.Action("GetDepartmentListBtBranchIdJsonResult", "Department")',
+                {
+                    branchId: branchId
+                },
+                function (data) {
+
+                    var dropDown =
+                        $("#DepartmentId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- Select --</option>"
+                    );
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $('<option/>', {
+                                    value: item.DepartmentId,
+                                    text: item.DepartmentName
+                                })
+                            );
+
+                        }
+                    );
+
+                    if (itemId) {
+                        dropDown.val(itemId);
+                    }
+
+                    var departmentId =
+                        '@ViewBag.DepartmentId';
+
+                    if (departmentId) {
+                        dropDown.val(departmentId);
+                    }
+
+                    loadAssets();
+
+                }
+            );
+
+        }
+
+
+        $("select#DepartmentId").on(
+            "change",
+            function () {
+
+                loadAssets();
+
+            }
+        );
+
+
+        function loadAssets() {
+
+            var branchId =
+                $('#BranchId').val();
+
+            var departmentId =
+                $('#DepartmentId').val();
+
+            var assetTypeId =
+                $('#AssetTypeId').val();
+
+            var requestUser =
+                $('#RequestedBy').val();
+
+            var dropDown =
+                $("#AssetId");
+
+            dropDown.empty();
+
+            dropDown.append(
+                "<option value='0'>-- Select --</option>"
+            );
+
+            if (
+                branchId > 0 &&
+                departmentId > 0 &&
+                assetTypeId > 0 &&
+                requestUser
+            ) {
+
+                $.getJSON(
+                    '@Url.Action("GetAssetListUserJsonResult", "Asset")',
+                    {
+                        branchId: branchId,
+                        assetTypeId: assetTypeId,
+                        deptId: departmentId,
+                        userId: requestUser
+                    },
+                    function (data) {
+
+                        $.each(
+                            parseJsonResult(data),
+                            function (index, item) {
+
+                                dropDown.append(
+                                    $('<option/>', {
+                                        value: item.AssetId,
+                                        text:
+                                            item.Barcode +
+                                            ' - ' +
+                                            item.AssetName
+                                    })
+                                );
+
+                            }
+                        );
+
+                    }
+                );
+
+            }
+
+        }
+
+    </script>
+
+}
+

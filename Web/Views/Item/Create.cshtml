@@ -1,0 +1,750 @@
+﻿@model Domain.Item
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="card">
+
+            <div class="card-header d-flex justify-content-between align-items-center">
+
+                <h5 class="card-title mb-0">
+                    <i class="align-middle me-2" data-lucide="plus"></i>
+                    Create New
+                </h5>
+
+                <a href="@Url.Action("Index", "Item")"
+                   class="btn btn-sm btn-light">
+
+                    <i class="align-middle me-1" data-lucide="arrow-left"></i>
+                    Back
+
+                </a>
+
+            </div>
+
+            @using (Html.BeginForm("Create", "Item", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true)
+
+                <div class="card-body">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+
+                            @Html.LabelFor(
+                                model => model.CompanyId,
+                                new { @class = "form-label" }
+                            )
+
+                            <select id="CompanyId"
+                                    name="CompanyId"
+                                    class="form-select">
+                                <option value=""></option>
+                            </select>
+
+                            <span class="text-danger"
+                                  data-valmsg-for="CompanyId"
+                                  data-valmsg-replace="true">
+                            </span>
+
+                            @Html.Hidden("CompanyName")
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            @Html.LabelFor(
+                                model => model.LocationId,
+                                new { @class = "form-label" }
+                            )
+
+                            <select id="LocationId"
+                                    name="LocationId"
+                                    class="form-select">
+                                <option value=""></option>
+                            </select>
+
+                            <span class="text-danger"
+                                  data-valmsg-for="LocationId"
+                                  data-valmsg-replace="true">
+                            </span>
+
+                            @Html.Hidden("LocationName")
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            @Html.LabelFor(
+                                model => model.DepartmentId,
+                                new { @class = "form-label" }
+                            )
+
+                            <select id="DepartmentId"
+                                    name="DepartmentId"
+                                    class="form-select">
+                                <option value=""></option>
+                            </select>
+
+                            <span class="text-danger"
+                                  data-valmsg-for="DepartmentId"
+                                  data-valmsg-replace="true">
+                            </span>
+
+                            @Html.Hidden("DepartmentName")
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            @Html.LabelFor(
+                                model => model.AssetTypeId,
+                                new { @class = "form-label" }
+                            )
+
+                            <select id="AssetTypeId"
+                                    name="AssetTypeId"
+                                    class="form-select">
+                                <option value=""></option>
+                            </select>
+
+                            <span class="text-danger"
+                                  data-valmsg-for="AssetTypeId"
+                                  data-valmsg-replace="true">
+                            </span>
+
+                            @Html.Hidden("AssetTypeName")
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            @Html.LabelFor(
+                                model => model.VendorId,
+                                new { @class = "form-label" }
+                            )
+
+                            <select id="VendorId"
+                                    name="VendorId"
+                                    class="form-select">
+                                <option value=""></option>
+                            </select>
+
+                            <span class="text-danger"
+                                  data-valmsg-for="VendorId"
+                                  data-valmsg-replace="true">
+                            </span>
+
+                            @Html.Hidden("VendorName")
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            @Html.LabelFor(
+                                model => model.ItemName,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.TextBoxFor(
+                                model => model.ItemName,
+                                new { @class = "form-control" }
+                            )
+
+                            @Html.ValidationMessageFor(
+                                model => model.ItemName,
+                                "",
+                                new { @class = "text-danger" }
+                            )
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            @Html.LabelFor(
+                                model => model.ItemSerialNo,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.TextBoxFor(
+                                model => model.ItemSerialNo,
+                                new { @class = "form-control" }
+                            )
+
+                            @Html.ValidationMessageFor(
+                                model => model.ItemSerialNo,
+                                "",
+                                new { @class = "text-danger" }
+                            )
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            @Html.LabelFor(
+                                model => model.ItemBarCode,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.TextBoxFor(
+                                model => model.ItemBarCode,
+                                new { @class = "form-control" }
+                            )
+
+                            @Html.ValidationMessageFor(
+                                model => model.ItemBarCode,
+                                "",
+                                new { @class = "text-danger" }
+                            )
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            @Html.LabelFor(
+                                model => model.ItemModelNo,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.TextBoxFor(
+                                model => model.ItemModelNo,
+                                new { @class = "form-control" }
+                            )
+
+                            @Html.ValidationMessageFor(
+                                model => model.ItemModelNo,
+                                "",
+                                new { @class = "text-danger" }
+                            )
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            @Html.LabelFor(
+                                model => model.ItemMake,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.TextBoxFor(
+                                model => model.ItemMake,
+                                new { @class = "form-control" }
+                            )
+
+                            @Html.ValidationMessageFor(
+                                model => model.ItemMake,
+                                "",
+                                new { @class = "text-danger" }
+                            )
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            @Html.LabelFor(
+                                model => model.ItemFixedAssetNo,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.TextBoxFor(
+                                model => model.ItemFixedAssetNo,
+                                new { @class = "form-control" }
+                            )
+
+                            @Html.ValidationMessageFor(
+                                model => model.ItemFixedAssetNo,
+                                "",
+                                new { @class = "text-danger" }
+                            )
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            @Html.LabelFor(
+                                model => model.ItemCost,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.TextBoxFor(
+                                model => model.ItemCost,
+                                new { @class = "form-control" }
+                            )
+
+                            @Html.ValidationMessageFor(
+                                model => model.ItemCost,
+                                "",
+                                new { @class = "text-danger" }
+                            )
+
+                        </div>
+
+
+                        <div class="col-md-3">
+
+                            @Html.LabelFor(
+                                model => model.ItemPurchaseDate,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.TextBoxFor(
+                                model => model.ItemPurchaseDate,
+                                "{0:yyyy-MM-dd}",
+                                new
+                                {
+                                    @class = "form-control",
+                                    type = "date"
+                                }
+                            )
+
+                            @Html.ValidationMessageFor(
+                                model => model.ItemPurchaseDate,
+                                "",
+                                new { @class = "text-danger" }
+                            )
+
+                        </div>
+
+
+                        <div class="col-md-3">
+
+                            @Html.LabelFor(
+                                model => model.ItemExpiryDate,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.TextBoxFor(
+                                model => model.ItemExpiryDate,
+                                "{0:yyyy-MM-dd}",
+                                new
+                                {
+                                    @class = "form-control",
+                                    type = "date"
+                                }
+                            )
+
+                            @Html.ValidationMessageFor(
+                                model => model.ItemExpiryDate,
+                                "",
+                                new { @class = "text-danger" }
+                            )
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="card-footer">
+
+                    <div class="d-flex justify-content-end gap-2">
+
+                        <button type="reset"
+                                class="btn btn-sm btn-danger">
+
+                            <i class="align-middle me-1" data-lucide="rotate-ccw"></i>
+                            Cancel
+
+                        </button>
+
+                        <button type="submit"
+                                class="btn btn-sm btn-primary">
+
+                            <i class="align-middle me-1" data-lucide="save"></i>
+                            Save
+
+                        </button>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+</div>
+
+
+@section scripts {
+
+    <script src="~/Scripts/jquery.validate.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            loadCompanies();
+            loadDepartments();
+            loadAssetType();
+            loadVendor();
+
+
+            $("#CompanyId").on("change", function () {
+
+                $("#CompanyName").val(
+                    $("#CompanyId option:selected").text()
+                );
+
+                loadLocation();
+
+            });
+
+
+            $("#LocationId").on("change", function () {
+
+                $("#LocationName").val(
+                    $("#LocationId option:selected").text()
+                );
+
+            });
+
+
+            $("#DepartmentId").on("change", function () {
+
+                $("#DepartmentName").val(
+                    $("#DepartmentId option:selected").text()
+                );
+
+            });
+
+
+            $("#AssetTypeId").on("change", function () {
+
+                $("#AssetTypeName").val(
+                    $("#AssetTypeId option:selected").text()
+                );
+
+            });
+
+
+            $("#VendorId").on("change", function () {
+
+                $("#VendorName").val(
+                    $("#VendorId option:selected").text()
+                );
+
+            });
+
+        });
+
+
+        function parseJsonResult(data) {
+
+            if (typeof data === "string") {
+
+                try {
+                    return JSON.parse(data);
+                }
+                catch (e) {
+                    return [];
+                }
+
+            }
+
+            return data || [];
+        }
+
+
+        function loadCompanies() {
+
+            $.getJSON(
+                '@Url.Action("GetCompanyListJsonResult", "Company")',
+                function (data) {
+
+                    var dropDown = $("#CompanyId");
+
+                    dropDown.empty();
+
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.CompanyId,
+                                    text: item.CompanyName
+                                })
+                            );
+
+                        }
+                    );
+
+
+                    var selectedId =
+                        '@ViewBag.CompanyId';
+
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+
+                    $("#CompanyName").val(
+                        dropDown.find("option:selected").text()
+                    );
+
+
+                    loadLocation();
+
+                }
+            );
+
+        }
+
+
+        function loadLocation() {
+
+            var companyId =
+                $("#CompanyId").val();
+
+
+            if (!companyId) {
+                companyId = 1;
+            }
+
+
+            var selectedCompanyId =
+                '@ViewBag.CompanyId';
+
+
+            if (selectedCompanyId &&
+                selectedCompanyId != "0") {
+
+                companyId =
+                    selectedCompanyId;
+
+            }
+
+
+            $.getJSON(
+                '@Url.Action("GetLocationListJsonResult", "Location")',
+                {
+                    CompanyId: companyId
+                },
+                function (data) {
+
+                    var dropDown =
+                        $("#LocationId");
+
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- Select --</option>"
+                    );
+
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.LocationId,
+                                    text: item.LocationName
+                                })
+                            );
+
+                        }
+                    );
+
+
+                    var selectedId =
+                        '@ViewBag.LocationId';
+
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+
+                    $("#LocationName").val(
+                        dropDown.find("option:selected").text()
+                    );
+
+                }
+            );
+
+        }
+
+
+        function loadDepartments() {
+
+            $.getJSON(
+                '@Url.Action("GetDepartmentListJsonResult", "Department")',
+                function (data) {
+
+                    var dropDown =
+                        $("#DepartmentId");
+
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- Select --</option>"
+                    );
+
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.DepartmentId,
+                                    text: item.DepartmentName
+                                })
+                            );
+
+                        }
+                    );
+
+
+                    var selectedId =
+                        '@ViewBag.DepartmentId';
+
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+
+                    $("#DepartmentName").val(
+                        dropDown.find("option:selected").text()
+                    );
+
+                }
+            );
+
+        }
+
+
+        function loadAssetType() {
+
+            var categoryId = 1;
+
+
+            $.getJSON(
+                '@Url.Action("GetAssetTypeByAssetCategoryListJsonResult", "AssetType")',
+                {
+                    assetCategory: categoryId
+                },
+                function (data) {
+
+                    var dropDown =
+                        $("#AssetTypeId");
+
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- Select --</option>"
+                    );
+
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.AssetTypeId,
+                                    text: item.AssetTypeName
+                                })
+                            );
+
+                        }
+                    );
+
+
+                    var selectedId =
+                        '@ViewBag.AssetTypeId';
+
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+
+                    $("#AssetTypeName").val(
+                        dropDown.find("option:selected").text()
+                    );
+
+                }
+            );
+
+        }
+
+
+        function loadVendor() {
+
+            $.getJSON(
+                '@Url.Action("GetVendorListJsonResult", "Vendor")',
+                function (data) {
+
+                    var dropDown =
+                        $("#VendorId");
+
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- Select --</option>"
+                    );
+
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.VendorId,
+                                    text: item.VendorName
+                                })
+                            );
+
+                        }
+                    );
+
+
+                    var selectedId =
+                        '@ViewBag.VendorId';
+
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+
+                    $("#VendorName").val(
+                        dropDown.find("option:selected").text()
+                    );
+
+                }
+            );
+
+        }
+
+    </script>
+}

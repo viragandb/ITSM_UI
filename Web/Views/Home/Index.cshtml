@@ -1,0 +1,1673 @@
+﻿@model IEnumerable<Domain.Ticket>
+@using Service
+@using Domain
+
+@{
+    ViewBag.Title = "Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var totalTickets = Model.Count();
+
+    var pendingTickets = Model.Where(w => (int)w.Status <= 5).ToList();
+    var inProgressTickets = Model.Where(w => (int)w.Status > 5 && (int)w.Status < 25).ToList();
+    var vendorTickets = Model.Where(w => (int)w.Status >= 25 && (int)w.Status < 40).ToList();
+    var toBeClosedTickets = Model.Where(w => w.Status == TicketStatusEnum.Completed).ToList();
+
+    var currentUserId = Session["UserId"] != null
+        ? Session["UserId"].ToString()
+        : "";
+
+    var rateAndCloseTickets = Model
+        .Where(w =>
+            w.Status == TicketStatusEnum.Completed &&
+            w.RequestedBy == currentUserId)
+        .ToList();
+}
+
+<style>
+    /* Override accent-card styling with vibrant gradient theme */
+    .accent-card {
+        border: none;
+        border-top: none !important;
+        border-radius: 5px;
+        color: #fff;
+        overflow: hidden;
+        box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+    }
+
+        .accent-card .card-title {
+            color: rgba(255,255,255,0.9);
+            font-weight: 500;
+        }
+
+        .accent-card .h1 {
+            color: #fff;
+            font-weight: 700;
+        }
+
+        .accent-card .stat-sm {
+            background: rgba(255,255,255,0.25);
+            border-radius: 10px;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+            .accent-card .stat-sm i {
+                color: #fff;
+                stroke: #fff;
+            }
+
+        .accent-card a {
+            color: rgba(255,255,255,0.9) !important;
+            font-weight: 500;
+        }
+
+            .accent-card a:hover {
+                color: #fff !important;
+            }
+
+    /* Color variants */
+    .accent-orange {
+        background: linear-gradient(135deg, #fe6100, #ff9248);
+    }
+
+    .accent-blue {
+        background: linear-gradient(135deg, #007bff, #5aa9ff);
+    }
+
+    .accent-navy {
+        background: linear-gradient(135deg, #1e2a5a, #3b4a8c);
+    }
+
+    .accent-blue-light {
+        background: linear-gradient(135deg, #6a5af9, #9d8cff);
+    }
+
+    .accent-orange-light {
+        background: linear-gradient(135deg, #00c896, #5eead4);
+    }
+
+
+    main {
+        background-image: url(Images/bg--3.png);
+        background-repeat: no-repeat;
+        background-position: right center;
+        background-size: 405px;
+    }
+    </style>
+
+<!-- Page Header -->
+<div class="row mb-3">
+
+    <div class="col-auto">
+        <h3 class="mb-0">Service Desk Dashboard</h3>
+        <div class="page-rule"></div>
+    </div>
+
+</div>
+
+
+<!-- QUICK ACTIONS -->
+<div class="row">
+
+    <div class="col-sm-6 col-lg-4 col-xl-2 d-flex">
+
+        <a href="@Url.Action("ServiceRequest", "ServiceDesk")"
+           class="card flex-fill text-decoration-none text-body" style=" border-radius: 15px;">
+
+            <div class="card-body text-center">
+
+                <div class="stat mx-auto mb-3 gradient-1">
+                    <i data-lucide="archive"></i>
+                </div>
+
+                <h5 class="mb-0">
+                    @TicketTypeEnum.SR.EnumDisplayName()
+                </h5>
+
+            </div>
+
+        </a>
+
+    </div>
+
+
+    <div class="col-sm-6 col-lg-4 col-xl-2 d-flex">
+
+        <a href="@Url.Action("Incident", "ServiceDesk")"
+           class="card flex-fill text-decoration-none text-body" style=" border-radius: 22px;">
+
+            <div class="card-body text-center">
+
+                <div class="stat mx-auto mb-3 gradient-2">
+                    <i data-lucide="tag"></i>
+                </div>
+
+                <h5 class="mb-0">
+                    @TicketTypeEnum.IN.EnumDisplayName()
+                </h5>
+
+            </div>
+
+        </a>
+
+    </div>
+
+
+    <div class="col-sm-6 col-lg-4 col-xl-2 d-flex">
+
+        <a href="@Url.Action("Create", "IncidentRequest")"
+           class="card flex-fill text-decoration-none text-body" style=" border-radius: 22px;">
+
+            <div class="card-body text-center">
+
+                <div class="stat mx-auto mb-3 gradient-3">
+                    <i data-lucide="megaphone"></i>
+                </div>
+
+                <h5 class="mb-0">
+                    Incident
+                </h5>
+
+            </div>
+
+        </a>
+
+    </div>
+
+
+    <div class="col-sm-6 col-lg-4 col-xl-2 d-flex">
+
+        <a href="@Url.Action("NewRequest", "AccessRequest")"
+           class="card flex-fill text-decoration-none text-body" style=" border-radius: 22px;">
+
+            <div class="card-body text-center">
+
+                <div class="stat mx-auto mb-3 gradient-4">
+                    <i data-lucide="key"></i>
+                </div>
+
+                <h5 class="mb-0">
+                    Access Request
+                </h5>
+
+            </div>
+
+        </a>
+
+    </div>
+
+
+    <div class="col-sm-6 col-lg-4 col-xl-2 d-flex">
+
+        <a href="@Url.Action("Create", "ChangeRequest")"
+           class="card flex-fill text-decoration-none text-body" style=" border-radius: 22px;">
+
+            <div class="card-body text-center">
+
+                <div class="stat mx-auto mb-3 gradient-5">
+                    <i data-lucide="settings"></i>
+                </div>
+
+                <h5 class="mb-0">
+                    Change Request
+                </h5>
+
+            </div>
+
+        </a>
+
+    </div>
+
+
+    <div class="col-sm-6 col-lg-4 col-xl-2 d-flex">
+
+        <a href="@Url.Action("MyAssets", "Asset")"
+           class="card flex-fill text-decoration-none text-body" style=" border-radius: 22px;">
+
+            <div class="card-body text-center">
+
+                <div class="stat mx-auto mb-3 gradient-6">
+                    <i data-lucide="plug"></i>
+                </div>
+
+                <h5 class="mb-0">
+                    My Assets
+                </h5>
+
+            </div>
+
+        </a>
+
+    </div>
+
+</div>
+
+
+
+<div class="row mt-3">
+
+    <!-- LEFT SECTION -->
+    <div class="col-xl-9">
+
+        <!-- STATUS CARDS -->
+        <div class="row g-3">
+
+            <!-- Pending -->
+            <div class="col-sm-6 col-lg-4 col-xl d-flex">
+
+                <div class="card flex-fill accent-card accent-orange">
+
+                    <div class="card-body">
+
+                        <div class="row">
+                            <div class="col-12">
+                                <h6 class="card-title">
+                                    Pending
+                                </h6>
+                            </div>
+                        </div>
+
+                        <div class="row mt-3 align-items-center">
+
+                            <div class="col-auto">
+
+                                <div class="stat stat-sm">
+
+                                    <i class="align-middle"
+                                       data-lucide="tags"></i>
+
+                                </div>
+
+                            </div>
+
+                            <div class="col px-0">
+
+                                <span class="h1 d-inline-block mb-0">
+                                    @pendingTickets.Count
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                        <div class="mt-3">
+
+                            <a href="#"
+                               class="text-decoration-none"
+                               data-bs-toggle="modal"
+                               data-bs-target="#modalUpdate_Pending">
+
+                                More info
+
+                                <i class="align-middle ms-1"
+                                   data-lucide="arrow-right-circle"></i>
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- In Progress -->
+            <div class="col-sm-6 col-lg-4 col-xl d-flex">
+
+                <div class="card flex-fill accent-card accent-blue">
+
+                    <div class="card-body">
+
+                        <div class="row">
+                            <div class="col-12">
+                                <h6 class="card-title">
+                                    In Progress
+                                </h6>
+                            </div>
+                        </div>
+
+                        <div class="row mt-3 align-items-center">
+
+                            <div class="col-auto">
+
+                                <div class="stat stat-sm">
+
+                                    <i class="align-middle"
+                                       data-lucide="settings"></i>
+
+                                </div>
+
+                            </div>
+
+                            <div class="col px-0">
+
+                                <span class="h1 d-inline-block mb-0">
+                                    @inProgressTickets.Count
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                        <div class="mt-3">
+
+                            <a href="#"
+                               class="text-decoration-none"
+                               data-bs-toggle="modal"
+                               data-bs-target="#modalUpdate_InProgress">
+
+                                More info
+
+                                <i class="align-middle ms-1"
+                                   data-lucide="arrow-right-circle"></i>
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Vendor -->
+            <div class="col-sm-6 col-lg-4 col-xl d-flex">
+
+                <div class="card flex-fill accent-card accent-navy">
+
+                    <div class="card-body">
+
+                        <div class="row">
+                            <div class="col-12">
+                                <h6 class="card-title">
+                                    Vendor Tickets
+                                </h6>
+                            </div>
+                        </div>
+
+                        <div class="row mt-3 align-items-center">
+
+                            <div class="col-auto">
+
+                                <div class="stat stat-sm">
+
+                                    <i class="align-middle"
+                                       data-lucide="briefcase"></i>
+
+                                </div>
+
+                            </div>
+
+                            <div class="col px-0">
+
+                                <span class="h1 d-inline-block mb-0">
+                                    @vendorTickets.Count
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                        <div class="mt-3">
+
+                            <a href="#"
+                               class="text-decoration-none"
+                               data-bs-toggle="modal"
+                               data-bs-target="#modalUpdate_Vendor">
+
+                                More info
+
+                                <i class="align-middle ms-1"
+                                   data-lucide="arrow-right-circle"></i>
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- To Be Closed -->
+            <div class="col-sm-6 col-lg-4 col-xl d-flex">
+
+                <div class="card flex-fill accent-card accent-blue-light">
+
+                    <div class="card-body">
+
+                        <div class="row">
+                            <div class="col-12">
+                                <h6 class="card-title">
+                                    To Be Closed
+                                </h6>
+                            </div>
+                        </div>
+
+                        <div class="row mt-3 align-items-center">
+
+                            <div class="col-auto">
+
+                                <div class="stat stat-sm">
+
+                                    <i class="align-middle"
+                                       data-lucide="check-circle"></i>
+
+                                </div>
+
+                            </div>
+
+                            <div class="col px-0">
+
+                                <span class="h1 d-inline-block mb-0">
+                                    @toBeClosedTickets.Count
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                        <div class="mt-3">
+
+                            <a href="#"
+                               class="text-decoration-none"
+                               data-bs-toggle="modal"
+                               data-bs-target="#modalUpdate_TobeClosed">
+
+                                More info
+
+                                <i class="align-middle ms-1"
+                                   data-lucide="arrow-right-circle"></i>
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Rate And Close -->
+            <div class="col-sm-6 col-lg-4 col-xl d-flex">
+
+                <div class="card flex-fill accent-card accent-orange-light">
+
+                    <div class="card-body">
+
+                        <div class="row">
+                            <div class="col-12">
+                                <h6 class="card-title">
+                                    Rate & Close
+                                </h6>
+                            </div>
+                        </div>
+
+                        <div class="row mt-3 align-items-center">
+
+                            <div class="col-auto">
+
+                                <div class="stat stat-sm">
+
+                                    <i class="align-middle"
+                                       data-lucide="star"></i>
+
+                                </div>
+
+                            </div>
+
+                            <div class="col px-0">
+
+                                <span class="h1 d-inline-block mb-0">
+                                    @rateAndCloseTickets.Count
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                        <div class="mt-3">
+
+                            <a href="#"
+                               class="text-decoration-none"
+                               data-bs-toggle="modal"
+                               data-bs-target="#modalUpdate_RateAndClose">
+
+                                More info
+
+                                <i class="align-middle ms-1"
+                                   data-lucide="arrow-right-circle"></i>
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- CATEGORY CARDS -->
+        <div class="row g-2 mt-1">
+
+            @{
+                var cardStyles = new[]
+                {
+            "text-bg-primary",
+            "text-bg-success",
+            "text-bg-info",
+            "text-bg-warning",
+            "text-bg-danger",
+            "text-bg-dark"
+        };
+
+                var iconTextStyles = new[]
+                {
+            "text-primary",
+            "text-success",
+            "text-info",
+            "text-warning",
+            "text-danger",
+            "text-dark"
+        };
+
+                var cardIndex = 0;
+            }
+
+            @foreach (Category cat in SystemService.GetCategories())
+            {
+                var categoryTickets = Model
+                    .Where(w =>
+                        w.RequestType != null &&
+                        w.RequestType.CategoryId == cat.CategoryId)
+                    .ToList();
+
+                if (categoryTickets.Count > 0)
+                {
+                    var cardStyle = cardStyles[cardIndex % cardStyles.Length];
+                    var iconTextStyle = iconTextStyles[cardIndex % iconTextStyles.Length];
+
+                    <div class="col-sm-6 col-lg-4 col-xl-3 d-flex">
+
+                        <a href="#"
+                           class="text-decoration-none w-100"
+                           data-bs-toggle="modal"
+                           data-bs-target="#modalUpdate_Cat_@cat.CategoryId">
+
+                            <div class="card widget-flat @cardStyle h-100">
+
+                                <div class="card-body p-3">
+
+                                    <div class="float-end">
+
+                                        <div class="widget-icon bg-white rounded-circle d-flex align-items-center justify-content-center"
+                                             style="width:46px;height:46px;">
+
+                                            <i class="fas fa-folder @iconTextStyle"></i>
+
+                                        </div>
+
+                                    </div>
+
+                                    <h6 class="text-uppercase text-reset mt-0 mb-1"
+                                        title="@cat.CategoryName">
+
+                                        @cat.CategoryName
+
+                                    </h6>
+
+                                    <h3 class="mt-3 mb-2 text-reset">
+                                        @categoryTickets.Count
+                                    </h3>
+
+                                    <p class="mb-0">
+
+                                        <span class="badge bg-white bg-opacity-10 me-1">
+
+                                            <i class="fas fa-ticket-alt me-1"></i>
+
+                                            @categoryTickets.Count
+
+                                        </span>
+
+                                        <span class="text-nowrap text-reset">
+                                            Tickets
+                                        </span>
+
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </a>
+
+                    </div>
+
+
+                    <!-- Category Modal -->
+                    <div class="modal fade"
+                         id="modalUpdate_Cat_@cat.CategoryId"
+                         tabindex="-1"
+                         aria-hidden="true">
+
+                        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+
+                            <div class="modal-content">
+
+                                <div class="modal-header">
+
+                                    <h5 class="modal-title">
+
+                                        <i class="fas fa-folder me-2"></i>
+
+                                        @cat.CategoryName
+
+                                        <span class="badge bg-primary ms-2">
+                                            @categoryTickets.Count
+                                        </span>
+
+                                    </h5>
+
+                                    <button type="button"
+                                            class="btn-close"
+                                            data-bs-dismiss="modal"
+                                            aria-label="Close">
+                                    </button>
+
+                                </div>
+
+                                <div class="modal-body">
+
+                                    <div class="table-responsive">
+
+                                        <table class="table table-hover align-middle dataTableModel">
+
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Asset Type</th>
+                                                    <th>Subcategory</th>
+                                                    <th>Location</th>
+                                                    <th>Status</th>
+                                                    <th>Requested Date</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+
+                                                @foreach (var item in categoryTickets)
+                                                {
+                                                    <tr>
+
+                                                        <td>
+
+                                                            <a href="@Html.EncodedActionLink(
+                                                                 "",
+                                                                 "Info",
+                                                                 "Ticket",
+                                                                 "",
+                                                                 new { id = item.TicketId },
+                                                                 null)"
+                                                               target="_blank"
+                                                               class="fw-semibold">
+
+                                                                @item.Code
+
+                                                            </a>
+
+                                                        </td>
+
+                                                        <td>
+                                                            @(item.RequestType != null &&
+                                                      item.RequestType.AssetType != null
+                                                        ? item.RequestType.AssetType.AssetTypeName
+                                                        : "N/A")
+                                                        </td>
+
+                                                        <td>
+                                                            @(item.RequestType != null &&
+                                                      item.RequestType.SubCategory != null
+                                                        ? item.RequestType.SubCategory.SubCategoryName
+                                                        : "N/A")
+                                                        </td>
+
+                                                        <td>
+                                                            @(item.Branch != null
+                                                        ? item.Branch.Name
+                                                        : "N/A")
+                                                        </td>
+
+                                                        <td>
+
+                                                            <span class="badge bg-@TicketService.GetTicketStatusColor(item.Status)">
+                                                                @item.Status.EnumDisplayName()
+                                                            </span>
+
+                                                        </td>
+
+                                                        <td>
+                                                            @item.RequestedDate.ToShortDateString()
+                                                        </td>
+
+                                                    </tr>
+                                                }
+
+                                            </tbody>
+
+                                        </table>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="modal-footer">
+
+                                    <button type="button"
+                                            class="btn btn-sm btn-secondary"
+                                            data-bs-dismiss="modal">
+
+                                        <i class="fas fa-times me-1"></i>
+                                        Close
+
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    cardIndex++;
+                }
+            }
+
+        </div>
+
+    </div>
+
+
+    <!-- RIGHT SECTION -->
+    <div class="col-xl-3">
+
+        <div class="card illustration h-100 shadow-none">
+
+            <div class="card-header">
+
+                <h5 class="card-title mb-0">
+
+                    <i class="align-middle me-2"
+                       data-lucide="check-square"></i>
+
+                    Team Wise - Tickets
+
+                </h5>
+
+            </div>
+
+            <div class="card-body">
+
+                @foreach (Team team in SystemService.GetTeams())
+                {
+                    double itemCount = 0;
+                    double itemCountP = 0;
+
+                    if (totalTickets > 0)
+                    {
+                        itemCount = Model
+                            .Where(w => w.PendingTeamId == team.TeamId)
+                            .Count();
+
+                        if (itemCount > 0)
+                        {
+                            itemCountP = itemCount * 100 / totalTickets;
+                            itemCountP = Math.Round(itemCountP, 2);
+                        }
+                    }
+
+                    if (itemCount > 0)
+                    {
+                        <div class="mb-4">
+
+                            <a href="#"
+                               class="text-decoration-none text-body"
+                               data-bs-toggle="modal"
+                               data-bs-target="#modalUpdate_Team_@team.TeamId">
+
+                                <div class="d-flex justify-content-between mb-1">
+
+                                    <span>
+                                        @team.TeamName
+                                    </span>
+
+                                    <span>
+                                        <strong>@itemCount</strong>
+                                        /
+                                        @totalTickets
+                                    </span>
+
+                                </div>
+
+                                <div class="d-flex justify-content-between mb-1">
+
+                                    <small class="text-muted">
+                                        @itemCountP%
+                                    </small>
+
+                                </div>
+
+                                <div class="progress"
+                                     style="height:6px;">
+
+                                    <div class="progress-bar"
+                                         role="progressbar"
+                                         style="width:@itemCountP%"
+                                         aria-valuenow="@itemCountP"
+                                         aria-valuemin="0"
+                                         aria-valuemax="100">
+                                    </div>
+
+                                </div>
+
+                            </a>
+
+                        </div>
+
+
+                        <!-- Team Modal -->
+                        <div class="modal fade"
+                             id="modalUpdate_Team_@team.TeamId"
+                             tabindex="-1"
+                             aria-hidden="true">
+
+                            <div class="modal-dialog modal-xl modal-dialog-scrollable">
+
+                                <div class="modal-content">
+
+                                    <div class="modal-header">
+
+                                        <h5 class="modal-title">
+
+                                            <i class="align-middle me-2"
+                                               data-lucide="users"></i>
+
+                                            @team.TeamName
+
+                                        </h5>
+
+                                        <button type="button"
+                                                class="btn-close"
+                                                data-bs-dismiss="modal"
+                                                aria-label="Close">
+                                        </button>
+
+                                    </div>
+
+                                    <div class="modal-body">
+
+                                        <div class="table-responsive">
+
+                                            <table class="table table-hover align-middle dataTableModel2">
+
+                                                <thead>
+                                                    <tr>
+                                                        <th>#</th>
+                                                        <th>Category</th>
+                                                        <th>Asset Type</th>
+                                                        <th>Subcategory</th>
+                                                        <th>Location</th>
+                                                        <th>Status</th>
+                                                        <th>Requested Date</th>
+                                                    </tr>
+                                                </thead>
+
+                                                <tbody>
+
+                                                    @foreach (var item in Model.Where(w => w.PendingTeamId == team.TeamId))
+                                                    {
+                                                        <tr>
+
+                                                            <td>
+
+                                                                <a href="@Html.EncodedActionLink(
+                                                                             "",
+                                                                             "Info",
+                                                                             "Ticket",
+                                                                             "",
+                                                                             new { id = item.TicketId },
+                                                                             null)"
+                                                                   target="_blank">
+
+                                                                    @item.Code
+
+                                                                </a>
+
+                                                            </td>
+
+                                                            <td>
+                                                                @(item.RequestType != null &&
+                                                                  item.RequestType.Category != null
+                                                                    ? item.RequestType.Category.CategoryName
+                                                                    : "N/A")
+                                                            </td>
+
+                                                            <td>
+                                                                @(item.RequestType != null &&
+                                                                  item.RequestType.AssetType != null
+                                                                    ? item.RequestType.AssetType.AssetTypeName
+                                                                    : "N/A")
+                                                            </td>
+
+                                                            <td>
+                                                                @(item.RequestType != null &&
+                                                                  item.RequestType.SubCategory != null
+                                                                    ? item.RequestType.SubCategory.SubCategoryName
+                                                                    : "N/A")
+                                                            </td>
+
+                                                            <td>
+                                                                @(item.Branch != null
+                                                                    ? item.Branch.Name
+                                                                    : "N/A")
+                                                            </td>
+
+                                                            <td>
+
+                                                                <span class="badge bg-@TicketService.GetTicketStatusColor(item.Status)">
+                                                                    @item.Status.EnumDisplayName()
+                                                                </span>
+
+                                                            </td>
+
+                                                            <td>
+                                                                @item.RequestedDate.ToShortDateString()
+                                                            </td>
+
+                                                        </tr>
+                                                    }
+
+                                                </tbody>
+
+                                            </table>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="modal-footer">
+
+                                        <button type="button"
+                                                class="btn btn-sm btn-secondary"
+                                                data-bs-dismiss="modal">
+
+                                            <i class="align-middle me-1"
+                                               data-lucide="x"></i>
+
+                                            Close
+
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    }
+                }
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ========================================================= -->
+<!-- STATUS MODALS -->
+<!-- ========================================================= -->
+<!-- Pending Modal -->
+<div class="modal fade"
+     id="modalUpdate_Pending"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title">
+
+                    <i class="align-middle me-2"
+                       data-lucide="tags"></i>
+
+                    Pending
+
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <div class="table-responsive">
+
+                    <table class="table table-hover align-middle dataTableModel">
+
+                        <thead>
+
+                            <tr>
+                                <th>#</th>
+                                <th>Category</th>
+                                <th>Asset Type</th>
+                                <th>Subcategory</th>
+                                <th>Location</th>
+                                <th>Requested Date</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            @foreach (var item in pendingTickets)
+                            {
+                                <tr>
+
+                                    <td>
+
+                                        <a href="@Html.EncodedActionLink("", "Info", "Ticket", "", new { id = item.TicketId }, null)"
+                                           target="_blank">
+
+                                            @item.Code
+
+                                        </a>
+
+                                    </td>
+
+                                    <td>
+                                        @item.RequestType.Category.CategoryName
+                                    </td>
+
+                                    <td>
+                                        @item.RequestType.AssetType.AssetTypeName
+                                    </td>
+
+                                    <td>
+                                        @item.RequestType.SubCategory.SubCategoryName
+                                    </td>
+
+                                    <td>
+                                        @item.Branch.Name
+                                    </td>
+
+                                    <td>
+                                        @item.RequestedDate.ToShortDateString()
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal">
+
+                    Close
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- In Progress Modal -->
+<div class="modal fade"
+     id="modalUpdate_InProgress"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title">
+
+                    <i class="align-middle me-2"
+                       data-lucide="settings"></i>
+
+                    In Progress
+
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <div class="table-responsive">
+
+                    <table class="table table-hover align-middle dataTableModel">
+
+                        <thead>
+
+                            <tr>
+                                <th>#</th>
+                                <th>Category</th>
+                                <th>Asset Type</th>
+                                <th>Subcategory</th>
+                                <th>Location</th>
+                                <th>Requested Date</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            @foreach (var item in inProgressTickets)
+                            {
+                                <tr>
+
+                                    <td>
+
+                                        <a href="@Html.EncodedActionLink("", "Info", "Ticket", "", new { id = item.TicketId }, null)"
+                                           target="_blank">
+
+                                            @item.Code
+
+                                        </a>
+
+                                    </td>
+
+                                    <td>
+                                        @item.RequestType.Category.CategoryName
+                                    </td>
+
+                                    <td>
+                                        @item.RequestType.AssetType.AssetTypeName
+                                    </td>
+
+                                    <td>
+                                        @item.RequestType.SubCategory.SubCategoryName
+                                    </td>
+
+                                    <td>
+                                        @item.Branch.Name
+                                    </td>
+
+                                    <td>
+                                        @item.RequestedDate.ToShortDateString()
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal">
+
+                    Close
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- Vendor Modal -->
+<div class="modal fade"
+     id="modalUpdate_Vendor"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title">
+
+                    <i class="align-middle me-2"
+                       data-lucide="briefcase"></i>
+
+                    Vendor
+
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <div class="table-responsive">
+
+                    <table class="table table-hover align-middle dataTableModel">
+
+                        <thead>
+
+                            <tr>
+                                <th>#</th>
+                                <th>Category</th>
+                                <th>Asset Type</th>
+                                <th>Subcategory</th>
+                                <th>Location</th>
+                                <th>Requested Date</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            @foreach (var item in vendorTickets)
+                            {
+                                <tr>
+
+                                    <td>
+
+                                        <a href="@Html.EncodedActionLink("", "Info", "Ticket", "", new { id = item.TicketId }, null)"
+                                           target="_blank">
+
+                                            @item.Code
+
+                                        </a>
+
+                                    </td>
+
+                                    <td>
+                                        @item.RequestType.Category.CategoryName
+                                    </td>
+
+                                    <td>
+                                        @item.RequestType.AssetType.AssetTypeName
+                                    </td>
+
+                                    <td>
+                                        @item.RequestType.SubCategory.SubCategoryName
+                                    </td>
+
+                                    <td>
+                                        @item.Branch.Name
+                                    </td>
+
+                                    <td>
+                                        @item.RequestedDate.ToShortDateString()
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal">
+
+                    Close
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- To Be Closed Modal -->
+<div class="modal fade"
+     id="modalUpdate_TobeClosed"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title">
+
+                    <i class="align-middle me-2"
+                       data-lucide="check-circle"></i>
+
+                    To Be Closed
+
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <div class="table-responsive">
+
+                    <table class="table table-hover align-middle dataTableModel">
+
+                        <thead>
+
+                            <tr>
+                                <th>#</th>
+                                <th>Category</th>
+                                <th>Asset Type</th>
+                                <th>Subcategory</th>
+                                <th>Location</th>
+                                <th>Requested Date</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            @foreach (var item in toBeClosedTickets)
+                            {
+                                <tr>
+
+                                    <td>
+
+                                        <a href="@Html.EncodedActionLink("", "Info", "Ticket", "", new { id = item.TicketId }, null)"
+                                           target="_blank">
+
+                                            @item.Code
+
+                                        </a>
+
+                                    </td>
+
+                                    <td>
+                                        @item.RequestType.Category.CategoryName
+                                    </td>
+
+                                    <td>
+                                        @item.RequestType.AssetType.AssetTypeName
+                                    </td>
+
+                                    <td>
+                                        @item.RequestType.SubCategory.SubCategoryName
+                                    </td>
+
+                                    <td>
+                                        @item.Branch.Name
+                                    </td>
+
+                                    <td>
+                                        @item.RequestedDate.ToShortDateString()
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal">
+
+                    Close
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- Rate and Close Modal -->
+<div class="modal fade"
+     id="modalUpdate_RateAndClose"
+     tabindex="-1"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title">
+
+                    <i class="align-middle me-1"
+                       data-lucide="star"></i>
+
+                    Rate and Close
+
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <div class="table-responsive">
+
+                    <table class="table table-hover align-middle dataTableModel">
+
+                        <thead>
+
+                            <tr>
+                                <th>#</th>
+                                <th>Category</th>
+                                <th>Asset Type</th>
+                                <th>Subcategory</th>
+                                <th>Location</th>
+                                <th>Requested Date</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            @foreach (var item in rateAndCloseTickets)
+                            {
+                                <tr>
+
+                                    <td>
+
+                                        <a href="@Html.EncodedActionLink("", "Rate", "MyTicket", "", new { id = item.TicketId }, null)"
+                                           target="_blank">
+
+                                            @item.Code
+
+                                        </a>
+
+                                    </td>
+
+                                    <td>
+                                        @item.RequestType.Category.CategoryName
+                                    </td>
+
+                                    <td>
+                                        @item.RequestType.AssetType.AssetTypeName
+                                    </td>
+
+                                    <td>
+                                        @item.RequestType.SubCategory.SubCategoryName
+                                    </td>
+
+                                    <td>
+                                        @item.Branch.Name
+                                    </td>
+
+                                    <td>
+                                        @item.RequestedDate.ToShortDateString()
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal">
+
+                    Close
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            if ($('#dataTable').length) {
+
+                $('#dataTable').DataTable({
+                    paging: true,
+                    responsive: true,
+                    autoWidth: false,
+                    searching: true
+                });
+
+            }
+
+
+            $('.dataTableModel').each(function () {
+
+                $(this).DataTable({
+                    paging: false,
+                    responsive: false,
+                    autoWidth: false,
+                    searching: false,
+                    info: false
+                });
+
+            });
+
+
+            $('.dataTableModel2').each(function () {
+
+                $(this).DataTable({
+                    paging: false,
+                    responsive: false,
+                    autoWidth: false,
+                    searching: false,
+                    info: false
+                });
+
+            });
+
+        });
+
+    </script>
+
+}
+

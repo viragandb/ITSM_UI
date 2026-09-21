@@ -1,0 +1,3347 @@
+﻿@model Web.Models.NewAccessRequestVM
+@using Service
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm(
+    "Create",
+    "AccessRequest",
+    FormMethod.Post,
+    new
+    {
+        enctype = "multipart/form-data"
+    }))
+{
+    @Html.AntiForgeryToken()
+
+    @Html.ValidationSummary(
+        true,
+        "",
+        new { @class = "alert alert-danger" }
+    )
+
+    @Html.HiddenFor(model => model.AccessTypeId)
+    @Html.HiddenFor(model => model.AccessType)
+    @Html.HiddenFor(model => model.AccessRequestTypeId)
+    @Html.HiddenFor(model => model.AccessRequestName)
+
+    <div class="row g-4">
+
+        <div class="col-lg-8">
+
+            <div class="card">
+
+                <div class="card-header d-flex align-items-center justify-content-between">
+
+                    <h5 class="card-title mb-0">
+                        New Request - @Model.AccessRequestName
+                    </h5>
+
+                    <a href="@Url.Action("NewRequest", "AccessRequest")"
+                       class="btn btn-sm btn-primary">
+
+                        <i class="align-middle me-1"
+                           data-lucide="key-round"></i>
+
+                        New Request
+
+                    </a>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="mb-3">
+
+                        @Html.LabelFor(
+                            model => model.Subject,
+                            new { @class = "form-label" }
+                        )
+
+                        @Html.TextBoxFor(
+                            model => model.Subject,
+                            new { @class = "form-control" }
+                        )
+
+                        @Html.ValidationMessageFor(
+                            model => model.Subject,
+                            "",
+                            new { @class = "text-danger" }
+                        )
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        @Html.LabelFor(
+                            model => model.Description,
+                            new { @class = "form-label" }
+                        )
+
+                        @Html.TextAreaFor(
+                            model => model.Description,
+                            new
+                            {
+                                @class = "form-control",
+                                rows = "3",
+                                style = "white-space: pre-wrap;"
+                            }
+                        )
+
+                        @Html.ValidationMessageFor(
+                            model => model.Description,
+                            "",
+                            new { @class = "text-danger" }
+                        )
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        @Html.LabelFor(
+                            model => model.Justification,
+                            new { @class = "form-label" }
+                        )
+
+                        @Html.TextAreaFor(
+                            model => model.Justification,
+                            new
+                            {
+                                @class = "form-control",
+                                rows = "3",
+                                style = "white-space: pre-wrap;"
+                            }
+                        )
+
+                        @Html.ValidationMessageFor(
+                            model => model.Justification,
+                            "",
+                            new { @class = "text-danger" }
+                        )
+
+                    </div>
+
+                    <div class="row g-3">
+
+                        <div class="col-md-8">
+
+                            <div class="mb-3">
+
+                                @Html.LabelFor(
+                                    model => model.DurationType,
+                                    new { @class = "form-label" }
+                                )
+
+                                @Html.EnumDropDownListFor(
+                                    model => model.DurationType,
+                                    "-- Select --",
+                                    new { @class = "form-select" }
+                                )
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-4">
+
+                            <div class="mb-3"
+                                 id="Duration_ExpireDate">
+
+                                @Html.LabelFor(
+                                    model => model.ExpireDate,
+                                    new { @class = "form-label" }
+                                )
+
+                                <div class="input-group">
+
+                                    @Html.TextBoxFor(
+                                        model => model.ExpireDate,
+                                        "{0:yyyy-MM-dd}",
+                                        new
+                                        {
+                                            @class = "form-control",
+                                            type = "date"
+                                        }
+                                    )
+
+                                    <span class="input-group-text">
+
+                                        <i class="align-middle"
+                                           data-lucide="calendar"></i>
+
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="mb-4">
+
+                        @Html.LabelFor(
+                            model => model.ApprovalBy,
+                            new { @class = "form-label" }
+                        )
+
+                        @Html.TextBoxFor(
+                            model => model.ApprovalByUserName,
+                            new
+                            {
+                                placeholder = "Type Name here to search",
+                                @class = "form-control"
+                            }
+                        )
+
+                        @Html.HiddenFor(model => model.ApprovalBy)
+
+                    </div>
+
+
+                    @if (Model.AccessRequestTypeId ==
+                         Service.AR.AccessRequestTypeService.GetSystemAccessId())
+                    {
+                        <div class="card bg-body-tertiary border-0 mb-3">
+
+                            <div class="card-header">
+
+                                <h5 class="card-title mb-0">
+
+                                    <i class="align-middle me-2"
+                                       data-lucide="server-cog"></i>
+
+                                    System Access
+
+                                </h5>
+
+                            </div>
+
+                            <div class="card-body">
+
+                                <div class="row g-3">
+
+                                    <div class="col-md-4">
+
+                                        <label class="form-label"
+                                               for="EnvironmentTypeId">
+
+                                            Environment Type
+
+                                        </label>
+
+                                        <select id="EnvironmentTypeId"
+                                                name="EnvironmentTypeId"
+                                                class="form-select">
+                                        </select>
+
+                                    </div>
+
+                                    <div class="col-md-4">
+
+                                        <label class="form-label"
+                                               for="SystemEnvironmentTypeId">
+
+                                            System
+
+                                        </label>
+
+                                        <select id="SystemEnvironmentTypeId"
+                                                name="SystemEnvironmentTypeId"
+                                                class="form-select">
+                                        </select>
+
+                                    </div>
+
+                                    <div class="col-md-4 d-flex align-items-end">
+
+                                        <button type="button"
+                                                class="btn btn-primary btnSubmitAdd"
+                                                onclick="addSystem()">
+
+                                            <i class="align-middle me-1"
+                                               data-lucide="plus"></i>
+
+                                            Add
+
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="row g-3 mt-1">
+
+                                    <div class="col-12">
+
+                                        <label class="form-label"
+                                               for="textDescription">
+
+                                            Description
+
+                                        </label>
+
+                                        <input type="text"
+                                               id="textDescription"
+                                               name="textDescription"
+                                               class="form-control" />
+
+                                    </div>
+
+                                    <div class="col-12">
+
+                                        <label class="form-label"
+                                               for="textJustification">
+
+                                            Justification
+
+                                        </label>
+
+                                        <input type="text"
+                                               id="textJustification"
+                                               name="textJustification"
+                                               class="form-control" />
+
+                                    </div>
+
+                                </div>
+
+                                <div class="row g-3 mt-1"
+                                     id="Privilege_External">
+
+                                    <div class="col-md-6">
+
+                                        <label class="form-label"
+                                               for="textPrivilegeLevel">
+
+                                            Privilege Level (External)
+
+                                        </label>
+
+                                        <input type="text"
+                                               id="textPrivilegeLevel"
+                                               name="textPrivilegeLevel"
+                                               class="form-control" />
+
+                                    </div>
+
+                                    <div class="col-md-6">
+
+                                        <label class="form-label"
+                                               for="textMonitoredBy">
+
+                                            Monitored By (External)
+
+                                        </label>
+
+                                        <input type="text"
+                                               id="textMonitoredBy"
+                                               name="textMonitoredBy"
+                                               class="form-control" />
+
+                                    </div>
+
+                                </div>
+
+                                <div class="table-responsive mt-4">
+
+                                    <table class="table table-striped table-hover align-middle">
+
+                                        <thead>
+
+                                            <tr>
+                                                <th>Env. Type</th>
+                                                <th>System</th>
+                                                <th>Description</th>
+                                                <th>Justification</th>
+                                                <th>Privilege Level</th>
+                                                <th>Monitored By</th>
+                                                <th class="text-end"></th>
+                                            </tr>
+
+                                        </thead>
+
+                                        <tbody id="systemdata">
+
+                                            @if (Model.SystemAccessItems != null)
+                                            {
+                                                for (var i = 0; i < Model.SystemAccessItems.Count; i++)
+                                                {
+                                                    <tr id="@i">
+
+                                                        @Html.HiddenFor(
+                                                            m => Model.SystemAccessItems[i].SystemEnvironmentId,
+                                                            new { @class = "iHidden" }
+                                                        )
+
+                                                        @Html.HiddenFor(
+                                                            m => Model.SystemAccessItems[i].SystemEnvironment.EnvironmentType
+                                                        )
+
+                                                        @Html.HiddenFor(
+                                                            m => Model.SystemAccessItems[i].SystemEnvironment.SystemName
+                                                        )
+
+                                                        @Html.HiddenFor(
+                                                            m => Model.SystemAccessItems[i].Description
+                                                        )
+
+                                                        @Html.HiddenFor(
+                                                            m => Model.SystemAccessItems[i].Justification
+                                                        )
+
+                                                        @Html.HiddenFor(
+                                                            m => Model.SystemAccessItems[i].PrivilegeLevel
+                                                        )
+
+                                                        @Html.HiddenFor(
+                                                            m => Model.SystemAccessItems[i].MonitoredBy
+                                                        )
+
+                                                        <td>
+                                                            @Model.SystemAccessItems[i]
+                                                            .SystemEnvironment
+                                                            .EnvironmentType
+                                                            .EnumDisplayName()
+                                                        </td>
+
+                                                        <td>
+                                                            @Model.SystemAccessItems[i]
+                                                            .SystemEnvironment
+                                                            .SystemName
+                                                        </td>
+
+                                                        <td>
+                                                            @Model.SystemAccessItems[i].Description
+                                                        </td>
+
+                                                        <td>
+                                                            @Model.SystemAccessItems[i].Justification
+                                                        </td>
+
+                                                        <td>
+                                                            @Model.SystemAccessItems[i].PrivilegeLevel
+                                                        </td>
+
+                                                        <td>
+                                                            @Model.SystemAccessItems[i].MonitoredBy
+                                                        </td>
+
+                                                        <td class="text-end">
+
+                                                            <button type="button"
+                                                                    id="btnRemove@i"
+                                                                    name="btnRemove@i"
+                                                                    onclick="deleteRow(@i)"
+                                                                    class="btn btn-sm btn-danger">
+
+                                                                <i class="align-middle"
+                                                                   data-lucide="trash-2"></i>
+
+                                                            </button>
+
+                                                        </td>
+
+                                                    </tr>
+                                                }
+                                            }
+
+                                        </tbody>
+
+                                    </table>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    }
+                    else if (Model.AccessRequestTypeId ==
+                             Service.AR.AccessRequestTypeService.GetUserPrivilegeAccessId())
+                    {
+                        <div class="card bg-body-tertiary border-0 mb-3">
+
+                            <div class="card-header">
+
+                                <h5 class="card-title mb-0">
+
+                                    <i class="align-middle me-2"
+                                       data-lucide="shield-keyhole"></i>
+
+                                    User Privilege Access
+
+                                </h5>
+
+                            </div>
+
+                            <div class="card-body">
+
+                                <div class="row g-3">
+
+                                    <div class="col-md-6">
+
+                                        <label class="form-label"
+                                               for="AccessPrivilegeCategoryId">
+
+                                            Privilege Category
+
+                                        </label>
+
+                                        <select id="AccessPrivilegeCategoryId"
+                                                name="AccessPrivilegeCategoryId"
+                                                class="form-select">
+                                        </select>
+
+                                    </div>
+
+                                    <div class="col-md-6">
+
+                                        <label class="form-label"
+                                               for="AccessApplicationId">
+
+                                            Application
+
+                                        </label>
+
+                                        <select id="AccessApplicationId"
+                                                name="AccessApplicationId"
+                                                class="form-select">
+                                        </select>
+
+                                    </div>
+
+                                    <div class="col-md-6">
+
+                                        <label class="form-label"
+                                               for="AccessLevelId">
+
+                                            Access Level
+
+                                        </label>
+
+                                        <select id="AccessLevelId"
+                                                name="AccessLevelId"
+                                                class="form-select">
+                                        </select>
+
+                                    </div>
+
+                                    <div class="col-md-6 d-flex align-items-end">
+
+                                        <button type="button"
+                                                class="btn btn-primary btnSubmitAdd"
+                                                onclick="addPrivilegeAccess()">
+
+                                            <i class="align-middle me-1"
+                                               data-lucide="plus"></i>
+
+                                            Add
+
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="table-responsive mt-4">
+
+                                    <table class="table table-striped table-hover align-middle">
+
+                                        <thead>
+
+                                            <tr>
+                                                <th>Privilege Category</th>
+                                                <th>Application</th>
+                                                <th>Access Level</th>
+                                                <th class="text-end"></th>
+                                            </tr>
+
+                                        </thead>
+
+                                        <tbody id="userprivilegedata">
+
+                                            @if (Model.UserPrivilegeAccessItems != null)
+                                            {
+                                                for (var i = 0; i < Model.UserPrivilegeAccessItems.Count; i++)
+                                                {
+                                                    <tr id="@i">
+
+                                                        @Html.HiddenFor(
+                                                            m => Model.UserPrivilegeAccessItems[i].AccessPrivilegeCategoryId
+                                                        )
+
+                                                        @Html.HiddenFor(
+                                                            m => Model.UserPrivilegeAccessItems[i].AccessPrivilegeCategory.Name
+                                                        )
+
+                                                        @Html.HiddenFor(
+                                                            m => Model.UserPrivilegeAccessItems[i].AccessApplicationId,
+                                                            new { @class = "iHidden" }
+                                                        )
+
+                                                        @Html.HiddenFor(
+                                                            m => Model.UserPrivilegeAccessItems[i].AccessApplication.ApplicationName
+                                                        )
+
+                                                        @Html.HiddenFor(
+                                                            m => Model.UserPrivilegeAccessItems[i].AccessLevelId
+                                                        )
+
+                                                        @Html.HiddenFor(
+                                                            m => Model.UserPrivilegeAccessItems[i].AccessLevel.Name
+                                                        )
+
+                                                        <td>
+                                                            @Model.UserPrivilegeAccessItems[i]
+                                                            .AccessPrivilegeCategory
+                                                            .Name
+                                                        </td>
+
+                                                        <td>
+                                                            @Model.UserPrivilegeAccessItems[i]
+                                                            .AccessApplication
+                                                            .ApplicationName
+                                                        </td>
+
+                                                        <td>
+                                                            @Model.UserPrivilegeAccessItems[i]
+                                                            .AccessLevel
+                                                            .Name
+                                                        </td>
+
+                                                        <td class="text-end">
+
+                                                            <button type="button"
+                                                                    id="btnRemove@i"
+                                                                    name="btnRemove@i"
+                                                                    onclick="deleteRowPrivilege(@i)"
+                                                                    class="btn btn-sm btn-danger">
+
+                                                                <i class="align-middle"
+                                                                   data-lucide="trash-2"></i>
+
+                                                            </button>
+
+                                                        </td>
+
+                                                    </tr>
+                                                }
+                                            }
+
+                                        </tbody>
+
+                                    </table>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    }
+                    else if (Model.AccessRequestTypeId ==
+                             Service.AR.AccessRequestTypeService.GetPhysicalAccessId())
+                    {
+                        <div class="card bg-body-tertiary border-0 mb-3">
+
+                            <div class="card-header">
+
+                                <h5 class="card-title mb-0">
+
+                                    <i class="align-middle me-2"
+                                       data-lucide="map-pin-check"></i>
+
+                                    Physical Location Access
+
+                                </h5>
+
+                            </div>
+
+                            <div class="card-body">
+
+                                <div class="row g-3">
+
+                                    <div class="col-md-4">
+
+                                        <label class="form-label"
+                                               for="LocationId">
+
+                                            Location
+
+                                        </label>
+
+                                        <select id="LocationId"
+                                                name="LocationId"
+                                                class="form-select">
+                                        </select>
+
+                                    </div>
+
+                                    <div class="col-md-4">
+
+                                        <label class="form-label"
+                                               for="PhysicalAreaId">
+
+                                            Area
+
+                                        </label>
+
+                                        <select id="PhysicalAreaId"
+                                                name="PhysicalAreaId"
+                                                class="form-select">
+                                        </select>
+
+                                    </div>
+
+                                    <div class="col-md-4 d-flex align-items-end">
+
+                                        <button type="button"
+                                                class="btn btn-primary btnSubmitAdd"
+                                                onclick="addAccessPhysical()">
+
+                                            <i class="align-middle me-1"
+                                               data-lucide="plus"></i>
+
+                                            Add
+
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="table-responsive mt-4">
+
+                                    <table class="table table-striped table-hover align-middle">
+
+                                        <thead>
+
+                                            <tr>
+                                                <th>Location</th>
+                                                <th>Area</th>
+                                                <th class="text-end"></th>
+                                            </tr>
+
+                                        </thead>
+
+                                        <tbody id="physicaldata">
+
+                                            @if (Model.PhysicalAccessItems != null)
+                                            {
+                                                for (var i = 0; i < Model.PhysicalAccessItems.Count; i++)
+                                                {
+                                                    <tr id="@i">
+
+                                                        @Html.HiddenFor(
+                                                            m => Model.PhysicalAccessItems[i].PhysicalAreaId,
+                                                            new { @class = "iHidden" }
+                                                        )
+
+                                                        @Html.HiddenFor(
+                                                            m => Model.PhysicalAccessItems[i].PhysicalArea.Name
+                                                        )
+
+                                                        @Html.HiddenFor(
+                                                            m => Model.PhysicalAccessItems[i].PhysicalArea.BranchId
+                                                        )
+
+                                                        @Html.HiddenFor(
+                                                            m => Model.PhysicalAccessItems[i].PhysicalArea.Branch.Name
+                                                        )
+
+                                                        <td>
+                                                            @Model.PhysicalAccessItems[i]
+                                                            .PhysicalArea
+                                                            .Branch
+                                                            .Name
+                                                        </td>
+
+                                                        <td>
+                                                            @Model.PhysicalAccessItems[i]
+                                                            .PhysicalArea
+                                                            .Name
+                                                        </td>
+
+                                                        <td class="text-end">
+
+                                                            <button type="button"
+                                                                    id="btnRemove@i"
+                                                                    name="btnRemove@i"
+                                                                    onclick="deleteRowAccessPhysical(@i)"
+                                                                    class="btn btn-sm btn-danger">
+
+                                                                <i class="align-middle"
+                                                                   data-lucide="trash-2"></i>
+
+                                                            </button>
+
+                                                        </td>
+
+                                                    </tr>
+                                                }
+                                            }
+
+                                        </tbody>
+
+                                    </table>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    }
+                    else if (
+                        Model.AccessRequestTypeId ==
+                        Service.AR.AccessRequestTypeService.GetUserAccessIdInternal()
+                        ||
+                        Model.AccessRequestTypeId ==
+                        Service.AR.AccessRequestTypeService.GetUserAccessIdExternal()
+                    )
+                    {
+                        <div class="card bg-body-tertiary border-0 mb-3">
+
+                            <div class="card-header">
+
+                                <h5 class="card-title mb-0">
+
+                                    <i class="align-middle me-2"
+                                       data-lucide="user-cog"></i>
+
+                                    User Access
+
+                                </h5>
+
+                            </div>
+
+                            <div class="card-body">
+
+                                <div class="row g-3">
+
+                                    <div class="col-md-6">
+
+                                        @Html.LabelFor(
+                                            model => model.UserAccessType,
+                                            new { @class = "form-label" }
+                                        )
+
+                                        @Html.EnumDropDownListFor(
+                                            model => model.UserAccessType,
+                                            "-- Select --",
+                                            new { @class = "form-select" }
+                                        )
+
+                                    </div>
+
+                                </div>
+
+                                <div class="row g-3 mt-1"
+                                     id="ExternalUserDoc">
+
+                                    <div class="col-md-6">
+
+                                        <label class="form-label"
+                                               for="fileInputLegalIdDoc">
+
+                                            Upload Legal Id
+
+                                        </label>
+
+                                        <input type="file"
+                                               name="fileInputLegalIdDoc"
+                                               id="fileInputLegalIdDoc"
+                                               class="form-control" />
+
+                                    </div>
+
+                                    <div class="col-md-6">
+
+                                        <label class="form-label"
+                                               for="fileInputNonEmpAcknowledgementDoc">
+
+                                            Upload Non-Emp. Acknowledgement
+
+                                        </label>
+
+                                        <input type="file"
+                                               name="fileInputNonEmpAcknowledgementDoc"
+                                               id="fileInputNonEmpAcknowledgementDoc"
+                                               class="form-control" />
+
+                                    </div>
+
+                                </div>
+
+                                <div class="row g-3 mt-1">
+
+                                    <div class="col-md-8">
+
+                                        <label class="form-label"
+                                               for="UserAccessItemTypeId">
+
+                                            Access Type
+
+                                        </label>
+
+                                        <select id="UserAccessItemTypeId"
+                                                name="UserAccessItemTypeId"
+                                                class="form-select">
+                                        </select>
+
+                                    </div>
+
+                                    <div class="col-md-4 d-flex align-items-end">
+
+                                        <button type="button"
+                                                class="btn btn-primary btnSubmitAdd"
+                                                onclick="addUserAccess()">
+
+                                            <i class="align-middle me-1"
+                                               data-lucide="plus"></i>
+
+                                            Add
+
+                                        </button>
+
+                                    </div>
+
+                                    <div class="col-12">
+
+                                        <label class="form-label"
+                                               for="textUserAccessDescription">
+
+                                            Description
+
+                                        </label>
+
+                                        <input type="text"
+                                               id="textUserAccessDescription"
+                                               name="textUserAccessDescription"
+                                               class="form-control" />
+
+                                    </div>
+
+                                    <div class="col-12">
+
+                                        <label class="form-label"
+                                               for="textUserAccessJustification">
+
+                                            Justification
+
+                                        </label>
+
+                                        <input type="text"
+                                               id="textUserAccessJustification"
+                                               name="textUserAccessJustification"
+                                               class="form-control" />
+
+                                    </div>
+
+                                </div>
+
+                                <div class="table-responsive mt-4">
+
+                                    <table class="table table-striped table-hover align-middle">
+
+                                        <thead>
+
+                                            <tr>
+                                                <th>User Access Type</th>
+                                                <th>Description</th>
+                                                <th>Justification</th>
+                                                <th class="text-end"></th>
+                                            </tr>
+
+                                        </thead>
+
+                                        <tbody id="useraccessdata">
+
+                                            @if (Model.UserAccessItems != null)
+                                            {
+                                                for (var i = 0; i < Model.UserAccessItems.Count; i++)
+                                                {
+                                                    <tr id="@i">
+
+                                                        @Html.HiddenFor(
+                                                            m => Model.UserAccessItems[i].UserAccessItemTypeId,
+                                                            new { @class = "iHidden" }
+                                                        )
+
+                                                        @Html.HiddenFor(
+                                                            m => Model.UserAccessItems[i].UserAccessItemType.Name
+                                                        )
+
+                                                        @Html.HiddenFor(
+                                                            m => Model.UserAccessItems[i].Description
+                                                        )
+
+                                                        @Html.HiddenFor(
+                                                            m => Model.UserAccessItems[i].Justification
+                                                        )
+
+                                                        <td>
+                                                            @Model.UserAccessItems[i]
+                                                            .UserAccessItemType
+                                                            .Name
+                                                        </td>
+
+                                                        <td>
+                                                            @Model.UserAccessItems[i].Description
+                                                        </td>
+
+                                                        <td>
+                                                            @Model.UserAccessItems[i].Justification
+                                                        </td>
+
+                                                        <td class="text-end">
+
+                                                            <button type="button"
+                                                                    id="btnRemove@i"
+                                                                    name="btnRemove@i"
+                                                                    onclick="deleteRowUserAccess(@i)"
+                                                                    class="btn btn-sm btn-danger">
+
+                                                                <i class="align-middle"
+                                                                   data-lucide="trash-2"></i>
+
+                                                            </button>
+
+                                                        </td>
+
+                                                    </tr>
+                                                }
+                                            }
+
+                                        </tbody>
+
+                                    </table>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    }
+                    else if (Model.AccessRequestTypeId ==
+                             Service.AR.AccessRequestTypeService.GetDeviceAccessId())
+                    {
+                        <div class="card bg-body-tertiary border-0 mb-3">
+
+                            <div class="card-header">
+
+                                <h5 class="card-title mb-0">
+
+                                    <i class="align-middle me-2"
+                                       data-lucide="monitor-smartphone"></i>
+
+                                    Device Access
+
+                                </h5>
+
+                            </div>
+
+                            <div class="card-body">
+
+                                <div class="row g-3">
+
+                                    <div class="col-md-8">
+
+                                        @Html.LabelFor(
+                                            model => model.AssetId,
+                                            new { @class = "form-label" }
+                                        )
+
+                                        @Html.TextBoxFor(
+                                            model => model.AssetName,
+                                            new
+                                            {
+                                                placeholder = "Type Asset #",
+                                                @class = "form-control"
+                                            }
+                                        )
+
+                                        @Html.HiddenFor(model => model.AssetId)
+
+                                    </div>
+
+                                    <div class="col-md-8">
+
+                                        <label class="form-label"
+                                               for="DeviceAccessItemTypeId">
+
+                                            Device Type
+
+                                        </label>
+
+                                        <select id="DeviceAccessItemTypeId"
+                                                name="DeviceAccessItemTypeId"
+                                                class="form-select">
+                                        </select>
+
+                                    </div>
+
+                                    <div class="col-md-4 d-flex align-items-end">
+
+                                        <button type="button"
+                                                class="btn btn-primary btnSubmitAdd"
+                                                onclick="addDeviceAccess()">
+
+                                            <i class="align-middle me-1"
+                                               data-lucide="plus"></i>
+
+                                            Add
+
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="table-responsive mt-4">
+
+                                    <table class="table table-striped table-hover align-middle">
+
+                                        <thead>
+
+                                            <tr>
+                                                <th>Device Access Type</th>
+                                                <th class="text-end"></th>
+                                            </tr>
+
+                                        </thead>
+
+                                        <tbody id="deviceaccessdata">
+
+                                            @if (Model.DeviceAccessItems != null)
+                                            {
+                                                for (var i = 0; i < Model.DeviceAccessItems.Count; i++)
+                                                {
+                                                    <tr id="@i">
+
+                                                        @Html.HiddenFor(
+                                                            m => Model.DeviceAccessItems[i].DeviceAccessItemTypeId,
+                                                            new { @class = "iHidden" }
+                                                        )
+
+                                                        @Html.HiddenFor(
+                                                            m => Model.DeviceAccessItems[i].DeviceAccessItemType.Name
+                                                        )
+
+                                                        <td>
+                                                            @Model.DeviceAccessItems[i]
+                                                            .DeviceAccessItemType
+                                                            .Name
+                                                        </td>
+
+                                                        <td class="text-end">
+
+                                                            <button type="button"
+                                                                    id="btnRemove@i"
+                                                                    name="btnRemove@i"
+                                                                    onclick="deleteRowDeviceAccess(@i)"
+                                                                    class="btn btn-sm btn-danger">
+
+                                                                <i class="align-middle"
+                                                                   data-lucide="trash-2"></i>
+
+                                                            </button>
+
+                                                        </td>
+
+                                                    </tr>
+                                                }
+                                            }
+
+                                        </tbody>
+
+                                    </table>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    }
+                    else if (Model.AccessRequestTypeId ==
+                             Service.AR.AccessRequestTypeService.GetRemoteAccessId())
+                    {
+                        <div class="card bg-body-tertiary border-0 mb-3">
+
+                            <div class="card-header">
+
+                                <h5 class="card-title mb-0">
+
+                                    <i class="align-middle me-2"
+                                       data-lucide="network"></i>
+
+                                    Remote Access
+
+                                </h5>
+
+                            </div>
+
+                            <div class="card-body">
+
+                                <div class="row g-3">
+
+                                    <div class="col-md-6">
+
+                                        @Html.LabelFor(
+                                            model => model.RemoteAccessType,
+                                            new { @class = "form-label" }
+                                        )
+
+                                        @Html.EnumDropDownListFor(
+                                            model => model.RemoteAccessType,
+                                            "-- Select --",
+                                            new { @class = "form-select" }
+                                        )
+
+                                    </div>
+
+                                    <div class="col-12">
+
+                                        @Html.LabelFor(
+                                            model => model.Impact,
+                                            new { @class = "form-label" }
+                                        )
+
+                                        @Html.TextBoxFor(
+                                            model => model.Impact,
+                                            new { @class = "form-control" }
+                                        )
+
+                                    </div>
+
+                                    <div class="col-md-8">
+
+                                        @Html.LabelFor(
+                                            model => model.RemoteAssetId,
+                                            new { @class = "form-label" }
+                                        )
+
+                                        @Html.TextBoxFor(
+                                            model => model.RemoteAssetName,
+                                            new
+                                            {
+                                                placeholder = "Type Asset #",
+                                                @class = "form-control"
+                                            }
+                                        )
+
+                                        @Html.HiddenFor(model => model.RemoteAssetId)
+
+                                    </div>
+
+                                    <div class="col-md-8">
+
+                                        <label class="form-label"
+                                               for="RemoteAccessItemTypeId">
+
+                                            Application/System
+
+                                        </label>
+
+                                        <select id="RemoteAccessItemTypeId"
+                                                name="RemoteAccessItemTypeId"
+                                                class="form-select">
+                                        </select>
+
+                                    </div>
+
+                                    <div class="col-md-4 d-flex align-items-end">
+
+                                        <button type="button"
+                                                class="btn btn-primary btnSubmitAdd"
+                                                onclick="addRemoteAccess()">
+
+                                            <i class="align-middle me-1"
+                                               data-lucide="plus"></i>
+
+                                            Add
+
+                                        </button>
+
+                                    </div>
+
+                                    <div class="col-12">
+
+                                        <label class="form-label"
+                                               for="textRemoteAccessDescription">
+
+                                            Description (URL)
+
+                                        </label>
+
+                                        <input type="text"
+                                               id="textRemoteAccessDescription"
+                                               name="textRemoteAccessDescription"
+                                               class="form-control" />
+
+                                    </div>
+
+                                </div>
+
+                                <div class="table-responsive mt-4">
+
+                                    <table class="table table-striped table-hover align-middle">
+
+                                        <thead>
+
+                                            <tr>
+                                                <th>Access Requested Systems</th>
+                                                <th>Description</th>
+                                                <th class="text-end"></th>
+                                            </tr>
+
+                                        </thead>
+
+                                        <tbody id="remoteaccessdata">
+
+                                            @if (Model.RemoteAccessItems != null)
+                                            {
+                                                for (var i = 0; i < Model.RemoteAccessItems.Count; i++)
+                                                {
+                                                    <tr id="@i">
+
+                                                        @Html.HiddenFor(
+                                                            m => Model.RemoteAccessItems[i].AssetTypeId,
+                                                            new { @class = "iHidden" }
+                                                        )
+
+                                                        @Html.HiddenFor(
+                                                            m => Model.RemoteAccessItems[i].AssetType.AssetTypeName
+                                                        )
+
+                                                        @Html.HiddenFor(
+                                                            m => Model.RemoteAccessItems[i].Description
+                                                        )
+
+                                                        <td>
+                                                            @Model.RemoteAccessItems[i]
+                                                            .AssetType
+                                                            .AssetTypeName
+                                                        </td>
+
+                                                        <td>
+                                                            @Model.RemoteAccessItems[i]
+                                                            .Description
+                                                        </td>
+
+                                                        <td class="text-end">
+
+                                                            <button type="button"
+                                                                    id="btnRemove@i"
+                                                                    name="btnRemove@i"
+                                                                    onclick="deleteRowRemoteAccess(@i)"
+                                                                    class="btn btn-sm btn-danger">
+
+                                                                <i class="align-middle"
+                                                                   data-lucide="trash-2"></i>
+
+                                                            </button>
+
+                                                        </td>
+
+                                                    </tr>
+                                                }
+                                            }
+
+                                        </tbody>
+
+                                    </table>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    }
+
+
+                    @if (Model.Instructions != null)
+                    {
+                        <div class="alert alert-secondary d-flex align-items-start">
+
+                            <i class="align-middle me-2 mt-1"
+                               data-lucide="info"></i>
+
+                            <div>
+                                @Html.Raw(Model.Instructions)
+                            </div>
+
+                        </div>
+                    }
+
+                </div>
+
+                <div class="card-footer">
+
+                    <div class="d-flex justify-content-end">
+
+                        <button type="submit"
+                                id="btnSave"
+                                class="btn btn-primary btnSubmitDisable">
+
+                            <i class="align-middle me-1"
+                               data-lucide="send"></i>
+
+                            Submit
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-lg-4">
+
+            <div class="card">
+
+                <div class="card-header d-flex align-items-center justify-content-between">
+
+                    <h5 class="card-title mb-0">
+
+                        <i class="align-middle me-2"
+                           data-lucide="user"></i>
+
+                        Requested For
+
+                    </h5>
+
+                    <span class="badge bg-primary">
+                        @Model.AccessType.EnumDisplayName()
+                    </span>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div id="InternalUser">
+
+                        <div class="mb-3">
+
+                            @Html.LabelFor(
+                                model => model.RequestedBy,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.TextBoxFor(
+                                model => model.RequestedBy,
+                                new
+                                {
+                                    placeholder = "Type Name here to search",
+                                    @class = "form-control"
+                                }
+                            )
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            @Html.LabelFor(
+                                model => model.RequestedUser.FullName,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.TextBoxFor(
+                                model => model.RequestedUser.FullName,
+                                new
+                                {
+                                    @class = "form-control",
+                                    @readonly = "readonly"
+                                }
+                            )
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            @Html.LabelFor(
+                                model => model.RequestedUser.DesignationName,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.TextBoxFor(
+                                model => model.RequestedUser.DesignationName,
+                                new
+                                {
+                                    @class = "form-control",
+                                    @readonly = "readonly"
+                                }
+                            )
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            @Html.LabelFor(
+                                model => model.RequestedUser.Email,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.TextBoxFor(
+                                model => model.RequestedUser.Email,
+                                new
+                                {
+                                    @class = "form-control",
+                                    @readonly = "readonly"
+                                }
+                            )
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            @Html.LabelFor(
+                                model => model.RequestedUser.ContactNo,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.TextBoxFor(
+                                model => model.RequestedUser.ContactNo,
+                                new
+                                {
+                                    @class = "form-control",
+                                    @readonly = "readonly"
+                                }
+                            )
+
+                        </div>
+
+                    </div>
+
+
+                    <div id="ExternalUser">
+
+                        <div class="mb-3">
+
+                            @Html.LabelFor(
+                                model => model.ExternalUser,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.TextBoxFor(
+                                model => model.ExternalUser,
+                                new { @class = "form-control" }
+                            )
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            @Html.LabelFor(
+                                model => model.LegalId,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.TextBoxFor(
+                                model => model.LegalId,
+                                new { @class = "form-control" }
+                            )
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            @Html.LabelFor(
+                                model => model.Organization,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.TextBoxFor(
+                                model => model.Organization,
+                                new { @class = "form-control" }
+                            )
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="mb-3">
+
+                        @Html.LabelFor(
+                            model => model.BranchId,
+                            new { @class = "form-label" }
+                        )
+
+                        @Html.DropDownListFor(
+                            model => model.BranchId,
+                            new List<SelectListItem>(),
+                            new { @class = "form-select" }
+                        )
+
+                        @Html.ValidationMessageFor(
+                            model => model.BranchId,
+                            "",
+                            new { @class = "text-danger" }
+                        )
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        @Html.LabelFor(
+                            model => model.DepartmentId,
+                            new { @class = "form-label" }
+                        )
+
+                        @Html.DropDownListFor(
+                            model => model.DepartmentId,
+                            new List<SelectListItem>(),
+                            new { @class = "form-select" }
+                        )
+
+                        @Html.ValidationMessageFor(
+                            model => model.DepartmentId,
+                            "",
+                            new { @class = "text-danger" }
+                        )
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+}
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        function parseJsonResult(data) {
+
+            if (typeof data === "string") {
+
+                try {
+                    return JSON.parse(data);
+                }
+                catch (e) {
+                    return [];
+                }
+
+            }
+
+            return data || [];
+
+        }
+
+
+        function refreshLucideIcons() {
+
+            if (
+                typeof lucide !== "undefined" &&
+                lucide.createIcons
+            ) {
+                lucide.createIcons();
+            }
+
+        }
+
+
+        function escapeHtml(value) {
+
+            return $("<div>")
+                .text(value || "")
+                .html();
+
+        }
+
+
+        function SearchRemoteAssets() {
+
+            $("#RemoteAssetName").autocomplete({
+
+                source: function (request, response) {
+
+                    $.ajax({
+
+                        url: '@Url.Action("GetSearchByIdJsonResult", "Asset")',
+
+                        dataType: "json",
+
+                        data: {
+                            term: request.term
+                        },
+
+                        success: function (data) {
+
+                            response(
+                                $.map(
+                                    data,
+                                    function (val) {
+
+                                        return {
+                                            label: val.Barcode + " - " + val.AssetName,
+                                            value: val.Barcode + " - " + val.AssetName,
+                                            itemId: val.AssetId
+                                        };
+
+                                    }
+                                )
+                            );
+
+                        }
+
+                    });
+
+                },
+
+                minLength: 6,
+
+                select: function (event, ui) {
+
+                    $("#RemoteAssetId")
+                        .val(ui.item.itemId);
+
+                }
+
+            });
+
+        }
+
+
+        function loadRemoteAccessSysTypes() {
+
+            $.getJSON(
+                '@Url.Action("GetAssetTypeSystemAppListJsonResult", "AssetType")',
+                function (data) {
+
+                    var dropDown =
+                        $("#RemoteAccessItemTypeId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- Select --</option>"
+                    );
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.AssetTypeId,
+                                    text: item.AssetTypeName
+                                })
+                            );
+
+                        }
+                    );
+
+                }
+            );
+
+        }
+
+
+        $(document).ready(function () {
+
+            SearchADUser();
+            SearchADUserApproval();
+
+            GetUserType();
+            GetDuration();
+
+            loadLocations();
+
+            loadEnvironmentTypes();
+
+            loadAccessPrivilegeCategories();
+            loadAccessLevels();
+
+            loadPhysicalLocations();
+
+            loadUserAccessTypes();
+
+            SearchAssets();
+            loadDeviceAccessTypes();
+
+            SearchRemoteAssets();
+            loadRemoteAccessSysTypes();
+
+        });
+
+
+        function SearchADUser() {
+
+            $("#RequestedBy").autocomplete({
+
+                source: function (request, response) {
+
+                    $.ajax({
+
+                        url: '@Url.Action("GetSearchUserByNameJsonResult", "User")',
+
+                        dataType: "json",
+
+                        data: {
+                            term: request.term
+                        },
+
+                        success: function (data) {
+
+                            response(
+                                $.map(
+                                    data,
+                                    function (val) {
+
+                                        return {
+                                            label: val.EmpNo + " - " + val.FullName + " | " + val.DepartmentName,
+                                            value: val.EmpNo,
+                                            itemId: val.EmpNo,
+                                            itemName: val.FullName,
+                                            itemDepartment: val.DepartmentName,
+                                            itemDesignation: val.DesignationName,
+                                            itemEmail: val.Email
+                                        };
+
+                                    }
+                                )
+                            );
+
+                        }
+
+                    });
+
+                },
+
+                minLength: 1,
+
+                select: function (event, ui) {
+
+                    $("#RequestedUser_FullName")
+                        .val(ui.item.itemName);
+
+                    $("#RequestedUser_DesignationName")
+                        .val(ui.item.itemDesignation);
+
+                    $("#RequestedUser_Email")
+                        .val(ui.item.itemEmail);
+
+                    loadSysUserData(
+                        ui.item.itemId
+                    );
+
+                }
+
+            });
+
+        }
+
+
+        function SearchADUserApproval() {
+
+            $("#ApprovalByUserName").autocomplete({
+
+                source: function (request, response) {
+
+                    $.ajax({
+
+                        url: '@Url.Action("GetSearchUserByNameJsonResult", "User")',
+
+                        dataType: "json",
+
+                        data: {
+                            term: request.term
+                        },
+
+                        success: function (data) {
+
+                            response(
+                                $.map(
+                                    data,
+                                    function (val) {
+
+                                        return {
+                                            label: val.EmpNo + " - " + val.FullName + " | " + val.DepartmentName,
+                                            value: val.EmpNo,
+                                            itemId: val.EmpNo
+                                        };
+
+                                    }
+                                )
+                            );
+
+                        }
+
+                    });
+
+                },
+
+                minLength: 1,
+
+                select: function (event, ui) {
+
+                    $("#ApprovalBy")
+                        .val(ui.item.itemId);
+
+                }
+
+            });
+
+        }
+
+
+        function loadSysUserData(userId) {
+
+            if (!userId) {
+                return;
+            }
+
+            $.getJSON(
+                '@Url.Action("GetSysUserJsonResult", "User")',
+                {
+                    lanId: userId
+                },
+                function (data) {
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, value) {
+
+                            if (index === "ContactNo") {
+
+                                $("#RequestedUser_ContactNo")
+                                    .val(value);
+
+                            }
+                            else if (index === "BranchId") {
+
+                                $("#BranchId")
+                                    .val(value);
+
+                            }
+                            else if (index === "DepartmentId") {
+
+                                loadDepartments(
+                                    value
+                                );
+
+                            }
+
+                        }
+                    );
+
+                }
+            );
+
+        }
+
+
+        function GetUserType() {
+
+            var accessType =
+                $("#AccessTypeId").val();
+
+            if (accessType == 2) {
+
+                $("#ExternalUser").show();
+
+                $("#ExternalUserDoc").show();
+
+                $("#InternalUser").hide();
+
+                $("#Privilege_External").show();
+
+                $("#DurationType")
+                    .prop("disabled", true);
+
+            }
+            else {
+
+                $("#ExternalUser").hide();
+
+                $("#ExternalUserDoc").hide();
+
+                $("#InternalUser").show();
+
+                $("#Privilege_External").hide();
+
+                $("#DurationType")
+                    .prop("disabled", false);
+
+            }
+
+        }
+
+
+        $("select#DurationType").on(
+            "change",
+            function () {
+
+                GetDuration();
+
+            }
+        );
+
+
+        function GetDuration() {
+
+            var durationType =
+                $("#DurationType").val();
+
+            if (durationType == 2) {
+
+                $("#Duration_ExpireDate").show();
+
+            }
+            else {
+
+                $("#Duration_ExpireDate").hide();
+
+            }
+
+        }
+
+
+        function loadLocations() {
+
+            $.getJSON(
+                '@Url.Action("GetItemListJsonResult", "Branch")',
+                function (data) {
+
+                    var dropDown =
+                        $("#BranchId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- Select --</option>"
+                    );
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.BranchId,
+                                    text: item.Name
+                                })
+                            );
+
+                        }
+                    );
+
+                    var branchId =
+                        '@ViewBag.BranchId';
+
+                    if (branchId) {
+                        dropDown.val(branchId);
+                    }
+
+                    loadDepartments();
+
+                }
+            );
+
+        }
+
+
+        $("select#BranchId").on(
+            "change",
+            function () {
+
+                loadDepartments();
+
+            }
+        );
+
+
+        function loadDepartments(itemId) {
+
+            var branchId =
+                $("#BranchId").val();
+
+            $.getJSON(
+                '@Url.Action("GetDepartmentListBtBranchIdJsonResult", "Department")',
+                {
+                    branchId: branchId
+                },
+                function (data) {
+
+                    var dropDown =
+                        $("#DepartmentId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- Select --</option>"
+                    );
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.DepartmentId,
+                                    text: item.DepartmentName
+                                })
+                            );
+
+                        }
+                    );
+
+                    if (itemId) {
+
+                        dropDown.val(itemId);
+
+                    }
+
+                    var departmentId =
+                        '@ViewBag.DepartmentId';
+
+                    if (departmentId) {
+
+                        dropDown.val(
+                            departmentId
+                        );
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        function loadEnvironmentTypes() {
+
+            $.getJSON(
+                '@Url.Action("GetEnvirnmentTypesJsonResult", "SystemEnvironment")',
+                function (data) {
+
+                    var dropDown =
+                        $("#EnvironmentTypeId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- Select --</option>"
+                    );
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.Id,
+                                    text: item.Name
+                                })
+                            );
+
+                        }
+                    );
+
+                    loadSystemType();
+
+                }
+            );
+
+        }
+
+
+        $("select#EnvironmentTypeId").on(
+            "change",
+            function () {
+
+                loadSystemType();
+
+            }
+        );
+
+
+        function loadSystemType() {
+
+            var envTypeId =
+                $("#EnvironmentTypeId").val();
+
+            $.getJSON(
+                '@Url.Action("GetSystemListJsonResult", "SystemEnvironment")',
+                {
+                    envTypeId: envTypeId
+                },
+                function (data) {
+
+                    var dropDown =
+                        $("#SystemEnvironmentTypeId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- Select --</option>"
+                    );
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.SystemEnvironmentId,
+                                    text: item.System.AssetTypeName
+                                })
+                            );
+
+                        }
+                    );
+
+                }
+            );
+
+        }
+
+
+        function addSystem() {
+
+            var accessType =
+                $("#AccessTypeId").val();
+
+            var envTypeId =
+                $("#EnvironmentTypeId").val();
+
+            var envTypeName =
+                $("#EnvironmentTypeId option:selected")
+                    .text();
+
+            var systemId =
+                $("#SystemEnvironmentTypeId").val();
+
+            var systemName =
+                $("#SystemEnvironmentTypeId option:selected")
+                    .text();
+
+            var description =
+                $("#textDescription").val().trim();
+
+            var justification =
+                $("#textJustification").val().trim();
+
+            var privilegeLevel =
+                $("#textPrivilegeLevel").val().trim();
+
+            var monitoredBy =
+                $("#textMonitoredBy").val().trim();
+
+
+            if (
+                !envTypeId ||
+                envTypeId == "0" ||
+                !systemId ||
+                systemId == "0" ||
+                !description ||
+                !justification ||
+                (
+                    accessType == 2 &&
+                    (
+                        !privilegeLevel ||
+                        !monitoredBy
+                    )
+                )
+            ) {
+
+                Swal.fire(
+                    "Error!",
+                    "Please enter the valid details",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            var duplicate = false;
+
+            $("#systemdata input.iHidden")
+                .each(function () {
+
+                    if (
+                        $(this).val() ==
+                        systemId
+                    ) {
+                        duplicate = true;
+                    }
+
+                });
+
+
+            if (duplicate) {
+
+                Swal.fire(
+                    "Error!",
+                    "Please enter the valid details",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            var itemIndex =
+                $("#systemdata input.iHidden").length;
+
+
+            var row =
+                "<tr id='" + itemIndex + "'>" +
+
+                "<input id='SystemAccessItems_" + itemIndex + "__SystemEnvironmentId' class='iHidden' name='SystemAccessItems[" + itemIndex + "].SystemEnvironmentId' type='hidden' value='" + escapeHtml(systemId) + "'>" +
+
+                "<input id='SystemAccessItems_" + itemIndex + "__SystemEnvironment_EnvironmentType' name='SystemAccessItems[" + itemIndex + "].SystemEnvironment.EnvironmentType' type='hidden' value='" + escapeHtml(envTypeId) + "'>" +
+
+                "<input id='SystemAccessItems_" + itemIndex + "__SystemEnvironment_SystemName' name='SystemAccessItems[" + itemIndex + "].SystemEnvironment.SystemName' type='hidden' value='" + escapeHtml(systemName) + "'>" +
+
+                "<input id='SystemAccessItems_" + itemIndex + "__Description' name='SystemAccessItems[" + itemIndex + "].Description' type='hidden' value='" + escapeHtml(description) + "'>" +
+
+                "<input id='SystemAccessItems_" + itemIndex + "__Justification' name='SystemAccessItems[" + itemIndex + "].Justification' type='hidden' value='" + escapeHtml(justification) + "'>" +
+
+                "<input id='SystemAccessItems_" + itemIndex + "__PrivilegeLevel' name='SystemAccessItems[" + itemIndex + "].PrivilegeLevel' type='hidden' value='" + escapeHtml(privilegeLevel) + "'>" +
+
+                "<input id='SystemAccessItems_" + itemIndex + "__MonitoredBy' name='SystemAccessItems[" + itemIndex + "].MonitoredBy' type='hidden' value='" + escapeHtml(monitoredBy) + "'>" +
+
+                "<td>" + escapeHtml(envTypeName) + "</td>" +
+
+                "<td>" + escapeHtml(systemName) + "</td>" +
+
+                "<td>" + escapeHtml(description) + "</td>" +
+
+                "<td>" + escapeHtml(justification) + "</td>" +
+
+                "<td>" + escapeHtml(privilegeLevel) + "</td>" +
+
+                "<td>" + escapeHtml(monitoredBy) + "</td>" +
+
+                "<td class='text-end'>" +
+
+                "<button type='button' class='btn btn-sm btn-danger' onclick='deleteRow(" + itemIndex + ")'>" +
+
+                "<i class='align-middle' data-lucide='trash-2'></i>" +
+
+                "</button>" +
+
+                "</td>" +
+
+                "</tr>";
+
+
+            $("#systemdata")
+                .append(row);
+
+            refreshLucideIcons();
+
+        }
+
+
+        function loadAccessPrivilegeCategories() {
+
+            $.getJSON(
+                '@Url.Action("GetItemsJsonResult", "AccessPrivilegeCategory")',
+                function (data) {
+
+                    var dropDown =
+                        $("#AccessPrivilegeCategoryId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- Select --</option>"
+                    );
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.AccessPrivilegeCategoryId,
+                                    text: item.Name
+                                })
+                            );
+
+                        }
+                    );
+
+                    loadApplications();
+
+                }
+            );
+
+        }
+
+
+        $("select#AccessPrivilegeCategoryId").on(
+            "change",
+            function () {
+
+                loadApplications();
+
+            }
+        );
+
+
+        function loadApplications() {
+
+            var privilegeCategoryId =
+                $("#AccessPrivilegeCategoryId").val();
+
+            $.getJSON(
+                '@Url.Action("GetItemsByCatJsonResult", "AccessApplication")',
+                {
+                    privilegeCategoryId: privilegeCategoryId
+                },
+                function (data) {
+
+                    var dropDown =
+                        $("#AccessApplicationId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- Select --</option>"
+                    );
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.AccessApplicationId,
+                                    text: item.System.AssetTypeName
+                                })
+                            );
+
+                        }
+                    );
+
+                }
+            );
+
+        }
+
+
+        function loadAccessLevels() {
+
+            $.getJSON(
+                '@Url.Action("GetItemsJsonResult", "AccessLevel")',
+                function (data) {
+
+                    var dropDown =
+                        $("#AccessLevelId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- Select --</option>"
+                    );
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.AccessLevelId,
+                                    text: item.Name
+                                })
+                            );
+
+                        }
+                    );
+
+                }
+            );
+
+        }
+
+
+        function addPrivilegeAccess() {
+
+            var appId =
+                $("#AccessApplicationId").val();
+
+            var appName =
+                $("#AccessApplicationId option:selected")
+                    .text();
+
+            var privilegeCategoryId =
+                $("#AccessPrivilegeCategoryId").val();
+
+            var privilegeCategoryName =
+                $("#AccessPrivilegeCategoryId option:selected")
+                    .text();
+
+            var accessLevelId =
+                $("#AccessLevelId").val();
+
+            var accessLevelName =
+                $("#AccessLevelId option:selected")
+                    .text();
+
+
+            if (
+                !appId ||
+                appId == "0" ||
+                !privilegeCategoryId ||
+                privilegeCategoryId == "0" ||
+                !accessLevelId ||
+                accessLevelId == "0"
+            ) {
+
+                Swal.fire(
+                    "Error!",
+                    "Please enter the valid details",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            var duplicate = false;
+
+            $("#userprivilegedata input.iHidden")
+                .each(function () {
+
+                    if ($(this).val() == appId) {
+                        duplicate = true;
+                    }
+
+                });
+
+
+            if (duplicate) {
+
+                Swal.fire(
+                    "Error!",
+                    "Please enter the valid details",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            var itemIndex =
+                $("#userprivilegedata input.iHidden").length;
+
+
+            var row =
+                "<tr id='" + itemIndex + "'>" +
+
+                "<input id='UserPrivilegeAccessItems_" + itemIndex + "__AccessApplicationId' class='iHidden' name='UserPrivilegeAccessItems[" + itemIndex + "].AccessApplicationId' type='hidden' value='" + escapeHtml(appId) + "'>" +
+
+                "<input id='UserPrivilegeAccessItems_" + itemIndex + "__AccessApplication_ApplicationName' name='UserPrivilegeAccessItems[" + itemIndex + "].AccessApplication.ApplicationName' type='hidden' value='" + escapeHtml(appName) + "'>" +
+
+                "<input id='UserPrivilegeAccessItems_" + itemIndex + "__AccessPrivilegeCategoryId' name='UserPrivilegeAccessItems[" + itemIndex + "].AccessPrivilegeCategoryId' type='hidden' value='" + escapeHtml(privilegeCategoryId) + "'>" +
+
+                "<input id='UserPrivilegeAccessItems_" + itemIndex + "__AccessPrivilegeCategory_Name' name='UserPrivilegeAccessItems[" + itemIndex + "].AccessPrivilegeCategory.Name' type='hidden' value='" + escapeHtml(privilegeCategoryName) + "'>" +
+
+                "<input id='UserPrivilegeAccessItems_" + itemIndex + "__AccessLevelId' name='UserPrivilegeAccessItems[" + itemIndex + "].AccessLevelId' type='hidden' value='" + escapeHtml(accessLevelId) + "'>" +
+
+                "<input id='UserPrivilegeAccessItems_" + itemIndex + "__AccessLevel_Name' name='UserPrivilegeAccessItems[" + itemIndex + "].AccessLevel.Name' type='hidden' value='" + escapeHtml(accessLevelName) + "'>" +
+
+                "<td>" + escapeHtml(privilegeCategoryName) + "</td>" +
+
+                "<td>" + escapeHtml(appName) + "</td>" +
+
+                "<td>" + escapeHtml(accessLevelName) + "</td>" +
+
+                "<td class='text-end'>" +
+
+                "<button type='button' class='btn btn-sm btn-danger' onclick='deleteRowPrivilege(" + itemIndex + ")'>" +
+
+                "<i class='align-middle' data-lucide='trash-2'></i>" +
+
+                "</button>" +
+
+                "</td>" +
+
+                "</tr>";
+
+
+            $("#userprivilegedata")
+                .append(row);
+
+            refreshLucideIcons();
+
+        }
+
+
+        function loadPhysicalLocations() {
+
+            $.getJSON(
+                '@Url.Action("GetItemListJsonResult", "Branch")',
+                function (data) {
+
+                    var dropDown =
+                        $("#LocationId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- Select --</option>"
+                    );
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.BranchId,
+                                    text: item.Name
+                                })
+                            );
+
+                        }
+                    );
+
+                    loadPhysicalAreas();
+
+                }
+            );
+
+        }
+
+
+        $("select#LocationId").on(
+            "change",
+            function () {
+
+                loadPhysicalAreas();
+
+            }
+        );
+
+
+        function loadPhysicalAreas() {
+
+            var branchId =
+                $("#LocationId").val();
+
+            $.getJSON(
+                '@Url.Action("GetItemsByBranchJsonResult", "PhysicalArea")',
+                {
+                    branchId: branchId
+                },
+                function (data) {
+
+                    var dropDown =
+                        $("#PhysicalAreaId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- Select --</option>"
+                    );
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.PhysicalAreaId,
+                                    text: item.Name
+                                })
+                            );
+
+                        }
+                    );
+
+                }
+            );
+
+        }
+
+
+        function addAccessPhysical() {
+
+            var areaId =
+                $("#PhysicalAreaId").val();
+
+            var areaName =
+                $("#PhysicalAreaId option:selected")
+                    .text();
+
+            var locationId =
+                $("#LocationId").val();
+
+            var locationName =
+                $("#LocationId option:selected")
+                    .text();
+
+
+            if (!areaId || areaId == "0") {
+
+                Swal.fire(
+                    "Error!",
+                    "Please enter the valid details",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            var duplicate = false;
+
+            $("#physicaldata input.iHidden")
+                .each(function () {
+
+                    if ($(this).val() == areaId) {
+                        duplicate = true;
+                    }
+
+                });
+
+
+            if (duplicate) {
+
+                Swal.fire(
+                    "Error!",
+                    "Please enter the valid details",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            var itemIndex =
+                $("#physicaldata input.iHidden").length;
+
+
+            var row =
+                "<tr id='" + itemIndex + "'>" +
+
+                "<input id='PhysicalAccessItems_" + itemIndex + "__PhysicalAreaId' class='iHidden' name='PhysicalAccessItems[" + itemIndex + "].PhysicalAreaId' type='hidden' value='" + escapeHtml(areaId) + "'>" +
+
+                "<input id='PhysicalAccessItems_" + itemIndex + "__PhysicalArea_Name' name='PhysicalAccessItems[" + itemIndex + "].PhysicalArea.Name' type='hidden' value='" + escapeHtml(areaName) + "'>" +
+
+                "<input id='PhysicalAccessItems_" + itemIndex + "__PhysicalArea_BranchId' name='PhysicalAccessItems[" + itemIndex + "].PhysicalArea.BranchId' type='hidden' value='" + escapeHtml(locationId) + "'>" +
+
+                "<input id='PhysicalAccessItems_" + itemIndex + "__PhysicalArea_Branch_Name' name='PhysicalAccessItems[" + itemIndex + "].PhysicalArea.Branch.Name' type='hidden' value='" + escapeHtml(locationName) + "'>" +
+
+                "<td>" + escapeHtml(locationName) + "</td>" +
+
+                "<td>" + escapeHtml(areaName) + "</td>" +
+
+                "<td class='text-end'>" +
+
+                "<button type='button' class='btn btn-sm btn-danger' onclick='deleteRowAccessPhysical(" + itemIndex + ")'>" +
+
+                "<i class='align-middle' data-lucide='trash-2'></i>" +
+
+                "</button>" +
+
+                "</td>" +
+
+                "</tr>";
+
+
+            $("#physicaldata")
+                .append(row);
+
+            refreshLucideIcons();
+
+        }
+
+
+        function loadUserAccessTypes() {
+
+            $.getJSON(
+                '@Url.Action("GetItemsJsonResult", "UserAccessItemType")',
+                function (data) {
+
+                    var dropDown =
+                        $("#UserAccessItemTypeId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- Select --</option>"
+                    );
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            var text =
+                                item.Name;
+
+                            if (item.AdditionalInfo) {
+
+                                text +=
+                                    " - " +
+                                    item.AdditionalInfo;
+
+                            }
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.UserAccessItemTypeId,
+                                    text: text
+                                })
+                            );
+
+                        }
+                    );
+
+                }
+            );
+
+        }
+
+
+        function addUserAccess() {
+
+            var typeId =
+                $("#UserAccessItemTypeId").val();
+
+            var typeName =
+                $("#UserAccessItemTypeId option:selected")
+                    .text();
+
+            var description =
+                $("#textUserAccessDescription").val().trim();
+
+            var justification =
+                $("#textUserAccessJustification").val().trim();
+
+
+            if (
+                !typeId ||
+                typeId == "0" ||
+                !description ||
+                !justification
+            ) {
+
+                Swal.fire(
+                    "Error!",
+                    "Please enter the valid details",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            var duplicate = false;
+
+            $("#useraccessdata input.iHidden")
+                .each(function () {
+
+                    if ($(this).val() == typeId) {
+                        duplicate = true;
+                    }
+
+                });
+
+
+            if (duplicate) {
+
+                Swal.fire(
+                    "Error!",
+                    "Please enter the valid details",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            var itemIndex =
+                $("#useraccessdata input.iHidden").length;
+
+
+            var row =
+                "<tr id='" + itemIndex + "'>" +
+
+                "<input id='UserAccessItems_" + itemIndex + "__UserAccessItemTypeId' class='iHidden' name='UserAccessItems[" + itemIndex + "].UserAccessItemTypeId' type='hidden' value='" + escapeHtml(typeId) + "'>" +
+
+                "<input id='UserAccessItems_" + itemIndex + "__UserAccessItemType_Name' name='UserAccessItems[" + itemIndex + "].UserAccessItemType.Name' type='hidden' value='" + escapeHtml(typeName) + "'>" +
+
+                "<input id='UserAccessItems_" + itemIndex + "__Description' name='UserAccessItems[" + itemIndex + "].Description' type='hidden' value='" + escapeHtml(description) + "'>" +
+
+                "<input id='UserAccessItems_" + itemIndex + "__Justification' name='UserAccessItems[" + itemIndex + "].Justification' type='hidden' value='" + escapeHtml(justification) + "'>" +
+
+                "<td>" + escapeHtml(typeName) + "</td>" +
+
+                "<td>" + escapeHtml(description) + "</td>" +
+
+                "<td>" + escapeHtml(justification) + "</td>" +
+
+                "<td class='text-end'>" +
+
+                "<button type='button' class='btn btn-sm btn-danger' onclick='deleteRowUserAccess(" + itemIndex + ")'>" +
+
+                "<i class='align-middle' data-lucide='trash-2'></i>" +
+
+                "</button>" +
+
+                "</td>" +
+
+                "</tr>";
+
+
+            $("#useraccessdata")
+                .append(row);
+
+            refreshLucideIcons();
+
+        }
+
+
+        function SearchAssets() {
+
+            $("#AssetName").autocomplete({
+
+                source: function (request, response) {
+
+                    $.ajax({
+
+                        url: '@Url.Action("GetSearchByIdJsonResult", "Asset")',
+
+                        dataType: "json",
+
+                        data: {
+                            term: request.term
+                        },
+
+                        success: function (data) {
+
+                            response(
+                                $.map(
+                                    data,
+                                    function (val) {
+
+                                        return {
+                                            label: val.Barcode + " - " + val.AssetName,
+                                            value: val.Barcode + " - " + val.AssetName,
+                                            itemId: val.AssetId
+                                        };
+
+                                    }
+                                )
+                            );
+
+                        }
+
+                    });
+
+                },
+
+                minLength: 6,
+
+                select: function (event, ui) {
+
+                    $("#AssetId")
+                        .val(ui.item.itemId);
+
+                }
+
+            });
+
+        }
+
+
+        function loadDeviceAccessTypes() {
+
+            $.getJSON(
+                '@Url.Action("GetItemsJsonResult", "DeviceAccessItemType")',
+                function (data) {
+
+                    var dropDown =
+                        $("#DeviceAccessItemTypeId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- Select --</option>"
+                    );
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.DeviceAccessItemTypeId,
+                                    text: item.Name
+                                })
+                            );
+
+                        }
+                    );
+
+                }
+            );
+
+        }
+
+
+        function addDeviceAccess() {
+
+            var typeId =
+                $("#DeviceAccessItemTypeId").val();
+
+            var typeName =
+                $("#DeviceAccessItemTypeId option:selected")
+                    .text();
+
+
+            if (!typeId || typeId == "0") {
+
+                Swal.fire(
+                    "Error!",
+                    "Please enter the valid details",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            var duplicate = false;
+
+            $("#deviceaccessdata input.iHidden")
+                .each(function () {
+
+                    if ($(this).val() == typeId) {
+                        duplicate = true;
+                    }
+
+                });
+
+
+            if (duplicate) {
+
+                Swal.fire(
+                    "Error!",
+                    "Please enter the valid details",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            var itemIndex =
+                $("#deviceaccessdata input.iHidden").length;
+
+
+            var row =
+                "<tr id='" + itemIndex + "'>" +
+
+                "<input id='DeviceAccessItems_" + itemIndex + "__DeviceAccessItemTypeId' class='iHidden' name='DeviceAccessItems[" + itemIndex + "].DeviceAccessItemTypeId' type='hidden' value='" + escapeHtml(typeId) + "'>" +
+
+                "<input id='DeviceAccessItems_" + itemIndex + "__DeviceAccessItemType_Name' name='DeviceAccessItems[" + itemIndex + "].DeviceAccessItemType.Name' type='hidden' value='" + escapeHtml(typeName) + "'>" +
+
+                "<td>" + escapeHtml(typeName) + "</td>" +
+
+                "<td class='text-end'>" +
+
+                "<button type='button' class='btn btn-sm btn-danger' onclick='deleteRowDeviceAccess(" + itemIndex + ")'>" +
+
+                "<i class='align-middle' data-lucide='trash-2'></i>" +
+
+                "</button>" +
+
+                "</td>" +
+
+                "</tr>";
+
+
+            $("#deviceaccessdata")
+                .append(row);
+
+            refreshLucideIcons();
+
+        }
+
+
+        function addRemoteAccess() {
+
+            var typeId =
+                $("#RemoteAccessItemTypeId").val();
+
+            var typeName =
+                $("#RemoteAccessItemTypeId option:selected")
+                    .text();
+
+            var description =
+                $("#textRemoteAccessDescription").val().trim();
+
+
+            if (
+                !typeId ||
+                typeId == "0" ||
+                !description
+            ) {
+
+                Swal.fire(
+                    "Error!",
+                    "Please enter the valid details",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            var duplicate = false;
+
+            $("#remoteaccessdata input.iHidden")
+                .each(function () {
+
+                    if ($(this).val() == typeId) {
+                        duplicate = true;
+                    }
+
+                });
+
+
+            if (duplicate) {
+
+                Swal.fire(
+                    "Error!",
+                    "Please enter the valid details",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            var itemIndex =
+                $("#remoteaccessdata input.iHidden").length;
+
+
+            var row =
+                "<tr id='" + itemIndex + "'>" +
+
+                "<input id='RemoteAccessItems_" + itemIndex + "__AssetTypeId' class='iHidden' name='RemoteAccessItems[" + itemIndex + "].AssetTypeId' type='hidden' value='" + escapeHtml(typeId) + "'>" +
+
+                "<input id='RemoteAccessItems_" + itemIndex + "__AssetType_AssetTypeName' name='RemoteAccessItems[" + itemIndex + "].AssetType.AssetTypeName' type='hidden' value='" + escapeHtml(typeName) + "'>" +
+
+                "<input id='RemoteAccessItems_" + itemIndex + "__Description' name='RemoteAccessItems[" + itemIndex + "].Description' type='hidden' value='" + escapeHtml(description) + "'>" +
+
+                "<td>" + escapeHtml(typeName) + "</td>" +
+
+                "<td>" + escapeHtml(description) + "</td>" +
+
+                "<td class='text-end'>" +
+
+                "<button type='button' class='btn btn-sm btn-danger' onclick='deleteRowRemoteAccess(" + itemIndex + ")'>" +
+
+                "<i class='align-middle' data-lucide='trash-2'></i>" +
+
+                "</button>" +
+
+                "</td>" +
+
+                "</tr>";
+
+
+            $("#remoteaccessdata")
+                .append(row);
+
+            refreshLucideIcons();
+
+        }
+
+
+        function reindexCollection(
+            tableSelector,
+            collectionName
+        ) {
+
+            $(tableSelector + " tr")
+                .each(function (rowIndex) {
+
+                    $(this)
+                        .attr(
+                            "id",
+                            rowIndex
+                        );
+
+                    $(this)
+                        .find(
+                            "[name^='" +
+                            collectionName +
+                            "'][name*='[']"
+                        )
+                        .each(function () {
+
+                            var name =
+                                $(this).attr("name");
+
+                            if (!name) {
+                                return;
+                            }
+
+                            var newName =
+                                name.replace(
+                                    /\[\d+\]/,
+                                    "[" + rowIndex + "]"
+                                );
+
+                            $(this)
+                                .attr(
+                                    "name",
+                                    newName
+                                );
+
+                        });
+
+                    $(this)
+                        .find(
+                            "[id^='" +
+                            collectionName +
+                            "_']"
+                        )
+                        .each(function () {
+
+                            var id =
+                                $(this).attr("id");
+
+                            if (!id) {
+                                return;
+                            }
+
+                            var newId =
+                                id.replace(
+                                    new RegExp(
+                                        "^" +
+                                        collectionName +
+                                        "_\\d+__"
+                                    ),
+                                    collectionName +
+                                    "_" +
+                                    rowIndex +
+                                    "__"
+                                );
+
+                            $(this)
+                                .attr(
+                                    "id",
+                                    newId
+                                );
+
+                        });
+
+                });
+
+        }
+
+
+        function deleteRow(index) {
+
+            $("#systemdata #" + index)
+                .remove();
+
+            reindexCollection(
+                "#systemdata",
+                "SystemAccessItems"
+            );
+
+        }
+
+
+        function deleteRowPrivilege(index) {
+
+            $("#userprivilegedata #" + index)
+                .remove();
+
+            reindexCollection(
+                "#userprivilegedata",
+                "UserPrivilegeAccessItems"
+            );
+
+        }
+
+
+        function deleteRowAccessPhysical(index) {
+
+            $("#physicaldata #" + index)
+                .remove();
+
+            reindexCollection(
+                "#physicaldata",
+                "PhysicalAccessItems"
+            );
+
+        }
+
+
+        function deleteRowUserAccess(index) {
+
+            $("#useraccessdata #" + index)
+                .remove();
+
+            reindexCollection(
+                "#useraccessdata",
+                "UserAccessItems"
+            );
+
+        }
+
+
+        function deleteRowDeviceAccess(index) {
+
+            $("#deviceaccessdata #" + index)
+                .remove();
+
+            reindexCollection(
+                "#deviceaccessdata",
+                "DeviceAccessItems"
+            );
+
+        }
+
+
+        function deleteRowRemoteAccess(index) {
+
+            $("#remoteaccessdata #" + index)
+                .remove();
+
+            reindexCollection(
+                "#remoteaccessdata",
+                "RemoteAccessItems"
+            );
+
+        }
+
+    </script>
+
+}

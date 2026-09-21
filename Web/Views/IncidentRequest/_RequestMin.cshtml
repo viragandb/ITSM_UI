@@ -1,0 +1,161 @@
+﻿@model Domain.IM.IncidentRequest
+@using Service.IM
+@using Service
+
+<div class="row g-4">
+
+    <div class="col-lg-8">
+
+        <div class="mb-3">
+
+            <div class="fw-semibold">
+                @Html.DisplayNameFor(model => model.Subject)
+            </div>
+
+            <div class="text-muted mt-1">
+                @Model.Subject
+            </div>
+
+        </div>
+
+        <hr />
+
+        <div class="mb-3">
+
+            <div class="fw-semibold">
+                @Html.DisplayNameFor(model => model.Description)
+            </div>
+
+            <div class="text-muted mt-1"
+                 style="white-space: pre-wrap;">
+                @Model.Description
+            </div>
+
+        </div>
+
+        <hr />
+
+        <div class="mb-3">
+
+            <div class="fw-semibold">
+                @Html.DisplayNameFor(model => model.BusinessImpact)
+            </div>
+
+            <div class="text-muted mt-1"
+                 style="white-space: pre-wrap;">
+                @Model.BusinessImpact
+            </div>
+
+        </div>
+
+        <hr />
+
+        <dl class="row mb-0">
+
+            <dt class="col-sm-3">
+                @Html.DisplayNameFor(model => model.OccurredDate)
+            </dt>
+
+            <dd class="col-sm-3">
+                @Model.OccurredDate
+            </dd>
+
+            <dt class="col-sm-3">
+                @Html.DisplayNameFor(model => model.Impact)
+            </dt>
+
+            <dd class="col-sm-3">
+
+                <span class="badge bg-@IncidentRequestService.GetImpactColor(Model.Impact)">
+                    @Model.Impact.EnumDisplayName()
+                </span>
+
+            </dd>
+
+            <dt class="col-sm-3">
+                @Html.DisplayNameFor(model => model.Level01TeamId)
+            </dt>
+
+            <dd class="col-sm-9">
+                @(Model.Level01Team != null ? Model.Level01Team.TeamName : "N/A")
+            </dd>
+
+        </dl>
+
+    </div>
+
+
+    <div class="col-lg-4">
+
+        <div class="card">
+
+            <div class="card-header">
+
+                <h5 class="card-title mb-0">
+                    <i class="align-middle me-2" data-lucide="user"></i>
+                    Requester
+                </h5>
+
+            </div>
+
+            <div class="card-body">
+
+                <div class="mb-3">
+
+                    <div class="fw-semibold">
+                        <i class="align-middle me-1" data-lucide="credit-card"></i>
+                        User
+                    </div>
+
+                    <div class="text-muted">
+                        @Model.RequestedBy - @Model.RequestedUser.FullName
+                    </div>
+
+                </div>
+
+                <div class="mb-3">
+
+                    <div class="fw-semibold">
+                        <i class="align-middle me-1" data-lucide="briefcase"></i>
+                        Designation
+                    </div>
+
+                    <div class="text-muted">
+                        @Model.RequestedUser.DesignationName
+                    </div>
+
+                </div>
+
+                <div class="mb-3">
+
+                    <div class="fw-semibold">
+                        <i class="align-middle me-1" data-lucide="phone"></i>
+                        Contact No
+                    </div>
+
+                    <div class="text-muted">
+                        @Model.RequestedUser.ContactNo
+                    </div>
+
+                </div>
+
+                <div class="mb-0">
+
+                    <div class="fw-semibold">
+                        <i class="align-middle me-1" data-lucide="mail"></i>
+                        Email
+                    </div>
+
+                    <div class="text-muted text-break">
+                        @Model.RequestedUser.Email
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

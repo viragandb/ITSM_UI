@@ -1,0 +1,550 @@
+﻿@model ICollection<Web.Models.WorkTaskUserVM>
+@using Service
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("Pending", "WorkTask", FormMethod.Get))
+{
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card">
+
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="align-middle me-2" data-lucide="clipboard-check"></i>
+                        Work Notes
+                    </h5>
+                </div>
+
+                <div class="card-body">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-4">
+
+                            <label for="TeamId" class="form-label">
+                                Team
+                            </label>
+
+                            <select id="TeamId"
+                                    name="TeamId"
+                                    class="form-select">
+                                <option value=""></option>
+                            </select>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <label for="UserEmpNo" class="form-label">
+                                Task Owner
+                            </label>
+
+                            <select id="UserEmpNo"
+                                    name="UserEmpNo"
+                                    class="form-select">
+                                <option value=""></option>
+                            </select>
+
+                            <span class="text-danger"
+                                  data-valmsg-for="UserEmpNo"
+                                  data-valmsg-replace="true">
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="card-footer">
+
+                    <div class="d-flex justify-content-end">
+
+                        <button type="submit"
+                                class="btn btn-sm btn-primary">
+
+                            <i class="align-middle me-1" data-lucide="search"></i>
+                            Search
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-12">
+
+            <div class="accordion" id="workTaskAccordion">
+
+                @foreach (var item in Model)
+                {
+                    var collapseId = "workTaskUser_" + item.UserId;
+
+                    <div class="accordion-item mb-3">
+
+                        <h2 class="accordion-header"
+                            id="heading_@item.UserId">
+
+                            <button class="accordion-button collapsed"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#@collapseId"
+                                    aria-expanded="false"
+                                    aria-controls="@collapseId">
+
+                                <div class="d-flex flex-column flex-md-row align-items-md-center gap-1 gap-md-3">
+
+                                    <span class="fw-semibold">
+                                        <i class="align-middle me-1" data-lucide="user"></i>
+                                        @(item.TaskUser != null
+                                            ? item.TaskUser.FullName
+                                            : "N/A")
+                                    </span>
+
+                                    @if (item.TaskUser != null &&
+                                         !string.IsNullOrWhiteSpace(item.TaskUser.DesignationName))
+                                    {
+                                        <span class="text-muted">
+                                            <i class="align-middle me-1" data-lucide="briefcase"></i>
+                                            @item.TaskUser.DesignationName
+                                        </span>
+                                    }
+
+                                </div>
+
+                            </button>
+
+                        </h2>
+
+                        <div id="@collapseId"
+                             class="accordion-collapse collapse"
+                             aria-labelledby="heading_@item.UserId"
+                             data-bs-parent="#workTaskAccordion">
+
+                            <div class="accordion-body">
+
+                                <div class="table-responsive">
+
+                                    <table class="table table-striped table-hover align-middle workTaskTable">
+
+                                        <thead>
+                                            <tr>
+                                                <th>Task Date</th>
+                                                <th>Subject</th>
+                                                <th>Description</th>
+                                                <th>Start Time</th>
+                                                <th>End Time</th>
+                                                <th>Spent Hrs</th>
+                                                <th>Requested Date</th>
+                                                <th class="text-end">Action</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+
+                                            @if (item.Tasks != null)
+                                            {
+                                                foreach (var task in item.Tasks)
+                                                {
+                                                    <tr>
+
+                                                        <td>
+                                                            @task.TaskDate.ToShortDateString()
+                                                        </td>
+
+                                                        <td>
+                                                            @task.Subject
+                                                        </td>
+
+                                                        <td>
+                                                            @task.Description
+                                                        </td>
+
+                                                        <td>
+                                                            @task.StartTime.ToShortTimeString()
+                                                        </td>
+
+                                                        <td>
+                                                            @task.EndTime.ToShortTimeString()
+                                                        </td>
+
+                                                        <td>
+                                                            @task.SpentTime
+                                                        </td>
+
+                                                        <td>
+                                                            @task.RequestedDate
+                                                        </td>
+
+                                                        <td class="text-end">
+
+                                                            <button type="button"
+                                                                    class="btn btn-sm btn-danger"
+                                                                    onclick="rejectItem('@task.WorkTaskId')">
+
+                                                                <i class="align-middle me-1"
+                                                                   data-lucide="x"></i>
+
+                                                                Reject
+
+                                                            </button>
+
+                                                        </td>
+
+                                                    </tr>
+                                                }
+                                            }
+
+                                        </tbody>
+
+                                    </table>
+
+                                </div>
+
+                            </div>
+
+                            <div class="border-top p-3">
+
+                                <div class="d-flex justify-content-end">
+
+                                    <button type="button"
+                                            class="btn btn-sm btn-primary"
+                                            onclick="approveItem('@item.UserId')">
+
+                                        <i class="align-middle me-1"
+                                           data-lucide="check-check"></i>
+
+                                        Approve All Tasks
+
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                }
+
+            </div>
+
+        </div>
+    </div>
+}
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $(".workTaskTable").DataTable({
+                paging: false,
+                lengthChange: true,
+                searching: false,
+                ordering: true,
+                info: true,
+                responsive: true,
+                autoWidth: false
+            });
+
+            loadTeams();
+
+        });
+
+
+        function parseJsonResult(data) {
+
+            if (typeof data === "string") {
+
+                try {
+                    return JSON.parse(data);
+                }
+                catch (e) {
+                    return [];
+                }
+
+            }
+
+            return data || [];
+        }
+
+
+        $("#TeamId").on("change", function () {
+            loadUsers();
+        });
+
+
+        function loadTeams() {
+
+            var dropDown = $("#TeamId");
+
+            dropDown.empty();
+
+            dropDown.append(
+                "<option value='0'>-- Select --</option>"
+            );
+
+
+            $.getJSON(
+                '@Url.Action("GetTeamUserListJsonResult", "Team")',
+                function (data) {
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.TeamId,
+                                    text: item.TeamName
+                                })
+                            );
+
+                        }
+                    );
+
+
+                    var selectedTeamId = '@ViewBag.TeamId';
+
+                    if (selectedTeamId) {
+                        dropDown.val(selectedTeamId);
+                    }
+
+                    loadUsers();
+
+                }
+            );
+
+        }
+
+
+        function loadUsers() {
+
+            var teamId = $("#TeamId").val();
+
+            var dropDown = $("#UserEmpNo");
+
+            dropDown.empty();
+
+            dropDown.append(
+                "<option value='0'>-- All --</option>"
+            );
+
+
+            $.getJSON(
+                '@Url.Action("GetUsersByTeamIdJsonResult", "User")',
+                {
+                    teamId: teamId
+                },
+                function (data) {
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.EmpNo,
+                                    text:
+                                        item.EmpNo +
+                                        " - " +
+                                        item.FullName +
+                                        " (" +
+                                        (item.DesignationName || "") +
+                                        ")"
+                                })
+                            );
+
+                        }
+                    );
+
+
+                    var selectedEmpNo = '@ViewBag.UserEmpNo';
+
+                    if (selectedEmpNo) {
+                        dropDown.val(selectedEmpNo);
+                    }
+
+                }
+            );
+
+        }
+
+
+        function rejectItem(itemId) {
+
+            Swal.fire({
+
+                title: "Are you sure?",
+                text: "Do you want to reject the task?",
+                icon: "warning",
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                showCancelButton: true,
+                reverseButtons: true
+
+            }).then(function (result) {
+
+                if (result.isConfirmed || result.value) {
+
+                    $.ajax({
+
+                        url: '@Url.Action("Reject", "WorkTask")',
+
+                        type: "GET",
+
+                        dataType: "json",
+
+                        data: {
+                            taskId: itemId
+                        },
+
+                        success: function (data) {
+
+                            if (data == "1" || data == 1) {
+
+                                Swal.fire(
+                                    "Rejected!",
+                                    "Task has been rejected",
+                                    "success"
+                                ).then(function () {
+                                    window.location.reload();
+                                });
+
+                            }
+                            else {
+
+                                Swal.fire(
+                                    "Something went wrong!",
+                                    "Data is not deleted. Please try again",
+                                    "error"
+                                );
+
+                            }
+
+                        },
+
+                        error: function () {
+
+                            Swal.fire(
+                                "Something went wrong!",
+                                "Data is not deleted. Please try again",
+                                "error"
+                            );
+
+                        }
+
+                    });
+
+                }
+                else {
+
+                    Swal.fire(
+                        "Cancelled",
+                        "Action canceled, Data is not deleted",
+                        "error"
+                    );
+
+                }
+
+            });
+
+        }
+
+
+        function approveItem(taskuserId) {
+
+            Swal.fire({
+
+                title: "Are you sure?",
+                text: "Do you want to approve all tasks?",
+                icon: "warning",
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                showCancelButton: true,
+                reverseButtons: true
+
+            }).then(function (result) {
+
+                if (result.isConfirmed || result.value) {
+
+                    $.ajax({
+
+                        url: '@Url.Action("Approve", "WorkTask")',
+
+                        type: "GET",
+
+                        dataType: "json",
+
+                        data: {
+                            userId: taskuserId
+                        },
+
+                        success: function (data) {
+
+                            if (data == "1" || data == 1) {
+
+                                Swal.fire(
+                                    "Approved!",
+                                    "Task has been approved",
+                                    "success"
+                                ).then(function () {
+                                    window.location.reload();
+                                });
+
+                            }
+                            else {
+
+                                Swal.fire(
+                                    "Something went wrong!",
+                                    "Data is not updated. Please try again",
+                                    "error"
+                                );
+
+                            }
+
+                        },
+
+                        error: function () {
+
+                            Swal.fire(
+                                "Something went wrong!",
+                                "Data is not updated. Please try again",
+                                "error"
+                            );
+
+                        }
+
+                    });
+
+                }
+                else {
+
+                    Swal.fire(
+                        "Cancelled",
+                        "Action canceled, Data is not updated",
+                        "error"
+                    );
+
+                }
+
+            });
+
+        }
+
+    </script>
+}

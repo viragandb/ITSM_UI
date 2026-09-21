@@ -1,0 +1,175 @@
+﻿@model Domain.TicketTask
+@using Service
+
+<div class="row g-3">
+
+    <div class="col-md-8">
+
+        <div class="mb-3">
+
+            <label class="form-label fw-semibold">
+                @Html.DisplayNameFor(model => model.Subject)
+            </label>
+
+            <div class="text-muted">
+                @Model.Subject
+            </div>
+
+        </div>
+
+        <hr />
+
+        <div class="mb-3">
+
+            <label class="form-label fw-semibold">
+                @Html.DisplayNameFor(model => model.Description)
+            </label>
+
+            <div class="text-muted">
+                @Model.Description
+            </div>
+
+        </div>
+
+        <hr />
+
+        <dl class="row mb-0">
+
+            <dt class="col-sm-3">
+                @Html.DisplayNameFor(model => model.AllocatedTeamId)
+            </dt>
+
+            <dd class="col-sm-3">
+                @(Model.AllocatedTeam != null
+                    ? Model.AllocatedTeam.TeamName
+                    : "N/A")
+            </dd>
+
+            <dt class="col-sm-3">
+                @Html.DisplayNameFor(model => model.CreatedDate)
+            </dt>
+
+            <dd class="col-sm-3">
+                @Model.CreatedDate
+            </dd>
+
+        </dl>
+
+        @if (!string.IsNullOrWhiteSpace(Model.Comment))
+        {
+            <hr />
+
+            <div class="mb-0">
+
+                <label class="form-label fw-semibold">
+                    @Html.DisplayNameFor(model => model.Comment)
+                </label>
+
+                <div class="text-muted">
+                    @Model.Comment
+                </div>
+
+                <div class="small text-muted mt-1">
+                    @Model.UpdatedBy
+
+                    @if (Model.UpdatedDate != null)
+                    {
+                        <span class="mx-1">|</span>
+                        @Model.UpdatedDate
+                    }
+                </div>
+
+            </div>
+        }
+
+    </div>
+
+
+    <div class="col-md-4">
+
+        <div class="card mb-3">
+
+            <div class="card-body">
+
+                <div class="d-flex align-items-center mb-2">
+
+                    <i class="align-middle me-2"
+                       data-lucide="user"></i>
+
+                    <strong>
+                        @Html.DisplayNameFor(model => model.CreatedBy)
+                    </strong>
+
+                </div>
+
+                <div class="text-muted">
+                    @(Model.CreatedUser != null
+                        ? Model.CreatedUser.FullName
+                        : Model.CreatedBy)
+                </div>
+
+            </div>
+
+        </div>
+
+
+        @if (Model.AssignedBy != null)
+        {
+            <div class="card mb-3">
+
+                <div class="card-body">
+
+                    <div class="d-flex align-items-center mb-2">
+
+                        <i class="align-middle me-2"
+                           data-lucide="user-plus"></i>
+
+                        <strong>
+                            @Html.DisplayNameFor(model => model.AssignedBy)
+                        </strong>
+
+                    </div>
+
+                    <div class="text-muted">
+                        @(Model.AssignedByUser != null
+                            ? Model.AssignedByUser.FullName
+                            : Model.AssignedBy)
+                    </div>
+
+                </div>
+
+            </div>
+        }
+
+
+        @if (Model.AssignedTo != null)
+        {
+            <div class="card">
+
+                <div class="card-body">
+
+                    <div class="d-flex align-items-center mb-2">
+
+                        <i class="align-middle me-2"
+                           data-lucide="user-check"></i>
+
+                        <strong>
+                            @Html.DisplayNameFor(model => model.AssignedTo)
+                        </strong>
+
+                    </div>
+
+                    <div class="text-muted">
+                        @(Model.AssignedToUser != null
+                            ? Model.AssignedToUser.FullName
+                            : Model.AssignedTo)
+                    </div>
+
+                </div>
+
+            </div>
+        }
+
+    </div>
+
+</div>

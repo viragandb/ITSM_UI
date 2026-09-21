@@ -1,0 +1,143 @@
+﻿@using Service
+@model IEnumerable<Domain.Policy>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+
+}
+
+<div class="row">
+
+    <div class="col-md-12">
+        <!-- Horizontal Form -->
+        <div class="card box-danger">
+
+            <div class="card-header with-border">
+                <h3 class="card-title">Policies</h3>
+                <div class="card-tools pull-right">
+                    <a href="@Url.Action("Create", "Policy")" class="btn btn-social btn-cancel">
+                        <i class="fa fa-plus"></i>Add New
+                    </a>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <!-- form start -->
+
+            <div class="card-body">
+
+                <table id="dataTable" class="table table-bordered table-striped table-hover dataTable">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Updated By</th>
+                            <th>Updated Date</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            foreach (var item in Model)
+                            {
+                                <tr>
+
+                                    <td>@item.PolicyName</td>
+                                    <td>@item.UpdatedBy</td>
+                                    <td>@item.UpdatedDate</td>
+                                    <td>
+                                        <a href="@Url.Action("Edit", "Policy", new { id = item.PolicyId })" class="btn btn-social-icon btn-edit">
+                                            <i class="fa fa-pencil"></i>
+                                        </a>
+                                        <a onclick="deleteItem('@item.PolicyId')" class="btn btn-social-icon btn-delete">
+                                            <i class="fa fa-trash-o"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+
+                </table>
+
+
+            </div>
+            <!-- /.box-body -->
+
+
+
+
+
+        </div>
+        <!-- /.box -->
+
+    </div>
+</div>
+
+
+
+@section scripts {
+    <script src="~/Scripts/jquery.validate.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
+
+
+    <script type="text/javascript">
+
+
+        function deleteItem(itemId) {
+
+            swal({
+                title: "Are you sure?",
+                text: "Do you want to delete?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                closeOnConfirm: true,
+                closeOnCancel: true
+            }, function (isConfirm) {
+                if (isConfirm) {
+                    $.ajax({
+                        url: "@Url.Action("Delete", "Policy")",
+                        type: 'GET',
+                        dataType: "json",
+                        data: { id: itemId },
+                        success: function (data) {
+                            if (data == "1") {
+                                swal("Deleted!", "Record has been deleted", "success");
+                                setTimeout(function () {
+                                    window.location.reload();
+                                }, 1000);
+                            }
+                            else if(data == "2")
+                                swal("Data in use!", "Data is currently in use and can not be deleted", "error");
+                            else
+                                swal("Something went wrong!", "Data is not deleted, Please try again", "error");
+                        },
+                        error: function (xhr) {
+                            swal("Something went wrong!", "Data is not deleted, Please try again", "error");
+                        }
+                    });
+
+                } else {
+                    swal("Cancelled", "Action canceled, Data is not deleted", "error");
+                }
+            });
+        }
+
+        $(document).ready(function () {
+
+            $('#dataTable').DataTable({
+                "paging": false,
+                "lengthChange": true,
+                "searching": true,
+                "ordering": true,
+                "info": true,
+                "autoWidth": true,
+            });
+
+
+
+        });
+    </script>
+}
+

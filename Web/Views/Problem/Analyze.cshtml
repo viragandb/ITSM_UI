@@ -1,0 +1,77 @@
+﻿
+@model ICollection<Domain.Problem>
+@using Service
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="row">
+
+    <div class="col-lg-12">
+        <div class="card card-danger">
+
+            <div class="card-header with-border">
+                <h3 class="card-title">Problems</h3>
+
+            </div>
+
+            <div class="card-body">
+                <br />
+                @{
+                    foreach (var item in Model)
+                    {
+
+                        <div class="panel box card-default">
+                            <div class="card-header">
+                                <h4 class="card-title">
+                                    <a data-bs-toggle="collapse" data-parent="#accordion" href="#@item.ProblemId">
+                                        Problem @item.ProblemId
+                                    </a>
+                                    | &nbsp;&nbsp;&nbsp; @item.RequestType.Category.CategoryName
+                                    &nbsp;&nbsp;<i class="fa fa-angle-double-right"></i>&nbsp;&nbsp; @item.RequestType.AssetType.AssetTypeName
+                                    &nbsp;&nbsp;<i class="fa fa-angle-double-right"></i>&nbsp;&nbsp;<b>@item.RequestType.SubCategory.SubCategoryName </b>
+
+                                </h4>
+                                <div class="card-tools pull-right">
+                                    @item.RequestedDate.ToShortDateString()
+                                    &nbsp;&nbsp;
+                                    <a href="@Html.EncodedActionLink("","Info", "Problem","", new { id = item.ProblemId },null)" target="_blank" class="btn btn-sm  btn-default">
+                                        <i class="fa fa-info"></i>
+                                    </a>
+
+                                    <a href="@Html.EncodedActionLink("","UpdateAnalyze", "Problem","", new { id = item.ProblemId },null)" class="btn btn-sm btn-social btn-warning">
+                                        <i class="fa fa-cogs"></i>Analyze
+                                    </a>
+
+                                </div>
+
+                            </div>
+                            <div id="@item.ProblemId" class="panel-collapse collapse">
+                                <div class="card-body">
+                                    @Html.Partial("_Problem", item)
+                                </div>
+                                                               
+                            </div>
+                        </div>
+                    }
+                }
+
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+@section scripts {
+
+
+   
+}
+
+
+
+

@@ -1,0 +1,713 @@
+﻿@model Web.Models.NewChangeRequestVM
+@using Service
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("Create", "ChangeRequest", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+
+    <div class="row">
+        <div class="col-12">
+
+            <div class="card">
+
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="align-middle me-2" data-lucide="plus"></i>
+                        New Request
+                    </h5>
+                </div>
+
+                <div class="card-body">
+
+                    <div class="mb-3">
+
+                        @Html.LabelFor(
+                            model => model.Subject,
+                            new { @class = "form-label" }
+                        )
+
+                        @Html.TextBoxFor(
+                            model => model.Subject,
+                            new { @class = "form-control" }
+                        )
+
+                        @Html.ValidationMessageFor(
+                            model => model.Subject,
+                            "",
+                            new { @class = "text-danger" }
+                        )
+
+                    </div>
+
+
+                    <div class="mb-3">
+
+                        @Html.LabelFor(
+                            model => model.Description,
+                            new { @class = "form-label" }
+                        )
+
+                        @Html.TextAreaFor(
+                            model => model.Description,
+                            new
+                            {
+                                @class = "form-control",
+                                rows = "3",
+                                style = "white-space: pre-wrap;"
+                            }
+                        )
+
+                        @Html.ValidationMessageFor(
+                            model => model.Description,
+                            "",
+                            new { @class = "text-danger" }
+                        )
+
+                    </div>
+
+
+                    <div class="mb-3">
+
+                        @Html.LabelFor(
+                            model => model.Justification,
+                            new { @class = "form-label" }
+                        )
+
+                        @Html.TextAreaFor(
+                            model => model.Justification,
+                            new
+                            {
+                                @class = "form-control",
+                                rows = "3",
+                                style = "white-space: pre-wrap;"
+                            }
+                        )
+
+                        @Html.ValidationMessageFor(
+                            model => model.Justification,
+                            "",
+                            new { @class = "text-danger" }
+                        )
+
+                    </div>
+
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+
+                            <div class="mb-3">
+
+                                @Html.LabelFor(
+                                    model => model.DurationType,
+                                    new { @class = "form-label" }
+                                )
+
+                                @Html.EnumDropDownListFor(
+                                    model => model.DurationType,
+                                    "-- Select --",
+                                    new { @class = "form-select" }
+                                )
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <div class="mb-3"
+                                 id="Duration_ExpireDate">
+
+                                @Html.LabelFor(
+                                    model => model.ExpireDate,
+                                    new { @class = "form-label" }
+                                )
+
+                                @Html.TextBoxFor(
+                                    model => model.ExpireDate,
+                                    "{0:yyyy-MM-dd}",
+                                    new
+                                    {
+                                        @class = "form-control",
+                                        type = "date"
+                                    }
+                                )
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="row g-4">
+
+                        <div class="col-md-6">
+
+                            <div class="mb-3">
+
+                                @Html.LabelFor(
+                                    model => model.ChangeRequestCategoryId,
+                                    new { @class = "form-label" }
+                                )
+
+                                @Html.DropDownListFor(
+                                    model => model.ChangeRequestCategoryId,
+                                    new List<SelectListItem>(),
+                                    new { @class = "form-select" }
+                                )
+
+                                @Html.ValidationMessageFor(
+                                    model => model.ChangeRequestCategoryId,
+                                    "",
+                                    new { @class = "text-danger" }
+                                )
+
+                            </div>
+
+
+                            <div class="mb-3">
+
+                                @Html.LabelFor(
+                                    model => model.ApprovalBy,
+                                    new { @class = "form-label" }
+                                )
+
+                                @Html.TextBoxFor(
+                                    model => model.ApprovalByUserName,
+                                    new
+                                    {
+                                        placeholder = "Type name here to search",
+                                        @class = "form-control",
+                                        autocomplete = "off"
+                                    }
+                                )
+
+                                @Html.HiddenFor(model => model.ApprovalBy)
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <div class="card h-100">
+
+                                <div class="card-header">
+
+                                    <h5 class="card-title mb-0">
+                                        <i class="align-middle me-2" data-lucide="upload"></i>
+                                        Documents
+                                    </h5>
+
+                                </div>
+
+                                <div class="card-body">
+
+                                    <div class="mb-3">
+
+                                        <label for="fileInput"
+                                               class="form-label">
+                                            Upload files
+                                        </label>
+
+                                        <input type="file"
+                                               id="fileInput"
+                                               class="form-control"
+                                               multiple />
+
+                                    </div>
+
+                                    <button type="button"
+                                            id="fileButton"
+                                            class="btn btn-sm btn-info">
+
+                                        <i class="align-middle me-1" data-lucide="upload"></i>
+                                        Upload Files
+
+                                    </button>
+
+
+                                    <hr />
+
+
+                                    <div id="uploadedFiles"></div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="card-footer">
+
+                    <div class="d-flex justify-content-end">
+
+                        <button type="submit"
+                                id="btnSave"
+                                class="btn btn-sm btn-primary btnSubmitDisable">
+
+                            <i class="align-middle me-1" data-lucide="send"></i>
+                            Submit
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+}
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            SearchADUserApproval();
+            GetDuration();
+            loadChangeRequestCategories();
+            loadTempDocs();
+
+
+            $("#DurationType").on("change", function () {
+                GetDuration();
+            });
+
+
+            $("#fileButton").on("click", function () {
+
+                uploadFiles();
+
+            });
+
+        });
+
+
+        function parseJsonResult(data) {
+
+            if (typeof data === "string") {
+
+                try {
+                    return JSON.parse(data);
+                }
+                catch (e) {
+                    return [];
+                }
+
+            }
+
+            return data || [];
+
+        }
+
+
+        function escapeHtml(value) {
+
+            if (value == null) {
+                return "";
+            }
+
+            return $("<div/>")
+                .text(value)
+                .html();
+
+        }
+
+
+        function SearchADUserApproval() {
+
+            $("#ApprovalByUserName").autocomplete({
+
+                source: function (request, response) {
+
+                    $.ajax({
+
+                        url: '@Url.Action("GetSearchUserByNameJsonResult", "User")',
+
+                        dataType: "json",
+
+                        data: {
+                            term: request.term
+                        },
+
+                        success: function (data) {
+
+                            response(
+                                $.map(data, function (val) {
+
+                                    return {
+                                        label:
+                                            val.EmpNo +
+                                            " - " +
+                                            val.FullName +
+                                            " | " +
+                                            val.DepartmentName,
+
+                                        value: val.EmpNo,
+                                        itemId: val.EmpNo
+                                    };
+
+                                })
+                            );
+
+                        }
+
+                    });
+
+                },
+
+                minLength: 1,
+
+                select: function (event, ui) {
+
+                    $("#ApprovalByUserName")
+                        .val(ui.item.label);
+
+                    $("#ApprovalBy")
+                        .val(ui.item.itemId);
+
+                    return false;
+
+                },
+
+                change: function (event, ui) {
+
+                    if (!ui.item) {
+                        $("#ApprovalBy").val("");
+                    }
+
+                }
+
+            });
+
+        }
+
+
+        function GetDuration() {
+
+            var durationType =
+                $("#DurationType").val();
+
+            if (durationType == "2") {
+
+                $("#Duration_ExpireDate").show();
+
+            }
+            else {
+
+                $("#Duration_ExpireDate").hide();
+
+                $("#ExpireDate").val("");
+
+            }
+
+        }
+
+
+        function loadChangeRequestCategories() {
+
+            $.getJSON(
+                '@Url.Action("GetItemsJsonResult", "ChangeRequestCategory")',
+                function (data) {
+
+                    var dropDown =
+                        $("#ChangeRequestCategoryId");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- Select --</option>"
+                    );
+
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.ChangeRequestCategoryId,
+                                    text: item.Name
+                                })
+                            );
+
+                        }
+                    );
+
+
+                    var selectedId =
+                        '@ViewBag.ChangeRequestCategoryId';
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+                }
+            );
+
+        }
+
+
+        function uploadFiles() {
+
+            var fileInput =
+                $("#fileInput").get(0);
+
+            var files =
+                fileInput.files;
+
+
+            if (!files || files.length === 0) {
+
+                Swal.fire(
+                    "Error!",
+                    "Please select at least one file",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            var fileData =
+                new FormData();
+
+
+            for (var i = 0; i < files.length; i++) {
+
+                fileData.append(
+                    "fileInput",
+                    files[i]
+                );
+
+            }
+
+
+            $("#fileButton")
+                .prop("disabled", true);
+
+
+            $.ajax({
+
+                type: "POST",
+
+                url: '@Url.Action("UploadFiles", "ChangeRequest")',
+
+                dataType: "json",
+
+                contentType: false,
+
+                processData: false,
+
+                data: fileData,
+
+                success: function (result) {
+
+                    Swal.fire(
+                        "Completed",
+                        result,
+                        "success"
+                    );
+
+                    $("#fileInput").val("");
+
+                    loadTempDocs();
+
+                    $("#fileButton")
+                        .prop("disabled", false);
+
+                },
+
+                error: function () {
+
+                    $("#fileButton")
+                        .prop("disabled", false);
+
+                    Swal.fire(
+                        "Something went wrong!",
+                        "Please try again",
+                        "error"
+                    );
+
+                }
+
+            });
+
+        }
+
+
+        function loadTempDocs() {
+
+            $.getJSON(
+                '@Url.Action("GetTempDocListJsonResult", "ChangeRequest")',
+                function (data) {
+
+                    var tempDocDiv =
+                        $("#uploadedFiles");
+
+                    tempDocDiv.empty();
+
+
+                    var documents =
+                        parseJsonResult(data);
+
+
+                    if (!documents.length) {
+
+                        tempDocDiv.append(
+                            '<div class="text-muted small">No files uploaded.</div>'
+                        );
+
+                        return;
+
+                    }
+
+
+                    $.each(
+                        documents,
+                        function (index, item) {
+
+                            var row =
+                                $("<div/>", {
+                                    class: "d-flex align-items-center justify-content-between gap-2 border-bottom py-2"
+                                });
+
+
+                            var link =
+                                $("<a/>", {
+                                    href: item.FileUrl,
+                                    target: "_blank",
+                                    class: "text-decoration-none"
+                                }).text(item.DocumentName);
+
+
+                            var deleteButton =
+                                $("<button/>", {
+                                    type: "button",
+                                    class: "btn btn-sm btn-danger",
+                                    title: "Delete"
+                                });
+
+
+                            deleteButton.attr(
+                                "onclick",
+                                "deleteDoc(" + item.TempDocId + ")"
+                            );
+
+
+                            deleteButton.html(
+                                '<i data-lucide="trash-2"></i>'
+                            );
+
+
+                            row.append(link);
+                            row.append(deleteButton);
+
+                            tempDocDiv.append(row);
+
+                        }
+                    );
+
+
+                    if (window.lucide) {
+                        lucide.createIcons();
+                    }
+
+                }
+            );
+
+        }
+
+
+        function deleteDoc(itemId) {
+
+            Swal.fire({
+
+                title: "Are you sure?",
+                text: "Do you want to delete?",
+                icon: "warning",
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                showCancelButton: true,
+                reverseButtons: true
+
+            }).then(function (result) {
+
+                if (result.isConfirmed || result.value) {
+
+                    $.ajax({
+
+                        url: '@Url.Action("DeleteTempDoc", "ChangeRequest")',
+
+                        type: "GET",
+
+                        dataType: "json",
+
+                        data: {
+                            id: itemId
+                        },
+
+                        success: function (data) {
+
+                            if (data == "1" || data == 1) {
+
+                                Swal.fire(
+                                    "Deleted!",
+                                    "Record has been deleted",
+                                    "success"
+                                );
+
+                                loadTempDocs();
+
+                            }
+                            else {
+
+                                Swal.fire(
+                                    "Something went wrong!",
+                                    "Data is not deleted, Please try again",
+                                    "error"
+                                );
+
+                            }
+
+                        },
+
+                        error: function () {
+
+                            Swal.fire(
+                                "Something went wrong!",
+                                "Data is not deleted, Please try again",
+                                "error"
+                            );
+
+                        }
+
+                    });
+
+                }
+
+            });
+
+        }
+
+    </script>
+}

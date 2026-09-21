@@ -1,0 +1,264 @@
+﻿@model Domain.AR.AccessRequest
+@using Service.AR
+@using Service
+
+<div class="row g-4">
+
+    <div class="col-lg-8">
+
+        <div class="card">
+
+            <div class="card-body">
+
+                <div class="mb-4">
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="align-middle me-2" data-lucide="file-text"></i>
+                        <strong>@Html.LabelFor(model => Model.Subject)</strong>
+                    </div>
+                    <p class="text-muted mb-0">
+                        @Model.Subject
+                    </p>
+                </div>
+
+                <hr />
+
+                <div class="mb-4">
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="align-middle me-2" data-lucide="align-left"></i>
+                        <strong>@Html.LabelFor(model => Model.Description)</strong>
+                    </div>
+                    <p class="text-muted mb-0">
+                        @Model.Description
+                    </p>
+                </div>
+
+                <hr />
+
+                <div class="mb-4">
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="align-middle me-2" data-lucide="message-square-text"></i>
+                        <strong>@Html.LabelFor(model => Model.Justification)</strong>
+                    </div>
+                    <p class="text-muted mb-0">
+                        @Model.Justification
+                    </p>
+                </div>
+
+                <hr />
+
+                <dl class="row mb-0">
+
+                    <dt class="col-md-3">
+                        @Html.LabelFor(model => Model.AccessRequestTypeId)
+                    </dt>
+                    <dd class="col-md-3">
+                        @Model.AccessRequestType.Name
+                    </dd>
+
+                    <dt class="col-md-3">
+                        @Html.LabelFor(model => Model.AccessType)
+                    </dt>
+                    <dd class="col-md-3">
+                        @Model.AccessType.EnumDisplayName()
+                    </dd>
+
+                    <dt class="col-md-3">
+                        @Html.LabelFor(model => Model.DurationType)
+                    </dt>
+                    <dd class="col-md-3">
+                        @Model.DurationType.EnumDisplayName()
+                    </dd>
+
+                    <dt class="col-md-3">
+                        @Html.LabelFor(model => Model.ExpireDate)
+                    </dt>
+                    <dd class="col-md-3">
+
+                        @if (Model.DurationType == Domain.AssignedTypeEnum.Permanent)
+                        {
+                            <span>N/A</span>
+                        }
+                        else
+                        {
+                            @Model.ExpireDate.ToShortDateString()
+                        }
+
+                    </dd>
+
+                </dl>
+
+                <hr />
+
+                <dl class="row mb-0">
+
+                    <dt class="col-md-3">
+                        @Html.LabelFor(model => Model.CreatedBy)
+                    </dt>
+                    <dd class="col-md-3">
+                        @Model.CreatedUser.FullName
+                    </dd>
+
+                    <dt class="col-md-3">
+                        @Html.LabelFor(model => Model.RequestedDate)
+                    </dt>
+                    <dd class="col-md-3">
+                        @Model.RequestedDate
+                    </dd>
+
+                </dl>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-lg-4">
+
+        <div class="card mb-3">
+
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="align-middle me-2" data-lucide="user"></i>
+                    Request User
+                </h5>
+            </div>
+
+            <div class="card-body">
+
+                @if (Model.AccessType == Domain.AllocatedTypeEnum.Internal)
+                {
+                    <div class="mb-3">
+
+                        <div class="d-flex align-items-center mb-1">
+                            <i class="align-middle me-2" data-lucide="user-circle"></i>
+                            <strong>@Html.LabelFor(model => Model.RequestedBy)</strong>
+                        </div>
+
+                        <div class="text-muted">
+                            @Model.RequestedBy - @Model.RequestedUser.FullName
+                        </div>
+
+                    </div>
+
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="align-middle me-2" data-lucide="briefcase-business"></i>
+                        <span>@Model.RequestedUser.DesignationName</span>
+                    </div>
+
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="align-middle me-2" data-lucide="phone"></i>
+                        <span>@Model.RequestedUser.ContactNo</span>
+                    </div>
+
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="align-middle me-2" data-lucide="mail"></i>
+                        <span>@Model.RequestedUser.Email</span>
+                    </div>
+                }
+                else
+                {
+                    <div class="mb-3">
+
+                        <div class="d-flex align-items-center mb-1">
+                            <i class="align-middle me-2" data-lucide="user-circle"></i>
+                            <strong>@Html.LabelFor(model => Model.ExternalUser)</strong>
+                        </div>
+
+                        <div class="text-muted">
+                            @Model.ExternalUser
+                        </div>
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <div class="d-flex align-items-center mb-1">
+                            <i class="align-middle me-2" data-lucide="id-card"></i>
+                            <strong>@Html.LabelFor(model => Model.LegalId)</strong>
+                        </div>
+
+                        <div class="text-muted">
+                            @Model.LegalId
+                        </div>
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <div class="d-flex align-items-center mb-1">
+                            <i class="align-middle me-2" data-lucide="building-2"></i>
+                            <strong>@Html.LabelFor(model => Model.Organization)</strong>
+                        </div>
+
+                        <div class="text-muted">
+                            @Model.Organization
+                        </div>
+
+                    </div>
+                }
+
+                <hr />
+
+                <div class="d-flex align-items-start">
+                    <i class="align-middle me-2 mt-1" data-lucide="building"></i>
+                    <strong>
+                        @Model.Department.DepartmentName - @Model.Branch.Name
+                    </strong>
+                </div>
+
+            </div>
+
+        </div>
+
+        @if (Model.ApprovalByUser != null)
+        {
+            <div class="card border-success">
+
+                <div class="card-header">
+
+                    <h5 class="card-title mb-0">
+                        <i class="align-middle me-2" data-lucide="shield-check"></i>
+                        Approval User
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="align-middle me-2" data-lucide="user-circle"></i>
+                        <span>
+                            @Model.ApprovalBy - @Model.ApprovalByUser.FullName
+                        </span>
+                    </div>
+
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="align-middle me-2" data-lucide="briefcase-business"></i>
+                        <span>
+                            @Model.ApprovalByUser.DesignationName
+                        </span>
+                    </div>
+
+                    <div class="d-flex align-items-center mb-3">
+                        <i class="align-middle me-2" data-lucide="phone"></i>
+                        <span>
+                            @Model.ApprovalByUser.ContactNo
+                        </span>
+                    </div>
+
+                    <div class="d-flex align-items-center">
+                        <i class="align-middle me-2" data-lucide="mail"></i>
+                        <span>
+                            @Model.ApprovalByUser.Email
+                        </span>
+                    </div>
+
+                </div>
+
+            </div>
+        }
+
+    </div>
+
+</div>

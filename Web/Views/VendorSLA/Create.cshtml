@@ -1,0 +1,256 @@
+﻿@model Domain.VendorSLA
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var vendorId = Convert.ToInt64(TempData["VendorId"]);
+}
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="card">
+
+            <div class="card-header d-flex justify-content-between align-items-center">
+
+                <h5 class="card-title mb-0">
+                    <i class="align-middle me-2" data-lucide="plus"></i>
+                    Create New
+                </h5>
+
+                <a href="@Url.Action("Index", "VendorSLA")"
+                   class="btn btn-sm btn-light">
+
+                    <i class="align-middle me-1" data-lucide="arrow-left"></i>
+                    Back
+
+                </a>
+
+            </div>
+
+            @using (Html.BeginForm("Create", "VendorSLA", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true)
+
+                <div class="card-body">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+
+                            @Html.LabelFor(
+                                model => model.VendorId,
+                                new { @class = "form-label" }
+                            )
+
+                            <select id="VendorId"
+                                    name="VendorId"
+                                    class="form-select">
+                                <option value="0">-- Select --</option>
+                            </select>
+
+                            <span class="text-danger"
+                                  data-valmsg-for="VendorId"
+                                  data-valmsg-replace="true">
+                            </span>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            @Html.LabelFor(
+                                model => model.AssetTypeId,
+                                new { @class = "form-label" }
+                            )
+
+                            <select id="AssetTypeId"
+                                    name="AssetTypeId"
+                                    class="form-select select2">
+                                <option value="0">-- Select --</option>
+                            </select>
+
+                            <span class="text-danger"
+                                  data-valmsg-for="AssetTypeId"
+                                  data-valmsg-replace="true">
+                            </span>
+
+                        </div>
+
+                        <div class="col-md-4">
+
+                            @Html.LabelFor(
+                                model => model.SLA,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.TextBoxFor(
+                                model => model.SLA,
+                                new { @class = "form-control" }
+                            )
+
+                            @Html.ValidationMessageFor(
+                                model => model.SLA,
+                                "",
+                                new { @class = "text-danger" }
+                            )
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="card-footer">
+
+                    <div class="d-flex justify-content-end gap-2">
+
+                        <button type="reset"
+                                class="btn btn-sm btn-danger">
+
+                            <i class="align-middle me-1" data-lucide="rotate-ccw"></i>
+                            Cancel
+
+                        </button>
+
+                        <button type="submit"
+                                class="btn btn-sm btn-primary">
+
+                            <i class="align-middle me-1" data-lucide="save"></i>
+                            Save
+
+                        </button>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+</div>
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $("#AssetTypeId").select2({
+                width: "100%"
+            });
+
+            loadVendors();
+            loadAssetTypes();
+
+        });
+
+
+        function parseJsonResult(data) {
+
+            if (typeof data === "string") {
+
+                try {
+                    return JSON.parse(data);
+                }
+                catch (e) {
+                    return [];
+                }
+
+            }
+
+            return data || [];
+        }
+
+
+        function loadVendors() {
+
+            var dropDown = $("#VendorId");
+
+            dropDown.empty();
+
+            dropDown.append(
+                "<option value='0'>-- Select --</option>"
+            );
+
+
+            $.getJSON(
+                '@Url.Action("GetVendorListJsonResult", "Vendor")',
+                function (data) {
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.VendorId,
+                                    text: item.VendorName
+                                })
+                            );
+
+                        }
+                    );
+
+
+                    var selectedId = '@ViewBag.VendorId';
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+                    else if ('@vendorId' && '@vendorId' != '0') {
+                        dropDown.val('@vendorId');
+                    }
+
+                }
+            );
+
+        }
+
+
+        function loadAssetTypes() {
+
+            var dropDown = $("#AssetTypeId");
+
+            dropDown.empty();
+
+            dropDown.append(
+                "<option value='0'>-- Select --</option>"
+            );
+
+
+            $.getJSON(
+                '@Url.Action("GetAssetTypeListJsonResult", "AssetType")',
+                function (data) {
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.AssetTypeId,
+                                    text: item.AssetTypeName
+                                })
+                            );
+
+                        }
+                    );
+
+
+                    var selectedId = '@ViewBag.AssetTypeId';
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+                    dropDown.trigger("change.select2");
+
+                }
+            );
+
+        }
+
+    </script>
+}

@@ -1,0 +1,1131 @@
+﻿@model Domain.AR.AccessRequest
+@using Service.AR
+@using Service
+@using Domain
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="card">
+
+            <div class="card-header">
+
+                <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-2">
+
+                    <div>
+
+                        <h5 class="card-title mb-1">
+                            <i class="align-middle me-2" data-lucide="file-key"></i>
+                            Request #@Model.AccessRequestId
+                        </h5>
+
+                        <span class="text-muted">
+                            @Model.AccessRequestType.Name
+                        </span>
+
+                    </div>
+
+                    <div class="d-flex flex-wrap gap-2">
+
+                        <span class="badge bg-@AccessRequestService.GetUserTypeColor(Model.AccessType)">
+                            @Model.AccessType.EnumDisplayName()
+                        </span>
+
+                        <span class="badge bg-@AccessRequestService.GetStatusColor(Model.Status)">
+
+                            @Model.Status.EnumDisplayName()
+
+                            @if (Model.Status == Domain.AR.AccessRequestStatusEnum.Pending)
+                            {
+                                <i class="align-middle mx-1"
+                                   data-lucide="chevrons-right"></i>
+
+                                <span>
+                                    @Model.WorkflowLevelType.EnumDisplayName()
+                                    -
+                                    @(Model.TeamId != null
+                                        ? Model.Team.TeamName
+                                        : "N/A")
+                                </span>
+                            }
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="card-body">
+
+                <div class="card bg-body-tertiary border-0 mb-4">
+
+                    <div class="card-body">
+
+                        <div class="bs-stepper linear">
+
+                            <div class="bs-stepper-header"
+                                 role="tablist">
+
+                                @{
+                                    int flowIndex = 0;
+                                    string active = "";
+                                    string prvFlow = "bg-success";
+                                }
+
+                                @foreach (WorkflowLevel flow in Model.Workflow.WorkflowLevels.OrderBy(o => o.LevelNo))
+                                {
+                                    if (Model.Status < Domain.AR.AccessRequestStatusEnum.Pending)
+                                    {
+                                        prvFlow = "";
+                                    }
+
+                                    if (flow.LevelNo == Model.NextWorkflowlevelNo &&
+                                        Model.Status == Domain.AR.AccessRequestStatusEnum.Pending)
+                                    {
+                                        active = "active";
+                                        prvFlow = "";
+                                    }
+                                    else
+                                    {
+                                        active = "";
+                                    }
+
+                                    flowIndex++;
+
+                                    if (flowIndex > 1)
+                                    {
+                                        <div class="line"></div>
+                                    }
+
+                                    <div class="step @active">
+
+                                        <button type="button"
+                                                class="step-trigger">
+
+                                            <span class="bs-stepper-circle @prvFlow">
+                                                @flowIndex
+                                            </span>
+
+                                            <span class="text-start small">
+
+                                                @flow.WorkflowLevelType.EnumDisplayName()
+
+                                                <br />
+
+                                                @flow.Team.TeamName
+
+                                            </span>
+
+                                        </button>
+
+                                    </div>
+                                }
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="row g-4">
+
+                    <div class="col-lg-8">
+
+                        <div class="card mb-4">
+
+                            <div class="card-body">
+
+                                <div class="mb-4">
+
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="align-middle me-2" data-lucide="file-text"></i>
+                                        <strong>@Html.LabelFor(model => Model.Subject)</strong>
+                                    </div>
+
+                                    <p class="text-muted mb-0">
+                                        @Model.Subject
+                                    </p>
+
+                                </div>
+
+                                <hr />
+
+                                <div class="mb-4">
+
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="align-middle me-2" data-lucide="align-left"></i>
+                                        <strong>@Html.LabelFor(model => Model.Description)</strong>
+                                    </div>
+
+                                    <p class="text-muted mb-0">
+                                        @Model.Description
+                                    </p>
+
+                                </div>
+
+                                <hr />
+
+                                <div class="mb-4">
+
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="align-middle me-2" data-lucide="message-square-text"></i>
+                                        <strong>@Html.LabelFor(model => Model.Justification)</strong>
+                                    </div>
+
+                                    <p class="text-muted mb-0">
+                                        @Model.Justification
+                                    </p>
+
+                                </div>
+
+                                <hr />
+
+                                <dl class="row mb-0">
+
+                                    <dt class="col-md-3">
+                                        @Html.LabelFor(model => Model.AccessRequestTypeId)
+                                    </dt>
+
+                                    <dd class="col-md-3">
+                                        @Model.AccessRequestType.Name
+                                    </dd>
+
+                                    <dt class="col-md-3">
+                                        @Html.LabelFor(model => Model.AccessType)
+                                    </dt>
+
+                                    <dd class="col-md-3">
+                                        @Model.AccessType.EnumDisplayName()
+                                    </dd>
+
+                                    <dt class="col-md-3">
+                                        @Html.LabelFor(model => Model.DurationType)
+                                    </dt>
+
+                                    <dd class="col-md-3">
+                                        @Model.DurationType.EnumDisplayName()
+                                    </dd>
+
+                                    <dt class="col-md-3">
+                                        @Html.LabelFor(model => Model.ExpireDate)
+                                    </dt>
+
+                                    <dd class="col-md-3">
+
+                                        @if (Model.DurationType == Domain.AssignedTypeEnum.Permanent)
+                                        {
+                                            <span>N/A</span>
+                                        }
+                                        else
+                                        {
+                                            @Model.ExpireDate.ToShortDateString()
+                                        }
+
+                                    </dd>
+
+                                </dl>
+
+                            </div>
+
+                        </div>
+
+
+                        @if (Model.SystemAccess != null)
+                        {
+                            <div class="card mb-4">
+
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">
+                                        <i class="align-middle me-2" data-lucide="server-cog"></i>
+                                        System Access
+                                    </h5>
+                                </div>
+
+                                <div class="card-body">
+
+                                    <div class="table-responsive">
+
+                                        <table class="table table-striped table-hover align-middle">
+
+                                            <thead>
+                                                <tr>
+                                                    <th>Env. Type</th>
+                                                    <th>System</th>
+                                                    <th>Description</th>
+                                                    <th>Justification</th>
+                                                    <th>Privilege Level</th>
+                                                    <th>Monitored By</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+
+                                                @foreach (var item in Model.SystemAccess.SystemAccessItems)
+                                                {
+                                                    <tr>
+                                                        <td>@item.SystemEnvironment.EnvironmentType.EnumDisplayName()</td>
+                                                        <td>@item.SystemEnvironment.System.AssetTypeName</td>
+                                                        <td>@item.Description</td>
+                                                        <td>@item.Justification</td>
+                                                        <td>@(item.PrivilegeLevel != null ? item.PrivilegeLevel : "N/A")</td>
+                                                        <td>@(item.MonitoredBy != null ? item.MonitoredBy : "N/A")</td>
+                                                    </tr>
+                                                }
+
+                                            </tbody>
+
+                                        </table>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        }
+                        else if (Model.UserPrivilegeAccess != null)
+                        {
+                            <div class="card mb-4">
+
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">
+                                        <i class="align-middle me-2" data-lucide="shield-keyhole"></i>
+                                        User Privilege Access
+                                    </h5>
+                                </div>
+
+                                <div class="card-body">
+
+                                    <div class="table-responsive">
+
+                                        <table class="table table-striped table-hover align-middle">
+
+                                            <thead>
+                                                <tr>
+                                                    <th>Privilege Category</th>
+                                                    <th>Application</th>
+                                                    <th>Access Level</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+
+                                                @foreach (var item in Model.UserPrivilegeAccess.UserPrivilegeAccessItems)
+                                                {
+                                                    <tr>
+                                                        <td>@item.AccessPrivilegeCategory.Name</td>
+                                                        <td>@item.AccessApplication.System.AssetTypeName</td>
+                                                        <td>@item.AccessLevel.Name</td>
+                                                    </tr>
+                                                }
+
+                                            </tbody>
+
+                                        </table>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        }
+                        else if (Model.PhysicalAccess != null)
+                        {
+                            <div class="card mb-4">
+
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">
+                                        <i class="align-middle me-2" data-lucide="map-pin-check"></i>
+                                        Physical Area Access
+                                    </h5>
+                                </div>
+
+                                <div class="card-body">
+
+                                    <div class="table-responsive">
+
+                                        <table class="table table-striped table-hover align-middle">
+
+                                            <thead>
+                                                <tr>
+                                                    <th>Location</th>
+                                                    <th>Area</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+
+                                                @foreach (var item in Model.PhysicalAccess.PhysicalAccessItems)
+                                                {
+                                                    <tr>
+                                                        <td>@item.PhysicalArea.Branch.Name</td>
+                                                        <td>@item.PhysicalArea.Name</td>
+                                                    </tr>
+                                                }
+
+                                            </tbody>
+
+                                        </table>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        }
+                        else if (Model.UserAccess != null)
+                        {
+                            <div class="card mb-4">
+
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">
+                                        <i class="align-middle me-2" data-lucide="user-cog"></i>
+                                        @Model.AccessRequestType.Name
+                                    </h5>
+                                </div>
+
+                                <div class="card-body">
+
+                                    <dl class="row">
+
+                                        <dt class="col-sm-4">
+                                            @Html.LabelFor(model => Model.UserAccess.UserAccessType)
+                                        </dt>
+
+                                        <dd class="col-sm-8">
+                                            @Model.UserAccess.UserAccessType.EnumDisplayName()
+                                        </dd>
+
+                                        <dt class="col-sm-4">
+                                            @Html.LabelFor(model => Model.UserAccess.LegalIdDoc)
+                                        </dt>
+
+                                        <dd class="col-sm-8">
+
+                                            @if (Model.UserAccess.LegalIdDoc != null)
+                                            {
+                                                <a href="@Model.UserAccess.LegalIdDoc"
+                                                   target="_blank">
+
+                                                    <i class="align-middle me-1"
+                                                       data-lucide="file-text"></i>
+
+                                                    Legal Id
+
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <span>N/A</span>
+                                            }
+
+                                        </dd>
+
+                                        <dt class="col-sm-4">
+                                            @Html.LabelFor(model => Model.UserAccess.NonEmpAcknowledgementDoc)
+                                        </dt>
+
+                                        <dd class="col-sm-8">
+
+                                            @if (Model.UserAccess.NonEmpAcknowledgementDoc != null)
+                                            {
+                                                <a href="@Model.UserAccess.NonEmpAcknowledgementDoc"
+                                                   target="_blank">
+
+                                                    <i class="align-middle me-1"
+                                                       data-lucide="file-text"></i>
+
+                                                    Non-Emp. Acknowledgement
+
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <span>N/A</span>
+                                            }
+
+                                        </dd>
+
+                                    </dl>
+
+                                    <div class="table-responsive">
+
+                                        <table class="table table-striped table-hover align-middle">
+
+                                            <thead>
+                                                <tr>
+                                                    <th>Access Item Type</th>
+                                                    <th>Description</th>
+                                                    <th>Justification</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+
+                                                @foreach (var item in Model.UserAccess.UserAccessItems)
+                                                {
+                                                    <tr>
+                                                        <td>@item.UserAccessItemType.Name</td>
+                                                        <td>@item.Description</td>
+                                                        <td>@item.Justification</td>
+                                                    </tr>
+                                                }
+
+                                            </tbody>
+
+                                        </table>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        }
+                        else if (Model.DeviceAccess != null)
+                        {
+                            <div class="card mb-4">
+
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">
+                                        <i class="align-middle me-2" data-lucide="monitor-smartphone"></i>
+                                        @Model.AccessRequestType.Name
+                                    </h5>
+                                </div>
+
+                                <div class="card-body">
+
+                                    <dl class="row">
+
+                                        <dt class="col-sm-3">
+                                            @Html.LabelFor(model => Model.DeviceAccess.AssetId)
+                                        </dt>
+
+                                        <dd class="col-sm-9">
+
+                                            <a href="@Html.EncodedActionLink(
+                                                         "",
+                                                         "Info",
+                                                         "Asset",
+                                                         "",
+                                                         new { id = Model.DeviceAccess.AssetId },
+                                                         null
+                                                     )"
+                                               target="_blank">
+
+                                                <i class="align-middle me-1"
+                                                   data-lucide="external-link"></i>
+
+                                                @Model.DeviceAccess.Asset.AssetNo
+                                                /
+                                                @Model.DeviceAccess.Asset.Barcode
+                                                -
+                                                @Model.DeviceAccess.Asset.AssetName
+
+                                            </a>
+
+                                        </dd>
+
+                                    </dl>
+
+                                    <div class="table-responsive">
+
+                                        <table class="table table-striped table-hover align-middle">
+
+                                            <thead>
+                                                <tr>
+                                                    <th>Device Item Type</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+
+                                                @foreach (var item in Model.DeviceAccess.DeviceAccessItems)
+                                                {
+                                                    <tr>
+                                                        <td>@item.DeviceAccessItemType.Name</td>
+                                                    </tr>
+                                                }
+
+                                            </tbody>
+
+                                        </table>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        }
+                        else if (Model.RemoteAccess != null)
+                        {
+                            <div class="card mb-4">
+
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">
+                                        <i class="align-middle me-2" data-lucide="network"></i>
+                                        @Model.AccessRequestType.Name
+                                    </h5>
+                                </div>
+
+                                <div class="card-body">
+
+                                    <dl class="row">
+
+                                        <dt class="col-sm-3">
+                                            @Html.LabelFor(model => Model.RemoteAccess.RemoteAccessType)
+                                        </dt>
+
+                                        <dd class="col-sm-9">
+                                            @Model.RemoteAccess.RemoteAccessType.EnumDisplayName()
+                                        </dd>
+
+                                        <dt class="col-sm-3">
+                                            @Html.LabelFor(model => Model.RemoteAccess.AssetId)
+                                        </dt>
+
+                                        <dd class="col-sm-9">
+
+                                            <a href="@Html.EncodedActionLink(
+                                                         "",
+                                                         "Info",
+                                                         "Asset",
+                                                         "",
+                                                         new { id = Model.RemoteAccess.AssetId },
+                                                         null
+                                                     )"
+                                               target="_blank">
+
+                                                <i class="align-middle me-1"
+                                                   data-lucide="external-link"></i>
+
+                                                @Model.RemoteAccess.Asset.AssetNo
+                                                /
+                                                @Model.RemoteAccess.Asset.Barcode
+                                                -
+                                                @Model.RemoteAccess.Asset.AssetName
+
+                                            </a>
+
+                                        </dd>
+
+                                        <dt class="col-sm-3">
+                                            Impact
+                                        </dt>
+
+                                        <dd class="col-sm-9">
+                                            @Model.RemoteAccess.Impact
+                                        </dd>
+
+                                    </dl>
+
+                                    <div class="table-responsive">
+
+                                        <table class="table table-striped table-hover align-middle">
+
+                                            <thead>
+                                                <tr>
+                                                    <th>System/Application</th>
+                                                    <th>Description</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+
+                                                @foreach (var item in Model.RemoteAccess.RemoteAccessItems)
+                                                {
+                                                    <tr>
+                                                        <td>@item.AssetType.AssetTypeName</td>
+                                                        <td>@item.Description</td>
+                                                    </tr>
+                                                }
+
+                                            </tbody>
+
+                                        </table>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        }
+
+                    </div>
+
+
+                    <div class="col-lg-4">
+
+                        <div class="card mb-3">
+
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">
+                                    <i class="align-middle me-2" data-lucide="user"></i>
+                                    Requested For
+                                </h5>
+                            </div>
+
+                            <div class="card-body">
+
+                                @if (Model.AccessType == Domain.AllocatedTypeEnum.Internal)
+                                {
+                                    <div class="mb-3">
+
+                                        <div class="d-flex align-items-center mb-1">
+                                            <i class="align-middle me-2" data-lucide="user-circle"></i>
+                                            <strong>@Html.LabelFor(model => Model.RequestedBy)</strong>
+                                        </div>
+
+                                        <div class="text-muted">
+                                            @Model.RequestedBy - @Model.RequestedUser.FullName
+                                        </div>
+
+                                    </div>
+
+                                    <div class="mb-3">
+
+                                        <div class="d-flex align-items-center mb-1">
+                                            <i class="align-middle me-2" data-lucide="briefcase-business"></i>
+                                            <strong>@Html.LabelFor(model => Model.RequestedUser.DesignationName)</strong>
+                                        </div>
+
+                                        <div class="text-muted">
+                                            @Model.RequestedUser.DesignationName
+                                        </div>
+
+                                    </div>
+
+                                    <div class="mb-3">
+
+                                        <div class="d-flex align-items-center mb-1">
+                                            <i class="align-middle me-2" data-lucide="phone"></i>
+                                            <strong>@Html.LabelFor(model => Model.RequestedUser.ContactNo)</strong>
+                                        </div>
+
+                                        <div class="text-muted">
+                                            @Model.RequestedUser.ContactNo
+                                        </div>
+
+                                    </div>
+
+                                    <div class="mb-3">
+
+                                        <div class="d-flex align-items-center mb-1">
+                                            <i class="align-middle me-2" data-lucide="mail"></i>
+                                            <strong>@Html.LabelFor(model => Model.RequestedUser.Email)</strong>
+                                        </div>
+
+                                        <div class="text-muted">
+                                            @Model.RequestedUser.Email
+                                        </div>
+
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="mb-3">
+
+                                        <div class="d-flex align-items-center mb-1">
+                                            <i class="align-middle me-2" data-lucide="user-circle"></i>
+                                            <strong>@Html.LabelFor(model => Model.ExternalUser)</strong>
+                                        </div>
+
+                                        <div class="text-muted">
+                                            @Model.ExternalUser
+                                        </div>
+
+                                    </div>
+
+                                    <div class="mb-3">
+
+                                        <div class="d-flex align-items-center mb-1">
+                                            <i class="align-middle me-2" data-lucide="id-card"></i>
+                                            <strong>@Html.LabelFor(model => Model.LegalId)</strong>
+                                        </div>
+
+                                        <div class="text-muted">
+                                            @Model.LegalId
+                                        </div>
+
+                                    </div>
+
+                                    <div class="mb-3">
+
+                                        <div class="d-flex align-items-center mb-1">
+                                            <i class="align-middle me-2" data-lucide="building-2"></i>
+                                            <strong>@Html.LabelFor(model => Model.Organization)</strong>
+                                        </div>
+
+                                        <div class="text-muted">
+                                            @Model.Organization
+                                        </div>
+
+                                    </div>
+                                }
+
+                                <hr />
+
+                                <div class="d-flex align-items-start">
+
+                                    <i class="align-middle me-2 mt-1"
+                                       data-lucide="building"></i>
+
+                                    <strong>
+                                        @Model.Department.DepartmentName - @Model.Branch.Name
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="card mb-3">
+
+                            <div class="card-body">
+
+                                <div class="d-flex align-items-center">
+
+                                    <img src="@Model.CreatedUser.ProImageName"
+                                         alt="User Avatar"
+                                         class="rounded-circle me-3"
+                                         width="48"
+                                         height="48" />
+
+                                    <div>
+
+                                        <div class="fw-semibold">
+                                            @Model.CreatedBy - @Model.CreatedUser.FullName
+                                        </div>
+
+                                        <div class="text-muted small">
+                                            @Model.CreatedUser.DesignationName
+                                            (@Model.CreatedUser.DepartmentName)
+                                        </div>
+
+                                        <div class="text-muted small">
+                                            Created By
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        @if (Model.ApprovalByUser != null)
+                        {
+                            <div class="card mb-3">
+
+                                <div class="card-body">
+
+                                    <div class="d-flex align-items-center">
+
+                                        <img src="@Model.ApprovalByUser.ProImageName"
+                                             alt="User Avatar"
+                                             class="rounded-circle me-3"
+                                             width="48"
+                                             height="48" />
+
+                                        <div>
+
+                                            <div class="fw-semibold">
+                                                @Model.ApprovalBy - @Model.ApprovalByUser.FullName
+                                            </div>
+
+                                            <div class="text-muted small">
+                                                @Model.ApprovalByUser.DesignationName
+                                                (@Model.ApprovalByUser.DepartmentName)
+                                            </div>
+
+                                            <div class="text-muted small">
+                                                Approval User
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        }
+
+
+                        <div class="card mb-3">
+
+                            <div class="card-header d-flex align-items-center justify-content-between">
+
+                                <h5 class="card-title mb-0">
+
+                                    <i class="align-middle me-2"
+                                       data-lucide="paperclip"></i>
+
+                                    Attachments
+
+                                </h5>
+
+                                <button type="button"
+                                        class="btn btn-sm btn-light"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#attachmentsBody"
+                                        aria-expanded="true"
+                                        aria-controls="attachmentsBody">
+
+                                    <i class="align-middle"
+                                       data-lucide="chevron-down"></i>
+
+                                </button>
+
+                            </div>
+
+                            <div id="attachmentsBody"
+                                 class="collapse show">
+
+                                <div class="card-body">
+
+                                    @if (Model.ApprovalAttachment != null)
+                                    {
+                                        <a href="@Model.ApprovalAttachment"
+                                           target="_blank">
+
+                                            <i class="align-middle me-1"
+                                               data-lucide="file-text"></i>
+
+                                            AVP/VP Approval attachment
+
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">
+                                            No attachments
+                                        </span>
+                                    }
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="row g-4">
+
+                    <div class="col-lg-8">
+
+                        <div class="card">
+
+                            <div class="card-header d-flex align-items-center justify-content-between">
+
+                                <h5 class="card-title mb-0">
+
+                                    <i class="align-middle me-2"
+                                       data-lucide="history"></i>
+
+                                    Status
+
+                                </h5>
+
+                                <button type="button"
+                                        class="btn btn-sm btn-light"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#statusHistoryBody"
+                                        aria-expanded="true"
+                                        aria-controls="statusHistoryBody">
+
+                                    <i class="align-middle"
+                                       data-lucide="chevron-down"></i>
+
+                                </button>
+
+                            </div>
+
+                            <div id="statusHistoryBody"
+                                 class="collapse show">
+
+                                <div class="card-body">
+
+                                    @foreach (var status in Model.AccessRequestUpdates.OrderBy(o => o.UpdatedDate))
+                                    {
+                                        <div class="d-flex mb-4">
+
+                                            <img src="@status.UpdatedUser.ProImageName"
+                                                 alt="User Image"
+                                                 class="rounded-circle me-3"
+                                                 width="42"
+                                                 height="42" />
+
+                                            <div class="flex-grow-1">
+
+                                                <div class="d-flex flex-column flex-md-row justify-content-between mb-2">
+
+                                                    <div class="fw-semibold">
+
+                                                        @status.UpdatedUser.FullName
+
+                                                        @if (status.Team != null && status.TeamId != 1)
+                                                        {
+                                                            <span class="text-muted">
+                                                                (@status.Team.TeamName)
+                                                            </span>
+                                                        }
+
+                                                    </div>
+
+                                                    <div class="text-muted small">
+
+                                                        <i class="align-middle me-1"
+                                                           data-lucide="calendar"></i>
+
+                                                        @status.UpdatedDate
+
+                                                    </div>
+
+                                                </div>
+
+                                                <div class="border rounded p-3">
+
+                                                    <div class="d-flex flex-column flex-md-row justify-content-between gap-2">
+
+                                                        <div>
+
+                                                            <span class="badge bg-@AccessRequestService.GetStatusColor(status.Status) me-2">
+                                                                @status.Status.EnumDisplayName()
+                                                            </span>
+
+                                                            <span>
+                                                                @status.Comment
+                                                            </span>
+
+                                                        </div>
+
+                                                        <div class="fw-semibold text-nowrap">
+
+                                                            <i class="align-middle me-1"
+                                                               data-lucide="clock"></i>
+
+                                                            @status.SpentTimeFomated (HH:MM)
+
+                                                        </div>
+
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+                                    }
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="col-lg-4">
+
+                        <div class="card">
+
+                            <div class="card-header d-flex align-items-center justify-content-between">
+
+                                <h5 class="card-title mb-0">
+
+                                    <i class="align-middle me-2"
+                                       data-lucide="list"></i>
+
+                                    Ticket Log
+
+                                </h5>
+
+                                <button type="button"
+                                        class="btn btn-sm btn-light"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#ticketLogBody"
+                                        aria-expanded="true"
+                                        aria-controls="ticketLogBody">
+
+                                    <i class="align-middle"
+                                       data-lucide="chevron-down"></i>
+
+                                </button>
+
+                            </div>
+
+                            <div id="ticketLogBody"
+                                 class="collapse show">
+
+                                <div class="card-body">
+
+                                    @foreach (var log in Model.AccessRequestLogs.OrderBy(o => o.UpdatedDate))
+                                    {
+                                        <div class="d-flex mb-4">
+
+                                            <img src="@(log.UpdatedBy != null
+                                                        ? log.UpdatedUser.ProImageName
+                                                        : "/Images/userimage.png")"
+                                                 alt="User Image"
+                                                 class="rounded-circle me-3"
+                                                 width="40"
+                                                 height="40" />
+
+                                            <div class="flex-grow-1">
+
+                                                <div class="d-flex justify-content-between mb-1">
+
+                                                    <span class="fw-semibold">
+                                                        @(log.UpdatedBy != null
+                                                            ? log.UpdatedUser.FullName
+                                                            : "N/A")
+                                                    </span>
+
+                                                    <span class="text-muted small">
+                                                        @log.UpdatedDate
+                                                    </span>
+
+                                                </div>
+
+                                                <div class="text-muted">
+                                                    @log.Comment
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+                                    }
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>

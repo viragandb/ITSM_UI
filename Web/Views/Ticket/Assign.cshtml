@@ -1,0 +1,317 @@
+﻿@model Domain.Ticket
+@using Service
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="card">
+
+            <div class="card-header d-flex justify-content-between align-items-center">
+
+                <h5 class="card-title mb-0">
+                    <i class="align-middle me-2" data-lucide="user-check"></i>
+                    Assign Ticket
+                </h5>
+
+                <a href="@Url.Action("Pending", "Ticket")"
+                   class="btn btn-sm btn-light">
+
+                    <i class="align-middle me-1" data-lucide="arrow-left"></i>
+                    Back
+
+                </a>
+
+            </div>
+
+            @using (Html.BeginForm("Assign", "Ticket", FormMethod.Post))
+            {
+                @Html.HiddenFor(model => model.TicketId)
+                @Html.HiddenFor(model => model.RequestType.TeamId)
+
+                <div class="card-body">
+
+                    <div class="row g-3">
+
+                        <div class="col-lg-7">
+
+                            <div class="card">
+
+                                <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+
+                                    <h5 class="card-title mb-0">
+                                        <i class="align-middle me-2" data-lucide="ticket"></i>
+                                        Ticket |
+                                        @(Model.RequestType != null && Model.RequestType.Team != null
+                                            ? Model.RequestType.Team.TeamName
+                                            : "N/A")
+                                    </h5>
+
+                                    <div class="d-flex flex-wrap gap-2">
+
+                                        <span class="badge bg-@TicketService.GetTicketStatusColor(Model.Status)">
+                                            @Model.Status.EnumDisplayName()
+                                        </span>
+
+                                        <span class="badge bg-@TicketService.GetTicketMediumColor(Model.TicketMedium)">
+                                            @Model.TicketMedium.EnumDisplayName()
+                                        </span>
+
+                                        <span class="badge bg-@TicketService.GetTicketTypeColor(Model.RequestType.TicketType)">
+                                            @Model.RequestType.TicketType.EnumDisplayName()
+                                        </span>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="card-body">
+
+                                    <dl class="row mb-0">
+
+                                        <dt class="col-md-3">
+                                            @Html.DisplayNameFor(model => model.RequestType.CategoryId)
+                                        </dt>
+
+                                        <dd class="col-md-3">
+                                            @(Model.RequestType != null && Model.RequestType.Category != null
+                                                ? Model.RequestType.Category.CategoryName
+                                                : "N/A")
+                                        </dd>
+
+                                        <dt class="col-md-3">
+                                            @Html.DisplayNameFor(model => model.RequestType.AssetTypeId)
+                                        </dt>
+
+                                        <dd class="col-md-3">
+                                            @(Model.RequestType != null && Model.RequestType.AssetType != null
+                                                ? Model.RequestType.AssetType.AssetTypeName
+                                                : "N/A")
+                                        </dd>
+
+                                        <dt class="col-md-3">
+                                            @Html.DisplayNameFor(model => model.RequestType.SubCategoryId)
+                                        </dt>
+
+                                        <dd class="col-md-3">
+                                            @(Model.RequestType != null && Model.RequestType.SubCategory != null
+                                                ? Model.RequestType.SubCategory.SubCategoryName
+                                                : "N/A")
+                                        </dd>
+
+                                        <dt class="col-md-3">
+                                            @Html.DisplayNameFor(model => model.Code)
+                                        </dt>
+
+                                        <dd class="col-md-3">
+                                            @Model.Code
+                                        </dd>
+
+                                        <dt class="col-md-3">
+                                            @Html.DisplayNameFor(model => model.Subject)
+                                        </dt>
+
+                                        <dd class="col-md-9">
+                                            @Model.Subject
+                                            @Html.HiddenFor(model => model.Subject)
+                                        </dd>
+
+                                        <dt class="col-md-3">
+                                            @Html.DisplayNameFor(model => model.Description)
+                                        </dt>
+
+                                        <dd class="col-md-9" style="white-space: pre-wrap;">
+                                            @Model.Description
+                                        </dd>
+
+                                        @if (Model.RequestType.TicketType == Domain.TicketTypeEnum.IN)
+                                        {
+                                            <dt class="col-md-3">
+                                                @Html.DisplayNameFor(model => model.Urgency)
+                                            </dt>
+
+                                            <dd class="col-md-3">
+                                                @Model.Urgency.EnumDisplayName()
+                                            </dd>
+
+                                            <dt class="col-md-3">
+                                                @Html.DisplayNameFor(model => model.Impact)
+                                            </dt>
+
+                                            <dd class="col-md-3">
+                                                @Model.Impact.EnumDisplayName()
+                                            </dd>
+
+                                            <dt class="col-md-3">
+                                                @Html.DisplayNameFor(model => model.TicketPriorityId)
+                                            </dt>
+
+                                            <dd class="col-md-9">
+                                                @(Model.TicketPriority != null
+                                                    ? Model.TicketPriority.TicketPriorityName
+                                                    : "N/A")
+                                            </dd>
+                                        }
+
+                                        <dt class="col-md-3">
+                                            @Html.DisplayNameFor(model => model.RequestedDate)
+                                        </dt>
+
+                                        <dd class="col-md-6">
+                                            @Model.RequestedDate
+                                        </dd>
+
+                                        <dd class="col-md-3">
+                                            <span class="badge bg-secondary">
+                                                Spent Hrs. @Model.SpentTime
+                                            </span>
+                                        </dd>
+
+                                    </dl>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-lg-5">
+
+                            <div class="card">
+
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">
+                                        <i class="align-middle me-2" data-lucide="user-plus"></i>
+                                        Assign User
+                                    </h5>
+                                </div>
+
+                                <div class="card-body">
+
+                                    <div class="mb-3">
+
+                                        <label for="EmpNo" class="form-label">
+                                            User
+                                        </label>
+
+                                        <select id="EmpNo"
+                                                name="EmpNo"
+                                                class="form-select">
+
+                                            <option value="0">-- Select --</option>
+
+                                        </select>
+
+                                        <span class="text-danger"
+                                              data-valmsg-for="EmpNo"
+                                              data-valmsg-replace="true">
+                                        </span>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="card-footer">
+
+                                    <div class="d-flex justify-content-end">
+
+                                        <button type="submit"
+                                                class="btn btn-sm btn-primary">
+
+                                            <i class="align-middle me-1" data-lucide="save"></i>
+                                            Update
+
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+</div>
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            loadUsers();
+
+        });
+
+
+        function parseJsonResult(data) {
+
+            if (typeof data === "string") {
+
+                try {
+                    return JSON.parse(data);
+                }
+                catch (e) {
+                    return [];
+                }
+
+            }
+
+            return data || [];
+        }
+
+
+        function loadUsers() {
+
+            var teamId =
+                $("#RequestType_TeamId").val();
+
+            $.getJSON(
+                '@Url.Action("GetUsersByTeamIdJsonResult", "User")',
+                {
+                    teamId: teamId
+                },
+                function (data) {
+
+                    var dropDown =
+                        $("#EmpNo");
+
+                    dropDown.empty();
+
+                    dropDown.append(
+                        "<option value='0'>-- Select --</option>"
+                    );
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.EmpNo,
+                                    text: item.FullName
+                                })
+                            );
+
+                        }
+                    );
+
+                }
+            );
+
+        }
+
+    </script>
+}

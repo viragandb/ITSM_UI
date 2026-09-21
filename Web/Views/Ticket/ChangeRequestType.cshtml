@@ -1,0 +1,443 @@
+﻿@model Domain.Ticket
+@using Service
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="card">
+
+            <div class="card-header d-flex justify-content-between align-items-center">
+
+                <h5 class="card-title mb-0">
+                    <i class="align-middle me-2" data-lucide="layers"></i>
+                    Change Request Type
+                </h5>
+
+                <a href="@Url.Action("RequestChange", "Ticket")"
+                   class="btn btn-sm btn-light">
+
+                    <i class="align-middle me-1" data-lucide="arrow-left"></i>
+                    Back
+
+                </a>
+
+            </div>
+
+            @using (Html.BeginForm("ChangeRequestType", "Ticket", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true)
+
+                @Html.HiddenFor(model => model.TicketId)
+                @Html.HiddenFor(model => model.RequestType.TeamId)
+                @Html.HiddenFor(model => model.RequestType.Team.TeamName)
+                @Html.HiddenFor(model => model.TicketPriorityId)
+
+                <div class="card-body">
+
+                    <div class="row g-3">
+
+                        <div class="col-lg-7">
+
+                            @Html.Partial("_TicketMin", Model)
+
+                        </div>
+
+                        <div class="col-lg-5">
+
+                            <div class="card">
+
+                                <div class="card-header">
+
+                                    <h5 class="card-title mb-0">
+                                        <i class="align-middle me-2" data-lucide="list"></i>
+                                        Request Type
+                                    </h5>
+
+                                </div>
+
+                                <div class="card-body">
+
+                                    <div class="mb-3">
+
+                                        @Html.LabelFor(
+                                            model => model.RequestType.TicketType,
+                                            new { @class = "form-label" }
+                                        )
+
+                                        @Html.EnumDropDownListFor(
+                                            model => model.RequestType.TicketType,
+                                            "-- Select --",
+                                            new
+                                            {
+                                                @class = "form-select",
+                                                disabled = "disabled"
+                                            }
+                                        )
+
+                                        <input type="hidden"
+                                               id="TicketTypeValue"
+                                               name="RequestType.TicketType"
+                                               value="@((int)Model.RequestType.TicketType)" />
+
+                                    </div>
+
+
+                                    <div class="mb-3">
+
+                                        @Html.LabelFor(
+                                            model => model.RequestType.CategoryId,
+                                            new { @class = "form-label" }
+                                        )
+
+                                        @Html.DropDownListFor(
+                                            model => model.RequestType.CategoryId,
+                                            new List<SelectListItem>(),
+                                            new { @class = "form-select" }
+                                        )
+
+                                        @Html.ValidationMessageFor(
+                                            model => model.RequestType.CategoryId,
+                                            "",
+                                            new { @class = "text-danger" }
+                                        )
+
+                                    </div>
+
+
+                                    <div class="mb-3">
+
+                                        @Html.LabelFor(
+                                            model => model.RequestType.AssetTypeId,
+                                            new { @class = "form-label" }
+                                        )
+
+                                        @Html.DropDownListFor(
+                                            model => model.RequestType.AssetTypeId,
+                                            new List<SelectListItem>(),
+                                            new { @class = "form-select" }
+                                        )
+
+                                        @Html.ValidationMessageFor(
+                                            model => model.RequestType.AssetTypeId,
+                                            "",
+                                            new { @class = "text-danger" }
+                                        )
+
+                                    </div>
+
+
+                                    <div class="mb-3">
+
+                                        @Html.LabelFor(
+                                            model => model.RequestType.SubCategoryId,
+                                            new { @class = "form-label" }
+                                        )
+
+                                        @Html.DropDownListFor(
+                                            model => model.RequestType.SubCategoryId,
+                                            new List<SelectListItem>(),
+                                            new { @class = "form-select" }
+                                        )
+
+                                        @Html.ValidationMessageFor(
+                                            model => model.RequestType.SubCategoryId,
+                                            "",
+                                            new { @class = "text-danger" }
+                                        )
+
+                                    </div>
+
+
+                                    <div class="mb-0">
+
+                                        @Html.LabelFor(
+                                            model => model.Subject,
+                                            new { @class = "form-label" }
+                                        )
+
+                                        @Html.TextAreaFor(
+                                            model => model.Subject,
+                                            new
+                                            {
+                                                @class = "form-control",
+                                                rows = "3"
+                                            }
+                                        )
+
+                                        @Html.ValidationMessageFor(
+                                            model => model.Subject,
+                                            "",
+                                            new { @class = "text-danger" }
+                                        )
+
+                                    </div>
+
+                                </div>
+
+                                <div class="card-footer">
+
+                                    <div class="d-flex justify-content-end">
+
+                                        <button type="submit"
+                                                class="btn btn-sm btn-primary">
+
+                                            <i class="align-middle me-1" data-lucide="save"></i>
+                                            Update
+
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+</div>
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            loadCategory();
+
+            $("#RequestType_CategoryId").on("change", function () {
+                loadAssetType();
+            });
+
+            $("#RequestType_AssetTypeId").on("change", function () {
+                loadSubCategory();
+            });
+
+        });
+
+
+        function parseJsonResult(data) {
+
+            if (typeof data === "string") {
+
+                try {
+                    return JSON.parse(data);
+                }
+                catch (e) {
+                    return [];
+                }
+
+            }
+
+            return data || [];
+        }
+
+
+        function loadCategory() {
+
+            var ticketType =
+                $("#RequestType_TicketType").val();
+
+            var dropDown =
+                $("#RequestType_CategoryId");
+
+            dropDown.empty();
+
+            dropDown.append(
+                "<option value='0'>-- Select --</option>"
+            );
+
+            $.getJSON(
+                '@Url.Action("GetCategoryByTicketTypeListJsonResult", "Category")',
+                {
+                    ticketType: ticketType
+                },
+                function (data) {
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.CategoryId,
+                                    text: item.CategoryName
+                                })
+                            );
+
+                        }
+                    );
+
+                    var selectedId =
+                        '@ViewBag.CategoryId';
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+                    loadAssetType();
+
+                }
+            );
+
+        }
+
+
+        function loadAssetType() {
+
+            var ticketType =
+                $("#RequestType_TicketType").val();
+
+            var categoryId =
+                $("#RequestType_CategoryId").val();
+
+            var dropDown =
+                $("#RequestType_AssetTypeId");
+
+
+            if ((!categoryId || categoryId == "0") &&
+                '@ViewBag.CategoryId' &&
+                '@ViewBag.CategoryId' != '0') {
+
+                categoryId =
+                    '@ViewBag.CategoryId';
+
+            }
+
+
+            dropDown.empty();
+
+            dropDown.append(
+                "<option value='0'>-- Select --</option>"
+            );
+
+
+            $.getJSON(
+                '@Url.Action("GetAssetTypeByTicketTypeListJsonResult", "AssetType")',
+                {
+                    ticketType: ticketType,
+                    categoryId: categoryId
+                },
+                function (data) {
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.AssetTypeId,
+                                    text: item.AssetTypeName
+                                })
+                            );
+
+                        }
+                    );
+
+                    var selectedId =
+                        '@ViewBag.AssetTypeId';
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+                    loadSubCategory();
+
+                }
+            );
+
+        }
+
+
+        function loadSubCategory() {
+
+            var ticketType =
+                $("#RequestType_TicketType").val();
+
+            var categoryId =
+                $("#RequestType_CategoryId").val();
+
+            var assetTypeId =
+                $("#RequestType_AssetTypeId").val();
+
+            var dropDown =
+                $("#RequestType_SubCategoryId");
+
+
+            if ((!categoryId || categoryId == "0") &&
+                '@ViewBag.CategoryId' &&
+                '@ViewBag.CategoryId' != '0') {
+
+                categoryId =
+                    '@ViewBag.CategoryId';
+
+            }
+
+
+            if ((!assetTypeId || assetTypeId == "0") &&
+                '@ViewBag.AssetTypeId' &&
+                '@ViewBag.AssetTypeId' != '0') {
+
+                assetTypeId =
+                    '@ViewBag.AssetTypeId';
+
+            }
+
+
+            dropDown.empty();
+
+            dropDown.append(
+                "<option value='0'>-- Select --</option>"
+            );
+
+
+            $.getJSON(
+                '@Url.Action("GetSubCategoryByTicketTypeListJsonResult", "SubCategory")',
+                {
+                    ticketType: ticketType,
+                    categoryId: categoryId,
+                    assetTypeId: assetTypeId
+                },
+                function (data) {
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.SubCategoryId,
+                                    text: item.SubCategoryName
+                                })
+                            );
+
+                        }
+                    );
+
+                    var selectedId =
+                        '@ViewBag.SubCategoryId';
+
+                    if (selectedId) {
+                        dropDown.val(selectedId);
+                    }
+
+                }
+            );
+
+        }
+
+    </script>
+}

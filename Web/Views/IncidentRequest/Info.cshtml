@@ -1,0 +1,702 @@
+﻿@model Domain.IM.IncidentRequest
+@using Service.IM
+@using Service
+@using Domain.IM
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="card">
+
+            <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+
+                <h5 class="card-title mb-0">
+                    <strong>Request #@Model.IncidentRequestId</strong>
+
+                    <i class="align-middle mx-2" data-lucide="chevrons-right"></i>
+
+                    @(Model.PendingTeam != null ? Model.PendingTeam.TeamName : "N/A")
+                </h5>
+
+                <span class="badge bg-@IncidentRequestService.GetStatusColor(Model.Status)">
+                    @Model.Status.EnumDisplayName()
+                </span>
+
+            </div>
+
+            <div class="card-body">
+
+                <div class="row g-4">
+
+                    <div class="col-lg-8">
+
+                        <div class="mb-3">
+
+                            <div class="fw-semibold">
+                                @Html.DisplayNameFor(model => model.Subject)
+                            </div>
+
+                            <div class="text-muted mt-1">
+                                @Model.Subject
+                            </div>
+
+                        </div>
+
+                        <hr />
+
+
+                        <div class="mb-3">
+
+                            <div class="fw-semibold">
+                                @Html.DisplayNameFor(model => model.Description)
+                            </div>
+
+                            <div class="text-muted mt-1"
+                                 style="white-space: pre-wrap;">
+                                @Model.Description
+                            </div>
+
+                        </div>
+
+                        <hr />
+
+
+                        <div class="mb-3">
+
+                            <div class="fw-semibold">
+                                @Html.DisplayNameFor(model => model.BusinessImpact)
+                            </div>
+
+                            <div class="text-muted mt-1"
+                                 style="white-space: pre-wrap;">
+                                @Model.BusinessImpact
+                            </div>
+
+                        </div>
+
+                        <hr />
+
+
+                        <dl class="row mb-4">
+
+                            <dt class="col-sm-3">
+                                @Html.DisplayNameFor(model => model.OccurredDate)
+                            </dt>
+
+                            <dd class="col-sm-3">
+                                @Model.OccurredDate
+                            </dd>
+
+
+                            <dt class="col-sm-3">
+                                @Html.DisplayNameFor(model => model.Impact)
+                            </dt>
+
+                            <dd class="col-sm-3">
+
+                                <span class="badge bg-@IncidentRequestService.GetImpactColor(Model.Impact)">
+                                    @Model.Impact.EnumDisplayName()
+                                </span>
+
+                            </dd>
+
+
+                            <dt class="col-sm-3">
+                                @Html.DisplayNameFor(model => model.Level01TeamId)
+                            </dt>
+
+                            <dd class="col-sm-3">
+                                @(Model.Level01Team != null ? Model.Level01Team.TeamName : "N/A")
+                            </dd>
+
+
+                            <dt class="col-sm-3">
+                                @Html.DisplayNameFor(model => model.PendingTeamId)
+                            </dt>
+
+                            <dd class="col-sm-3">
+                                @(Model.PendingTeam != null ? Model.PendingTeam.TeamName : "N/A")
+                            </dd>
+
+                        </dl>
+
+
+                        @if (Model.Status >= IncidentStatusEnum.Completed)
+                        {
+                            <div class="card mb-4">
+
+                                <div class="card-header">
+
+                                    <h5 class="card-title mb-0">
+                                        <i class="align-middle me-2" data-lucide="check-circle"></i>
+                                        Resolution Details
+                                    </h5>
+
+                                </div>
+
+                                <div class="card-body">
+
+                                    <dl class="row mb-0">
+
+                                        <dt class="col-md-3">
+                                            @Html.DisplayNameFor(model => model.RootCause)
+                                        </dt>
+
+                                        <dd class="col-md-9"
+                                            style="white-space: pre-wrap;">
+                                            @Model.RootCause
+                                        </dd>
+
+
+                                        <dt class="col-md-3">
+                                            @Html.DisplayNameFor(model => model.CorrectiveAction)
+                                        </dt>
+
+                                        <dd class="col-md-9"
+                                            style="white-space: pre-wrap;">
+                                            @Model.CorrectiveAction
+                                        </dd>
+
+
+                                        <dt class="col-md-3">
+                                            @Html.DisplayNameFor(model => model.PreventiveAction)
+                                        </dt>
+
+                                        <dd class="col-md-9"
+                                            style="white-space: pre-wrap;">
+                                            @Model.PreventiveAction
+                                        </dd>
+
+
+                                        <dt class="col-md-3">
+                                            @Html.DisplayNameFor(model => model.LessonsLearnt)
+                                        </dt>
+
+                                        <dd class="col-md-9 mb-0"
+                                            style="white-space: pre-wrap;">
+                                            @Model.LessonsLearnt
+                                        </dd>
+
+                                    </dl>
+
+                                </div>
+
+                            </div>
+                        }
+
+
+                        @if (Model.Assets != null && Model.Assets.Count > 0)
+                        {
+                            <div class="card mb-0">
+
+                                <div class="card-header">
+
+                                    <h5 class="card-title mb-0">
+                                        <i class="align-middle me-2" data-lucide="boxes"></i>
+                                        Assets
+                                    </h5>
+
+                                </div>
+
+                                <div class="card-body">
+
+                                    <div class="table-responsive">
+
+                                        <table id="assetDataTable"
+                                               class="table table-striped table-hover align-middle w-100">
+
+                                            <thead>
+                                                <tr>
+                                                    <th>Asset No</th>
+                                                    <th>Asset Type</th>
+                                                    <th>Make</th>
+                                                    <th>Model</th>
+                                                    <th>Serial No</th>
+                                                    <th>Barcode</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+
+                                                @foreach (var item in Model.Assets)
+                                                {
+                                                    <tr>
+
+                                                        <td>
+
+                                                            <a href="@Html.EncodedActionLink("", "Info", "Asset", "", new { id = item.AssetId }, null)"
+                                                               target="_blank">
+
+                                                                @item.Asset.AssetNo
+
+                                                            </a>
+
+                                                        </td>
+
+                                                        <td>
+                                                            @(item.Asset.AssetType != null ? item.Asset.AssetType.AssetTypeName : "N/A")
+                                                        </td>
+
+                                                        <td>
+                                                            @(item.Asset.AssetMake != null ? item.Asset.AssetMake.Name : "N/A")
+                                                        </td>
+
+                                                        <td>
+                                                            @item.Asset.ModelName
+                                                        </td>
+
+                                                        <td>
+                                                            @item.Asset.SerialNo
+                                                        </td>
+
+                                                        <td>
+                                                            @item.Asset.Barcode
+                                                        </td>
+
+                                                    </tr>
+                                                }
+
+                                            </tbody>
+
+                                        </table>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        }
+
+                    </div>
+
+
+                    <div class="col-lg-4">
+
+                        <div class="card mb-3">
+
+                            <div class="card-header">
+
+                                <h5 class="card-title mb-0">
+                                    <i class="align-middle me-2" data-lucide="user"></i>
+                                    Requester
+                                </h5>
+
+                            </div>
+
+                            <div class="card-body">
+
+                                <div class="mb-3">
+
+                                    <div class="fw-semibold">
+                                        <i class="align-middle me-1" data-lucide="credit-card"></i>
+                                        User
+                                    </div>
+
+                                    <div class="text-muted">
+                                        @Model.RequestedBy
+                                        -
+                                        @(Model.RequestedUser != null ? Model.RequestedUser.FullName : "N/A")
+                                    </div>
+
+                                </div>
+
+
+                                <div class="mb-3">
+
+                                    <div class="fw-semibold">
+                                        <i class="align-middle me-1" data-lucide="briefcase"></i>
+                                        Designation
+                                    </div>
+
+                                    <div class="text-muted">
+                                        @(Model.RequestedUser != null ? Model.RequestedUser.DesignationName : "N/A")
+                                    </div>
+
+                                </div>
+
+
+                                <div class="mb-3">
+
+                                    <div class="fw-semibold">
+                                        <i class="align-middle me-1" data-lucide="phone"></i>
+                                        Contact No
+                                    </div>
+
+                                    <div class="text-muted">
+                                        @(Model.RequestedUser != null ? Model.RequestedUser.ContactNo : "N/A")
+                                    </div>
+
+                                </div>
+
+
+                                <div class="mb-3">
+
+                                    <div class="fw-semibold">
+                                        <i class="align-middle me-1" data-lucide="mail"></i>
+                                        Email
+                                    </div>
+
+                                    <div class="text-muted text-break">
+                                        @(Model.RequestedUser != null ? Model.RequestedUser.Email : "N/A")
+                                    </div>
+
+                                </div>
+
+
+                                <div>
+
+                                    <div class="fw-semibold">
+                                        <i class="align-middle me-1" data-lucide="calendar"></i>
+                                        Requested Date
+                                    </div>
+
+                                    <div class="text-muted">
+                                        @Model.RequestedDate
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        @if (Model.IncidentRequestDocs != null && Model.IncidentRequestDocs.Any())
+                        {
+                            <div class="card mb-3">
+
+                                <div class="card-header">
+
+                                    <h5 class="card-title mb-0">
+                                        <i class="align-middle me-2" data-lucide="file-text"></i>
+                                        Documents
+                                    </h5>
+
+                                </div>
+
+                                <div class="card-body">
+
+                                    <div class="list-group list-group-flush">
+
+                                        @foreach (var item in Model.IncidentRequestDocs)
+                                        {
+                                            <a href="@item.FileUrl"
+                                               target="_blank"
+                                               class="list-group-item list-group-item-action px-0 d-flex justify-content-between align-items-center">
+
+                                                <span class="text-break">
+
+                                                    <i class="align-middle me-2"
+                                                       data-lucide="file-text">
+                                                    </i>
+
+                                                    @item.DocumentName
+
+                                                </span>
+
+                                                <i class="align-middle"
+                                                   data-lucide="external-link">
+                                                </i>
+
+                                            </a>
+                                        }
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        }
+
+
+                        @if (Model.Tickets != null && Model.Tickets.Count > 0)
+                        {
+                            <div class="card">
+
+                                <div class="card-header">
+
+                                    <h5 class="card-title mb-0">
+                                        <i class="align-middle me-2" data-lucide="link"></i>
+                                        Tickets
+                                    </h5>
+
+                                </div>
+
+                                <div class="card-body">
+
+                                    <div class="table-responsive">
+
+                                        <table id="ticketDataTable"
+                                               class="table table-striped table-hover align-middle mb-0">
+
+                                            <tbody>
+
+                                                @foreach (var item in Model.Tickets)
+                                                {
+                                                    <tr>
+
+                                                        <td>
+
+                                                            <a href="@Html.EncodedActionLink("", "Info", "Ticket", "", new { id = item.TicketId }, null)"
+                                                               target="_blank">
+
+                                                                @(item.Ticket != null ? item.Ticket.Code : item.TicketId.ToString())
+
+                                                            </a>
+
+                                                        </td>
+
+                                                    </tr>
+                                                }
+
+                                            </tbody>
+
+                                        </table>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        }
+
+                    </div>
+
+                </div>
+
+
+                <div class="row g-4 mt-1">
+
+                    <div class="col-lg-8">
+
+                        <div class="card">
+
+                            <div class="card-header d-flex justify-content-between align-items-center">
+
+                                <h5 class="card-title mb-0">
+                                    <i class="align-middle me-2" data-lucide="clock"></i>
+                                    Status
+                                </h5>
+
+                                <button type="button"
+                                        class="btn btn-sm btn-light"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#incidentStatusHistory"
+                                        aria-expanded="true"
+                                        aria-controls="incidentStatusHistory">
+
+                                    <i class="align-middle"
+                                       data-lucide="chevron-down">
+                                    </i>
+
+                                </button>
+
+                            </div>
+
+                            <div id="incidentStatusHistory"
+                                 class="collapse show">
+
+                                <div class="card-body">
+
+                                    @if (Model.IncidentRequestUpdates != null)
+                                    {
+                                        foreach (var status in Model.IncidentRequestUpdates.OrderBy(o => o.UpdatedDate))
+                                        {
+                                            <div class="border rounded p-3 mb-3">
+
+                                                <div class="d-flex align-items-start gap-3">
+
+                                                    <img src="@status.UpdatedUser.ProImageName"
+                                                         alt="User"
+                                                         class="rounded-circle"
+                                                         style="width: 42px; height: 42px; object-fit: cover;" />
+
+                                                    <div class="flex-grow-1">
+
+                                                        <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-2">
+
+                                                            <div class="fw-semibold">
+                                                                @status.UpdatedUser.FullName
+                                                            </div>
+
+                                                            <div class="text-muted small">
+
+                                                                <i class="align-middle me-1"
+                                                                   data-lucide="calendar">
+                                                                </i>
+
+                                                                @status.UpdatedDate
+
+                                                            </div>
+
+                                                        </div>
+
+                                                        <div class="p-3 rounded bg-@IncidentRequestService.GetStatusColor(status.Status) text-white">
+
+                                                            <div class="row g-2">
+
+                                                                <div class="col-md-9">
+
+                                                                    <strong>
+                                                                        @status.Status.EnumDisplayName()
+                                                                    </strong>
+
+                                                                    @if (!string.IsNullOrWhiteSpace(status.Comment))
+                                                                    {
+                                                                        <span>
+                                                                            | @status.Comment
+                                                                        </span>
+                                                                    }
+
+                                                                </div>
+
+                                                                <div class="col-md-3 text-md-end">
+
+                                                                    <strong>
+                                                                        @status.SpentTimeFomated
+                                                                    </strong>
+
+                                                                    <small>
+                                                                        (HH:MM)
+                                                                    </small>
+
+                                                                </div>
+
+                                                            </div>
+
+                                                        </div>
+
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+                                        }
+                                    }
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="col-lg-4">
+
+                        <div class="card">
+
+                            <div class="card-header d-flex justify-content-between align-items-center">
+
+                                <h5 class="card-title mb-0">
+                                    <i class="align-middle me-2" data-lucide="file-text"></i>
+                                    Ticket Log
+                                </h5>
+
+                                <button type="button"
+                                        class="btn btn-sm btn-light"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#incidentTicketLog"
+                                        aria-expanded="true"
+                                        aria-controls="incidentTicketLog">
+
+                                    <i class="align-middle"
+                                       data-lucide="chevron-down">
+                                    </i>
+
+                                </button>
+
+                            </div>
+
+                            <div id="incidentTicketLog"
+                                 class="collapse show">
+
+                                <div class="card-body">
+
+                                    @if (Model.IncidentRequestLogs != null)
+                                    {
+                                        foreach (var log in Model.IncidentRequestLogs.OrderBy(o => o.UpdatedDate))
+                                        {
+                                            <div class="d-flex gap-3 mb-3">
+
+                                                <img src="@(log.UpdatedBy != null && log.UpdatedUser != null
+                                                            ? log.UpdatedUser.ProImageName
+                                                            : "/Images/userimage.png")"
+                                                     alt="User"
+                                                     class="rounded-circle"
+                                                     style="width: 40px; height: 40px; object-fit: cover;" />
+
+                                                <div class="flex-grow-1">
+
+                                                    <div class="d-flex justify-content-between align-items-start gap-2">
+
+                                                        <strong>
+                                                            @(log.UpdatedBy != null && log.UpdatedUser != null
+                                                                ? log.UpdatedUser.FullName
+                                                                : "N/A")
+                                                        </strong>
+
+                                                        <small class="text-muted">
+                                                            @log.UpdatedDate
+                                                        </small>
+
+                                                    </div>
+
+                                                    <div class="text-muted mt-1"
+                                                         style="white-space: pre-wrap;">
+                                                        @log.Comment
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+                                        }
+                                    }
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            if ($("#assetDataTable").length) {
+
+                $("#assetDataTable").DataTable({
+                    paging: true,
+                    lengthChange: true,
+                    searching: true,
+                    ordering: true,
+                    info: true,
+                    responsive: true,
+                    autoWidth: false
+                });
+
+            }
+
+        });
+
+    </script>
+}

@@ -1,0 +1,178 @@
+﻿@model Web.Models.DocUploadVM
+@using Service
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card box-danger">
+            <div class="card-header with-border">
+                <h3 class="card-title">Problem Documents </h3>
+                <div class="card-tools pull-right">
+                    <a href="@Url.Action("AssignItems", "Problem")" class="btn btn-social btn-cancel">
+                        <i class="fa fa-arrow-left"></i>Back
+                    </a>
+                </div>
+            </div>
+
+
+
+
+            <div class="card-body">
+
+                <div class="row">
+                    <div class="col-md-7">
+                        @Html.Partial("_ProblemMin", Model.Problem)
+                    </div>
+
+                    <div class="col-md-5">
+                        <div class="card box-warning">
+                            <div class="card-header">
+                                <h3 class="card-title">Documents</h3>
+                            </div>
+                            <div class="card-body">
+                                @{
+                                    foreach (var item in Model.ItemDocs)
+                                    {
+                                        <div class="form-group-sm row">
+                                            <div class="col-md-9">
+
+                                                <a href="@item.FileUrl" target="_blank">@item.FileName</a>
+                                            </div>
+                                            <div class="col-md-3">
+
+                                                <a onclick="deleteItem('@item.ItemDocId', '@item.FileName')" class="btn btn-sm btn-delete">
+                                                    <i class="fa fa-trash-o"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="row">
+
+                    <div class="col-md-12">
+
+                        @using (Html.BeginForm("DocUpload", "Problem", FormMethod.Post, new { @class = "form-horizontal", enctype = "multipart/form-data" }))
+                        {
+
+                            @Html.HiddenFor(model => model.Problem.ProblemId)
+
+                            <div class="card">
+
+                                <div class="card-header with-border">
+                                    <h3 class="card-title">Upload Documnets </h3>
+                                    <div class="card-tools pull-right">
+
+                                        <button type="button" class="btn btn-box-tool" data-widget="collapse" data-bs-toggle="tooltip" title="" data-original-title="Collapse">
+                                            <i class="fa fa-minus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="card-body">
+                                    <div class="form-group">
+
+                                        @Html.LabelFor(model => model.FileName, new { @class = "col-md-2 control-label" })
+                                        <div class="col-md-9">
+                                            @Html.TextBoxFor(model => model.FileName, new { @class = "form-control" })
+                                            @Html.ValidationMessageFor(model => model.FileName, null, new { @class = "help-block" })
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div class="col-md-2">
+                                        </div>
+
+                                        <div class="col-md-9">
+                                            <input type="file" name="itemFile" id="itemFile" />
+                                        </div>
+                                    </div>
+
+
+
+
+
+                                </div>
+                                <div class="card-footer">
+                                    <div class="text-right">
+                                        <button type="submit" class="btn btn-social btn-primary"><i class="fa fa-floppy-o"></i>Upload</button>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+@section scripts {
+    <script type="text/javascript">
+
+        function deleteItem(itemId, itemName) {
+
+            swal({
+                title: "Are you sure?",
+                text: "Do you want to delete : " + itemName,
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                closeOnConfirm: true,
+                closeOnCancel: true
+            }, function (isConfirm) {
+                if (isConfirm) {
+                    $.ajax({
+                        url: "@Url.Action("Delete", "ItemDoc")",
+                        type: 'GET',
+                        dataType: "json",
+                        data: { id: itemId },
+                        success: function (data) {
+                            if (data == "1") {
+                                swal("Deleted!", "Record has been deleted", "success");
+                                setTimeout(function () {
+                                    window.location.reload();
+                                }, 500);
+                            }
+                            else if(data == "2")
+                                swal("Data in use!", "Data is currently in use and can not be deleted", "error");
+                            else
+                                swal("Something went wrong!", "Data is not deleted, Please try again", "error");
+                        },
+                        error: function (xhr) {
+                            swal("Something went wrong!", "Data is not deleted, Please try again", "error");
+                        }
+                    });
+
+                } else {
+                    swal("Cancelled", "Action canceled, Data is not deleted", "error");
+                }
+                });
+
+
+        }
+
+
+        function deleteItem2(itemId, itemName) {
+            alert(itemName);
+        }
+
+    </script>
+}

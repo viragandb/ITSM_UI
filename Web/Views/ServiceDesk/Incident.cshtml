@@ -1,0 +1,167 @@
+﻿@model IEnumerable<Domain.Category>
+@using Service
+@using Domain
+
+@{
+    ViewBag.Title = "ServiceRequest";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="card">
+
+    <div class="card-header p-0">
+
+        <ul class="nav nav-tabs"
+            role="tablist">
+
+            @{
+                int row = 0;
+                string activeClass = "";
+
+                foreach (var item in Model)
+                {
+                    activeClass = row == 0 ? "active" : "";
+
+                    <li class="nav-item"
+                        role="presentation">
+
+                        <a class="nav-link @activeClass"
+                           data-bs-toggle="tab"
+                           href="#cat_@item.CategoryId"
+                           role="tab"
+                           aria-selected="@(row == 0 ? "true" : "false")">
+
+                            <i class="align-middle me-2"
+                               data-lucide="folder"></i>
+
+                            @item.CategoryName
+
+                        </a>
+
+                    </li>
+
+                    row++;
+                }
+            }
+
+        </ul>
+
+    </div>
+
+
+    <div class="card-body">
+
+        <div class="tab-content">
+
+            @{
+                int row2 = 0;
+
+                foreach (var item in Model)
+                {
+                    activeClass = row2 == 0 ? "show active" : "";
+
+                    <div class="tab-pane fade @activeClass"
+                         id="cat_@item.CategoryId"
+                         role="tabpanel">
+
+                        <div class="row g-3">
+
+                            @foreach (var asset in item.AssetTypes)
+                            {
+                                var collapseId = "AT_" + item.CategoryId + "_" + asset.AssetTypeId;
+
+                                <div class="col-12 col-md-6">
+
+                                    <div class="card h-100">
+
+                                        <div class="card-header">
+
+                                            <h5 class="card-title mb-0">
+
+                                                <a href="#@collapseId"
+                                                   data-bs-toggle="collapse"
+                                                   class="d-flex align-items-center text-body"
+                                                   aria-expanded="false"
+                                                   aria-controls="@collapseId">
+
+                                                    <i class="align-middle me-2"
+                                                       data-lucide="box"></i>
+
+                                                    <span>
+                                                        @asset.AssetTypeName
+                                                    </span>
+
+                                                    <i class="align-middle ms-auto"
+                                                       data-lucide="chevron-down"></i>
+
+                                                </a>
+
+                                            </h5>
+
+                                        </div>
+
+
+                                        <div id="@collapseId"
+                                             class="collapse">
+
+                                            <div class="card-body">
+
+                                                <div class="row g-2">
+
+                                                    @foreach (var subCat in asset.SubCategories)
+                                                    {
+                                                        <div class="col-12 col-sm-6">
+
+                                                            <a href="@Html.EncodedActionLink(
+                                                                         "",
+                                                                         "CreateRequest",
+                                                                         "ServiceDesk",
+                                                                         "",
+                                                                         new
+                                                                         {
+                                                                             ticketType = (int)TicketTypeEnum.IN,
+                                                                             categoryId = item.CategoryId,
+                                                                             assetTypeId = asset.AssetTypeId,
+                                                                             subCategoryId = subCat.SubCategoryId
+                                                                         },
+                                                                         null
+                                                                     )"
+                                                               class="btn btn-outline-primary w-100 text-start">
+
+                                                                <i class="align-middle me-2"
+                                                                   data-lucide="circle-dot"></i>
+
+                                                                @subCat.SubCategoryName
+
+                                                            </a>
+
+                                                        </div>
+                                                    }
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            }
+
+                        </div>
+
+                    </div>
+
+                    row2++;
+                }
+            }
+
+        </div>
+
+    </div>
+
+</div>
+
+@section scripts {
+}

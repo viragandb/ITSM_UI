@@ -1,0 +1,424 @@
+﻿@model Domain.SubCategory
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="card">
+
+            <div class="card-header d-flex justify-content-between align-items-center">
+
+                <h5 class="card-title mb-0">
+                    <i class="align-middle me-2" data-lucide="plus"></i>
+                    Create New
+                </h5>
+
+                <a href="@Url.Action("Index", "SubCategory")"
+                   class="btn btn-sm btn-light">
+
+                    <i class="align-middle me-1" data-lucide="arrow-left"></i>
+                    Back
+
+                </a>
+
+            </div>
+
+            @using (Html.BeginForm("Create", "SubCategory", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true)
+
+                <div class="card-body">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+
+                            @Html.LabelFor(
+                                model => model.SubCategoryName,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.TextBoxFor(
+                                model => model.SubCategoryName,
+                                new { @class = "form-control" }
+                            )
+
+                            @Html.ValidationMessageFor(
+                                model => model.SubCategoryName,
+                                "",
+                                new { @class = "text-danger" }
+                            )
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            @Html.LabelFor(
+                                model => model.Icon,
+                                new { @class = "form-label" }
+                            )
+
+                            <div class="input-group">
+
+                                @Html.DropDownListFor(
+                                    model => model.Icon,
+                                    new List<SelectListItem>(),
+                                    new { @class = "form-select" }
+                                )
+
+                                <span class="input-group-text"
+                                      id="IconName">
+                                </span>
+
+                            </div>
+
+                            @Html.ValidationMessageFor(
+                                model => model.Icon,
+                                "",
+                                new { @class = "text-danger" }
+                            )
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            @Html.LabelFor(
+                                model => model.Color,
+                                new { @class = "form-label" }
+                            )
+
+                            @Html.DropDownListFor(
+                                model => model.Color,
+                                new List<SelectListItem>(),
+                                new { @class = "form-select" }
+                            )
+
+                            @Html.ValidationMessageFor(
+                                model => model.Color,
+                                "",
+                                new { @class = "text-danger" }
+                            )
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+                                Preview
+                            </label>
+
+                            <div>
+                                <span id="ColorName"></span>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="card-footer">
+
+                    <div class="d-flex justify-content-end gap-2">
+
+                        <button type="reset"
+                                class="btn btn-sm btn-danger">
+
+                            <i class="align-middle me-1" data-lucide="rotate-ccw"></i>
+                            Cancel
+
+                        </button>
+
+                        <button type="submit"
+                                class="btn btn-sm btn-primary">
+
+                            <i class="align-middle me-1" data-lucide="save"></i>
+                            Save
+
+                        </button>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+</div>
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            loadIcons();
+            loadColors();
+
+
+            $("#Icon").on("change", function () {
+                displayIcon();
+            });
+
+
+            $("#Color").on("change", function () {
+                displayColor();
+            });
+
+        });
+
+
+        function parseJsonResult(data) {
+
+            if (typeof data === "string") {
+
+                try {
+                    return JSON.parse(data);
+                }
+                catch (e) {
+                    return [];
+                }
+
+            }
+
+            return data || [];
+        }
+
+
+        function getLucideIcon(icon) {
+
+            if (!icon) {
+                return "layers";
+            }
+
+            var value = icon.toString().toLowerCase()
+                .replace("fas ", "")
+                .replace("far ", "")
+                .replace("fab ", "")
+                .replace("fa ", "")
+                .replace("fa-", "")
+                .trim();
+
+
+            var iconMap = {
+
+                "plus": "plus",
+                "edit": "pencil",
+                "pencil": "pencil",
+                "pencil-alt": "pencil",
+
+                "trash": "trash-2",
+                "trash-alt": "trash-2",
+
+                "user": "user",
+                "users": "users",
+                "user-circle": "circle-user",
+
+                "briefcase": "briefcase",
+                "phone": "phone",
+                "envelope": "mail",
+                "mail": "mail",
+
+                "calendar": "calendar",
+                "clock": "clock",
+
+                "info": "info",
+                "info-circle": "info",
+
+                "check": "check",
+                "check-circle": "check-circle",
+                "check-square": "square-check",
+
+                "thumbs-up": "thumbs-up",
+                "thumbs-down": "thumbs-down",
+
+                "folder": "folder",
+                "file": "file",
+                "file-alt": "file-text",
+
+                "save": "save",
+                "search": "search",
+
+                "cog": "settings",
+                "gear": "settings",
+
+                "wrench": "wrench",
+                "key": "key",
+                "lock": "lock",
+                "unlock": "unlock",
+
+                "shield": "shield",
+                "bell": "bell",
+
+                "comment": "message-square",
+                "comments": "messages-square",
+
+                "list": "list",
+                "bars": "menu",
+
+                "home": "house",
+                "building": "building",
+
+                "database": "database",
+                "server": "server",
+
+                "desktop": "monitor",
+                "laptop": "laptop",
+
+                "mobile": "smartphone",
+                "mobile-alt": "smartphone",
+
+                "plug": "plug",
+
+                "link": "link",
+                "unlink": "unlink",
+
+                "exchange-alt": "arrow-right-left",
+                "sync": "refresh-cw",
+
+                "redo": "redo-2",
+                "undo": "undo-2",
+
+                "exclamation": "triangle-alert",
+                "exclamation-triangle": "triangle-alert",
+
+                "times": "x",
+                "times-circle": "circle-x",
+
+                "hourglass": "hourglass",
+                "hourglass-end": "hourglass",
+
+                "tasks": "clipboard-check",
+                "layer-group": "layers"
+            };
+
+
+            return iconMap[value] || "layers";
+
+        }
+
+
+        function loadIcons() {
+
+            $.getJSON(
+                '@Url.Action("GetIconJsonResult", "Ticket")',
+                function (data) {
+
+                    var dropDown = $("#Icon");
+
+                    dropDown.empty();
+
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.Value,
+                                    text: item.Text
+                                })
+                            );
+
+                        }
+                    );
+
+
+                    displayIcon();
+
+                }
+            );
+
+        }
+
+
+        function displayIcon() {
+
+            var iconValue =
+                $("#Icon").val();
+
+            var lucideIcon =
+                getLucideIcon(iconValue);
+
+
+            $("#IconName").html(
+                '<i class="align-middle" data-lucide="' +
+                lucideIcon +
+                '"></i>'
+            );
+
+
+            if (window.lucide) {
+                lucide.createIcons();
+            }
+
+        }
+
+
+        function loadColors() {
+
+            $.getJSON(
+                '@Url.Action("GetColorJsonResult", "Ticket")',
+                function (data) {
+
+                    var dropDown = $("#Color");
+
+                    dropDown.empty();
+
+
+                    $.each(
+                        parseJsonResult(data),
+                        function (index, item) {
+
+                            dropDown.append(
+                                $("<option/>", {
+                                    value: item.Value,
+                                    text: item.Text
+                                })
+                            );
+
+                        }
+                    );
+
+
+                    displayColor();
+
+                }
+            );
+
+        }
+
+
+        function displayColor() {
+
+            var color =
+                $("#Color").val();
+
+
+            if (!color) {
+
+                $("#ColorName").empty();
+
+                return;
+            }
+
+
+            $("#ColorName").html(
+                '<span class="badge bg-' +
+                color +
+                '">' +
+                $("<div/>").text(color).html() +
+                '</span>'
+            );
+
+        }
+
+    </script>
+
+}

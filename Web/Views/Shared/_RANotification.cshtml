@@ -1,0 +1,278 @@
+﻿@model IEnumerable<Domain.RA.RemoteAccessRequest>
+
+@using Domain.AR
+@using Domain.RA
+@using Domain
+
+@{
+    var teamIds = ViewBag.TeamIds as Dictionary<string, long>;
+    var currentUserId = Session["UserId"] != null
+        ? Session["UserId"].ToString()
+        : "";
+
+    var supervisorCount = Model
+        .Where(w =>
+            w.Status == AccessRequestStatusEnum.Initiated &&
+            w.ApprovalStage == RemoteAccessApprovalStageEnum.SupervisorApprovalStage &&
+            w.FinalApprovalBy == currentUserId)
+        .Count();
+
+    var avpvpCount = Model
+        .Where(e =>
+            e.Status <= AccessRequestStatusEnum.Pending &&
+            e.ApprovalStage == RemoteAccessApprovalStageEnum.VPOrAVPApprovalStage &&
+            e.FinalApprovalBy == currentUserId)
+        .Count();
+
+    var pendingByTeam = Model
+        .Where(r =>
+            r.Status == AccessRequestStatusEnum.Pending &&
+            r.TeamId.HasValue)
+        .GroupBy(r => r.TeamId.Value)
+        .ToDictionary(g => g.Key, g => g.Count());
+
+    int riskCount = 0;
+    int hrCount = 0;
+    int itSecHeadCount = 0;
+    int itRemoteNetCount = 0;
+    int itSecCount = 0;
+    int helpDeskCount = 0;
+
+    if (teamIds != null)
+    {
+        if (teamIds.ContainsKey("Risk"))
+        {
+            pendingByTeam.TryGetValue(teamIds["Risk"], out riskCount);
+        }
+
+        if (teamIds.ContainsKey("HR"))
+        {
+            pendingByTeam.TryGetValue(teamIds["HR"], out hrCount);
+        }
+
+        if (teamIds.ContainsKey("ITSecHead"))
+        {
+            pendingByTeam.TryGetValue(teamIds["ITSecHead"], out itSecHeadCount);
+        }
+
+        if (teamIds.ContainsKey("ITRemoteNet"))
+        {
+            pendingByTeam.TryGetValue(teamIds["ITRemoteNet"], out itRemoteNetCount);
+        }
+
+        if (teamIds.ContainsKey("ITSec"))
+        {
+            pendingByTeam.TryGetValue(teamIds["ITSec"], out itSecCount);
+        }
+
+        if (teamIds.ContainsKey("HelpDesk"))
+        {
+            pendingByTeam.TryGetValue(teamIds["HelpDesk"], out helpDeskCount);
+        }
+    }
+
+    var implementerCount = itRemoteNetCount + itSecCount;
+
+    var totalCount =
+        supervisorCount +
+        avpvpCount +
+        riskCount +
+        hrCount +
+        itSecHeadCount +
+        implementerCount +
+        helpDeskCount;
+}
+
+<li class="nav-item dropdown">
+
+    <a class="nav-icon dropdown-toggle"
+       href="#"
+       id="remoteAccessDropdown"
+       data-bs-toggle="dropdown"
+       aria-expanded="false">
+
+        <div class="position-relative">
+
+            <i class="align-middle text-body"
+               data-lucide="globe"></i>
+
+            @if (totalCount > 0)
+            {
+                <span class="indicator">
+                    @totalCount
+                </span>
+            }
+
+        </div>
+
+    </a>
+
+    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end py-0"
+         aria-labelledby="remoteAccessDropdown">
+
+        <div class="dropdown-menu-header">
+
+            <div class="position-relative">
+
+                <i class="fas fa-globe me-2"></i>
+
+                Remote Access Requests
+
+            </div>
+
+        </div>
+
+        <div class="list-group">
+
+            @if (supervisorCount > 0)
+            {
+                <a href="@Url.Action("SupervisorApprovalPending", "RemoteAccessRequest")"
+                   class="list-group-item">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <span>
+                            Supervisor Approval
+                        </span>
+
+                        <span class="badge bg-danger">
+                            @supervisorCount
+                        </span>
+
+                    </div>
+
+                </a>
+            }
+
+            @if (avpvpCount > 0)
+            {
+                <a href="@Url.Action("VPAVPApprovalPending", "RemoteAccessRequest")"
+                   class="list-group-item">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <span>
+                            AVP / VP Approval
+                        </span>
+
+                        <span class="badge bg-danger">
+                            @avpvpCount
+                        </span>
+
+                    </div>
+
+                </a>
+            }
+
+            @if (riskCount > 0)
+            {
+                <a href="@Url.Action("RiskApprovalPending", "RemoteAccessRequest")"
+                   class="list-group-item">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <span>
+                            Risk
+                        </span>
+
+                        <span class="badge bg-danger">
+                            @riskCount
+                        </span>
+
+                    </div>
+
+                </a>
+            }
+
+            @if (hrCount > 0)
+            {
+                <a href="@Url.Action("HRApprovalPending", "RemoteAccessRequest")"
+                   class="list-group-item">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <span>
+                            HR Remote Admin
+                        </span>
+
+                        <span class="badge bg-danger">
+                            @hrCount
+                        </span>
+
+                    </div>
+
+                </a>
+            }
+
+            @if (itSecHeadCount > 0)
+            {
+                <a href="@Url.Action("ITSecHeadApprovalPending", "RemoteAccessRequest")"
+                   class="list-group-item">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <span>
+                            IT Sec Head
+                        </span>
+
+                        <span class="badge bg-danger">
+                            @itSecHeadCount
+                        </span>
+
+                    </div>
+
+                </a>
+            }
+
+            @if (implementerCount > 0)
+            {
+                <a href="@Url.Action("ImplementerApprovalPending", "RemoteAccessRequest")"
+                   class="list-group-item">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <span>
+                            Implementer
+                        </span>
+
+                        <span class="badge bg-danger">
+                            @implementerCount
+                        </span>
+
+                    </div>
+
+                </a>
+            }
+
+            @if (helpDeskCount > 0)
+            {
+                <a href="@Url.Action("HelpDeskApprovalPending", "RemoteAccessRequest")"
+                   class="list-group-item">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <span>
+                            Help Desk
+                        </span>
+
+                        <span class="badge bg-danger">
+                            @helpDeskCount
+                        </span>
+
+                    </div>
+
+                </a>
+            }
+
+            @if (totalCount == 0)
+            {
+                <div class="p-3 text-center text-muted">
+                    No pending remote access requests
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+</li>

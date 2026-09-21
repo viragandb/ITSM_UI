@@ -1,0 +1,356 @@
+﻿
+@model ICollection<Web.Models.CheklistTaskVM>
+@using Service
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@using (Html.BeginForm("ChecklistPending", "ScheduledTask", FormMethod.Get, new { @class = "form-horizontal" }))
+{
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card box-danger">
+                <div class="card-header with-border">
+                    <h3 class="card-title">Tasks</h3>
+
+                </div>
+
+
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+
+                            <div class="form-group">
+                                <label class="control-label col-md-2">
+                                    Team :
+                                </label>
+                                <div class="col-md-4">
+                                    <select id="TeamId" name="TeamId" class="form-control">
+                                        <option value=""></option>
+                                    </select>
+                                </div>
+                                <label class="control-label col-md-2">
+                                    Task Date :
+                                </label>
+                                <div class="col-md-2">
+                                    <div class="input-group date">
+                                        <div class="input-group-addon">
+                                            <i class="fa fa-calendar"></i>
+                                        </div>
+                                        <input type="text" name="StartDate" id="StartDate" value="@ViewBag.StartDate" autocomplete="off" class="form-control datepicker" />
+                                    </div>
+                                </div>
+
+
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+                <div class="card-footer">
+                    <div class="text-right">
+                        <button type="submit" class="btn btn-social">
+                            <i class="fa fa-search"></i>Search
+                        </button>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+
+        <div class="col-lg-12">
+            <div class="card box-default">
+
+
+                <div class="card-body">
+                    @{
+                        foreach (var item in Model)
+                        {
+
+                            <div class="panel box ">
+                                <div class="card-header" style="background-color:#D9D9DC">
+                                    <h4 class="card-title">
+                                        <a data-bs-toggle="collapse" data-parent="#accordion" href="#Cat_@item.TaskCategoryId">
+                                            @item.TaskCategory.TaskCategoryName
+                                            &nbsp;&nbsp;(@item.TaskCategory.Weightage%)
+
+                                        </a>
+
+                                    </h4>
+                                    @*<div class="pull-right">
+                                            <a href="@Html.EncodedActionLink("", "TaskInfo", "ScheduledTask", "", new { id = item.ScheduledTaskId }, null)" target="_blank" class="btn btn-sm btn-default">
+                                                <i class="fa fa-info"></i>
+                                            </a>
+                                            <a href="@Html.EncodedActionLink("", "TaskUpdate", "ScheduledTask", "", new { id = item.TaskUpdateId }, null)" class="btn btn-sm btn-social btn-warning">
+                                                <i class="fa fa-pencil-square-o"></i>Complete
+                                            </a>
+                                        </div>*@
+
+                                </div>
+                                <div id="Cat_@item.TaskCategoryId" class="panel-collapse">
+                                    <div class="card-body">
+                                        @{
+                                            foreach (var task in item.TaskUpdates)
+                                            {
+                                                <div class="panel box box-@ScheduledTaskService.GetTaskStatusColor(task.Status)">
+                                                    <div class="card-header">
+                                                        <h4 class="card-title">
+                                                            <a data-parent="#accordion" href="#Task_@task.TaskUpdateId" data-id="@task.TaskUpdateId"
+                                                               class="openTaskUpdate" data-bs-toggle="modal" data-bs-target="#modal-default">
+                                                                @task.ScheduledTask.TaskName
+                                                            </a>
+
+                                                        </h4>
+
+                                                        <div class="card-tools pull-right">
+                                                           Assigned to : @task.ScheduledTask.User.FullName
+
+                                                            @*<span class="label text- label-@ScheduledTaskService.GetTaskStatusColor(task.Status)">
+                                                                    @task.Status.EnumDisplayName()
+                                                                </span>*@
+                                                            @*<a href="@Url.Action("Create", "ScheduledTask")" class="btn btn-social btn-cancel">
+                                                                    <i class="fa fa-plus"></i>Add New
+                                                                </a>*@
+                                                            @*<button type="button" class="btn btn-default" data-bs-toggle="modal" data-bs-target="#modal-default">
+                                                                    Update
+                                                                </button>*@
+                                                        </div>
+
+
+                                                    </div>
+                                                    <div id="Task_@task.TaskUpdateId" class="panel-collapse2 ">
+                                                        <div class="card-body">
+
+                                                            Comment : @task.Comment
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+                                        }
+
+                                    </div>
+
+                                    @*@Html.LabelFor(model => item.Comment, new { @class = "col-md-2 control-label" })
+                                        <div class="col-md-10">
+                                            @Html.TextAreaFor(model => item.Comment, new { @class = "form-control", rows = "2" })
+                                            @Html.ValidationMessageFor(model => item.Comment, null, new { @class = "help-block" })
+                                        </div>*@
+                                </div>
+                            </div>
+                        }
+                    }
+
+
+                </div>
+
+                <div class="card-footer">
+
+                    <div class="pull-right">
+
+                        <a onclick="sendEmail()" class="btn btn-sm btn-social btn-primary">
+                            <i class="fa fa-envelope"></i> Send Email
+                        </a>
+                    </div>
+
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+}
+
+<div class="modal fade" id="modal-default" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                @*<button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>*@
+                <h4 class="modal-title">Enter task comment</h4>
+            </div>
+            <div class="modal-body" style="padding-bottom:50px">
+                <input type="hidden" name="clTaskId" id="clTaskId" value="" />
+
+                @*Comment :
+        <input type="text" name="clTaskComment" id="clTaskComment" value="" />*@
+
+                @*<label class="col-md-12">
+            Comment
+        </label>*@
+
+                <div class="form-group">
+
+                    <div class="control-label col-md-12">
+                        @*<textarea rows="3" id="textComment" name="textComment" class="form-control">
+            </textarea>*@
+                        <input type="text" id="textComment" name="textComment" class="form-control">
+                    </div>
+                </div>
+              <br /><br />
+                <div class="form-group">
+                    <div class="control-label col-md-10 text-right">
+
+                        Follow Up Needed
+
+                    </div>
+                    <div class="control-label col-md-2">
+                        <input type="checkbox" id="checkBoxFollowup" name="checkBoxFollowup" >
+                    </div>
+                </div>
+            </div>
+                <div class="modal-footer">
+                    <br />
+
+                    <button type="button" class="btn btn-default pull-left" data-bs-dismiss="modal">Close</button>
+                    @*<button type="button" class="btnbtn-primary" data-bs-dismiss="modal">Complete</button>*@
+
+                    <a onclick="updateTask()" class="btn btn-primary" data-bs-dismiss="modal">
+                        <i class="fa fa-check-square-o"> </i> &nbsp;  Complete
+                    </a>
+                </div>
+            </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+@section scripts {
+
+
+
+
+
+    <script type="text/javascript">
+                    $(document).on("click", ".openTaskUpdate", function () {
+                        var _taskId = $(this).data('id');
+                        $(".modal-body #clTaskId").val(_taskId);
+
+                        $('#textComment').val('');
+                    });
+
+
+                    $(document).ready(function () {
+                        loadTeams();
+                    });
+
+                    function updateTask() {
+                    var _taskId = $("#clTaskId").val();
+                        var _taskComment = $("#textComment").val();
+
+                        var _followUp = false;
+                        //alert(_followUp);
+
+                        if ($('#checkBoxFollowup').is(":checked")) {
+                            _followUp = true;
+                        }
+                        //var _followUp = $("#checkBoxFollowup").val();
+                        if (_taskComment != null && _taskComment!='') {
+
+                                $.ajax({
+                                url: "@Url.Action("UpdateChecklistTask", "ScheduledTask")",
+                                type: 'GET',
+                                dataType: "json",
+                                    data: { id: _taskId, comment: _taskComment, isFollowup: _followUp },
+                                success: function (data) {
+                                    if (data == "1") {
+                                        swal("Updated", "Task has been completed", "success");
+                                        window.location.reload();
+
+                                        //setTimeout(function () {
+                                        //    window.location.reload();
+                                        //}, 10);
+                                    }
+                                    else
+                                        swal("Something went wrong!", "Please try again", "error");
+                                },
+                                error: function (xhr) {
+                                    swal("Something went wrong!", "Please try again", "error");
+                                }
+                                });
+                        }
+                        else
+                            swal("Error!", "Please enter comment", "error");
+                    }
+
+                    function sendEmail() {
+                        var _date = $("#StartDate").val();
+                        var _teamId = $("#TeamId").val();
+                        swal({
+                            title: "Are you sure?",
+                            text: "Do you want to send the summary email?",
+                            type: "warning",
+                            showCancelButton: true,
+                            confirmButtonColor: "#DD6B55",
+                            confirmButtonText: "Yes",
+                            cancelButtonText: "No",
+                            closeOnConfirm: true,
+                            closeOnCancel: true
+                        }, function (isConfirm) {
+                            if (isConfirm) {
+                                $.ajax({
+                                    url: "@Url.Action("SendChacklistEmail", "ScheduledTask")",
+                                    type: 'GET',
+                                    dataType: "json",
+                                    data: { date: _date, teamId: _teamId},
+                                    success: function (data) {
+                                        if (data == "1") {
+                                            swal("Sent!", "Email has been sent", "success");
+                                                window.location.reload();
+                                        }
+                                        else if (data == "3") {
+                                            swal("Error!", "Please update all tasks", "Error");
+                                        }
+                                        else
+                                            swal("Something went wrong!", "Email is not sent, Please try again", "error");
+                                    },
+                                    error: function (xhr) {
+                                        swal("Something went wrong!", "Please try again", "error");
+                                    }
+                                });
+
+                            } else {
+                                swal("Cancelled", "Action canceled", "error");
+                            }
+                        });
+                    }
+
+
+
+          function loadTeams() {
+
+            $.getJSON("@Url.Action("GetTeamUserListJsonResult", "Team")", function (data) {
+                var dropDown = $("#TeamId");
+
+                dropDown.empty();
+               // dropDown.append("<option value='0'>-- Select --</option>");
+
+                $.each(JSON.parse(data), function (index, optionaldata) {
+                    dropDown.append($('<option />', { value: optionaldata.TeamId }).html(optionaldata.TeamName));
+                });
+
+                if ('@ViewBag.TeamId') {
+                      $('#TeamId').val(@ViewBag.TeamId).attr("selected", "selected");
+                 }
+
+                loadUsers();
+                loadCategory();
+            });
+
+        }
+    </script>
+}
+
+

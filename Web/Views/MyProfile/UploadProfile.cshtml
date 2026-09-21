@@ -1,0 +1,222 @@
+﻿@model Domain.User
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="card">
+
+            <div class="card-header d-flex justify-content-between align-items-center">
+
+                <h5 class="card-title mb-0">
+                    <i class="align-middle me-2" data-lucide="image"></i>
+                    Update Profile Image
+                </h5>
+
+                <a href="@Url.Action("Index", "MyProfile")"
+                   class="btn btn-sm btn-light">
+
+                    <i class="align-middle me-1" data-lucide="arrow-left"></i>
+                    Back
+
+                </a>
+
+            </div>
+
+            <div class="card-body">
+
+                <div class="row g-4">
+
+                    <div class="col-lg-6">
+
+                        <div class="row g-3">
+
+                            <div class="col-12">
+
+                                @Html.LabelFor(
+                                    model => model.EmpNo,
+                                    new { @class = "form-label" }
+                                )
+
+                                <input type="text"
+                                       class="form-control"
+                                       value="@Model.EmpNo"
+                                       readonly />
+
+                            </div>
+
+                            <div class="col-12">
+
+                                @Html.LabelFor(
+                                    model => model.FullName,
+                                    new { @class = "form-label" }
+                                )
+
+                                <input type="text"
+                                       class="form-control"
+                                       value="@Model.FullName"
+                                       readonly />
+
+                            </div>
+
+                            <div class="col-12">
+
+                                @Html.LabelFor(
+                                    model => model.DepartmentName,
+                                    new { @class = "form-label" }
+                                )
+
+                                <input type="text"
+                                       class="form-control"
+                                       value="@Model.DepartmentName"
+                                       readonly />
+
+                            </div>
+
+                            <div class="col-12">
+
+                                @Html.LabelFor(
+                                    model => model.DesignationName,
+                                    new { @class = "form-label" }
+                                )
+
+                                <input type="text"
+                                       class="form-control"
+                                       value="@Model.DesignationName"
+                                       readonly />
+
+                            </div>
+
+                            <div class="col-12">
+
+                                @Html.LabelFor(
+                                    model => model.Email,
+                                    new { @class = "form-label" }
+                                )
+
+                                <input type="text"
+                                       class="form-control"
+                                       value="@Model.Email"
+                                       readonly />
+
+                            </div>
+
+                            <div class="col-12">
+
+                                @Html.LabelFor(
+                                    model => model.ContactNo,
+                                    new { @class = "form-label" }
+                                )
+
+                                <input type="text"
+                                       class="form-control"
+                                       value="@Model.ContactNo"
+                                       readonly />
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-lg-6">
+
+                        @using (Html.BeginForm(
+                            "UploadProfile",
+                            "MyProfile",
+                            FormMethod.Post,
+                            new
+                            {
+                                enctype = "multipart/form-data"
+                            }))
+                        {
+                            <div class="card h-100">
+
+                                <div class="card-header">
+
+                                    <h5 class="card-title mb-0">
+                                        <i class="align-middle me-2" data-lucide="upload"></i>
+                                        Upload Profile Image
+                                    </h5>
+
+                                </div>
+
+                                <div class="card-body">
+
+                                    <div class="mb-3">
+
+                                        <label for="itemFile" class="form-label">
+                                            Select Image
+                                        </label>
+
+                                        <input type="file"
+                                               name="itemFile"
+                                               id="itemFile"
+                                               class="form-control"
+                                               accept="image/*"
+                                               required />
+
+                                        <div class="form-text">
+                                            Select an image file for your profile.
+                                        </div>
+
+                                    </div>
+
+                                    @if (!string.IsNullOrWhiteSpace(Model.ProImageName))
+                                    {
+                                        <div class="text-center mt-4">
+
+                                            <img src="@Model.ProImageName"
+                                                 alt="Current Profile Image"
+                                                 class="rounded-circle border"
+                                                 style="width: 150px; height: 150px; object-fit: cover;" />
+
+                                            <div class="text-muted small mt-2">
+                                                Current Profile Image
+                                            </div>
+
+                                        </div>
+                                    }
+
+                                </div>
+
+                                <div class="card-footer">
+
+                                    <div class="d-flex justify-content-end">
+
+                                        <button type="submit"
+                                                class="btn btn-sm btn-primary">
+
+                                            <i class="align-middle me-1" data-lucide="upload"></i>
+                                            Upload
+
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        }
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+@section scripts {
+
+    <script src="~/Scripts/jquery.validate.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+
+}

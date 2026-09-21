@@ -1,0 +1,91 @@
+﻿@model IEnumerable<Domain.IM.IncidentRequest>
+
+@using Domain.IM
+
+@{
+    var currentUserId = Session["UserId"] != null
+        ? Session["UserId"].ToString()
+        : "";
+
+    var pendingCount = Model
+        .Where(w =>
+            w.Status < IncidentStatusEnum.Completed &&
+            w.PendingTeam.UserTeams.Any(u => u.EmpNo == currentUserId))
+        .Count();
+
+    var totalCount = pendingCount;
+}
+
+<li class="nav-item dropdown">
+
+    <a class="nav-icon dropdown-toggle"
+       href="#"
+       id="incidentRequestDropdown"
+       data-bs-toggle="dropdown"
+       aria-expanded="false">
+
+        <div class="position-relative">
+
+            <i class="align-middle text-body"
+               data-lucide="megaphone"></i>
+
+            @if (totalCount > 0)
+            {
+                <span class="indicator">
+                    @totalCount
+                </span>
+            }
+
+        </div>
+
+    </a>
+
+    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end py-0"
+         aria-labelledby="incidentRequestDropdown">
+
+        <div class="dropdown-menu-header">
+
+            <div class="position-relative">
+
+                <i class="fas fa-bullhorn me-2"></i>
+
+                Incident Requests
+
+            </div>
+
+        </div>
+
+        <div class="list-group">
+
+            @if (pendingCount > 0)
+            {
+                <a href="@Url.Action("Pending", "IncidentRequest")"
+                   class="list-group-item">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <span>
+                            Pending
+                        </span>
+
+                        <span class="badge bg-danger">
+                            @pendingCount
+                        </span>
+
+                    </div>
+
+                </a>
+            }
+
+            @if (totalCount == 0)
+            {
+                <div class="p-3 text-center text-muted">
+                    No pending incident requests
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+</li>

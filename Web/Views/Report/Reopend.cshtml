@@ -1,0 +1,432 @@
+﻿
+@using Service
+@model IEnumerable<Domain.Ticket>
+@{
+    /**/
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@using (Html.BeginForm("Reopend", "Report", FormMethod.Get, new { @class = "form-horizontal" }))
+{
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card box-danger">
+                <div class="card-header with-border">
+                    <h3 class="card-title">Tickets</h3>
+
+                </div>
+
+
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+
+                            <div class="form-group">
+
+                                <label class="control-label col-md-2">
+                                    Team :
+                                </label>
+                                <div class="col-md-4">
+                                    <select id="TeamId" name="TeamId" class="form-control">
+                                        <option value=""></option>
+                                    </select>
+                                    <span class="help-block" data-valmsg-for="TeamId" data-valmsg-replace="true"></span>
+                                </div>
+
+                                <label class="control-label col-md-2">
+                                    Company :
+                                </label>
+                                <div class="col-md-4">
+                                    <select id="CompanyId" name="CompanyId" class="form-control">
+                                        <option value=""></option>
+                                    </select>
+                                    <span class="help-block" data-valmsg-for="CompanyId" data-valmsg-replace="true"></span>
+                                </div>
+
+
+                            </div>
+                            <div class="form-group">
+
+                                <label class="control-label col-md-2">
+                                    Assigned To :
+                                </label>
+                                <div class="col-md-6">
+                                    <select id="UserEmpNo" name="UserEmpNo" class="form-control">
+                                        <option value=""></option>
+                                    </select>
+                                    <span class="help-block" data-valmsg-for="UserEmpNo" data-valmsg-replace="true"></span>
+                                </div>
+                            </div>
+
+                            <div class="form-group ">
+                                <label class="control-label col-md-2">
+                                    Category :
+                                </label>
+                                <div class="col-md-4">
+                                    <select id="CategoryId" name="CategoryId" class="form-control">
+                                        <option value=""></option>
+                                    </select>
+                                    <span class="help-block" data-valmsg-for="CategoryId" data-valmsg-replace="true"></span>
+                                </div>
+
+                                <label class="control-label col-md-2">
+                                    Ticket Type :
+                                </label>
+                                <div class="col-md-4">
+                                    <select id="TicketTypeId" name="TicketTypeId" class="form-control">
+                                        <option value=""></option>
+                                    </select>
+                                    <span class="help-block" data-valmsg-for="TicketTypeId" data-valmsg-replace="true"></span>
+                                </div>
+
+
+                            </div>
+
+                            <div class="form-group ">
+
+                                <label class="control-label col-md-2">
+                                    Requested Date :
+                                </label>
+                                <div class="col-md-2">
+                                    <div class="input-group date">
+                                        <div class="input-group-addon">
+                                            <i class="fa fa-calendar"></i>
+                                        </div>
+                                        <input type="text" name="StartDate" id="StartDate" value="@ViewBag.StartDate" class="form-control datepicker" />
+                                    </div>
+                                </div>
+
+
+                                <label class="control-label col-md-1">
+                                    To
+                                </label>
+                                <div class="col-md-2">
+                                    <div class="input-group date">
+                                        <div class="input-group-addon">
+                                            <i class="fa fa-calendar"></i>
+                                        </div>
+                                        <input type="text" name="EndDate" id="EndDate" value="@ViewBag.EndDate" class="form-control datepicker" />
+                                    </div>
+                                </div>
+
+
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+                <div class="card-footer">
+                    <div class="text-right">
+                        <button type="submit" class="btn btn-social">
+                            <i class="fa fa-search"></i>Search
+                        </button>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+
+        <div class="col-md-12">
+            <div class="card box-default">
+                <div class="card-body">
+
+                    <table id="dataTable" class="table table-bordered table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Ticket Id</th>
+                                <th>Category</th>
+                                <th>Asset Type</th>
+                                <th>Subcategory</th>
+                                <th>Requested By</th>
+                                <th>Assigned To</th>
+                                <th>Reques -ted Date</th>
+                                <th>Resolu -tion Hrs</th>
+                                <th>Spent Hrs</th>
+                                @*<th width="60px">Rate</th>*@
+                                <th>SLA</th>
+                                <th>Location</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                foreach (var item in Model)
+                                {
+                            <tr>
+
+                                <td>
+                                    <a href="@Html.EncodedActionLink("","Info", "Ticket","", new { id = item.TicketId },null)" target="_blank">
+                                        @item.Code
+                                    </a>
+
+                                </td>
+                                @*<td>
+            <span class="label text- label-@TicketService.GetTicketTypeColor(item.RequestType.TicketType)">
+                @item.RequestType.TicketType.EnumDisplayName()
+            </span>
+        </td>*@
+                                <td>@item.RequestType.Category.CategoryName</td>
+                                <td>@item.RequestType.AssetType.AssetTypeName</td>
+                                <td>@item.RequestType.SubCategory.SubCategoryName</td>
+                                <td>@item.RequestedUser.FullName</td>
+                                <td>
+                                    @if (item.AssignedToUser != null)
+                                    {
+                                        @item.AssignedToUser.FullName
+                                    }
+                                </td>
+
+                                <td align="right">@item.RequestedDate.ToShortDateString()</td>
+                                <td align="right">@item.Resolve</td>
+                                <td align="right">@item.SpentTime</td>
+                                @*<td>
+                                    <span class="label text- label-@TicketService.GetTicketRateColor(item.Rate)">
+                                        @(new HtmlString(@TicketService.GetTicketRate(item.Rate)))
+                                    </span>
+                                </td>*@
+                                <td>
+                                    @if (@item.IsTimeViolated)
+                                    {
+                                        <label class="label text- label-danger">
+                                            Violated
+                                        </label>
+                                    }
+                                    else
+                                    {
+                                       <p>N/A</p>
+                                    }
+                                </td>
+
+                                <td>@*@item.LocationName*@</td>
+
+                                <td>
+                                    <span class="label text- label-@TicketService.GetTicketStatusColor(item.Status)">
+                                        @item.Status.EnumDisplayName()
+                                    </span>
+                                </td>
+                            </tr>
+                                }
+                            }
+                        </tbody>
+
+                    </table>
+
+                </div>
+                <!-- /.box-body -->
+
+            </div>
+
+        </div>
+    </div>
+
+
+    <div class="row">
+
+
+        <div class="col-md-4">
+            <div class="card box-default">
+
+                <div class="card-header with-border">
+                    <h3 class="card-title">Ticket Type Summary</h3>
+                    <div class="card-tools pull-right">
+
+                    </div>
+                </div>
+
+                <div class="card-body">
+
+                    <div class="row">
+
+                        <div class="col-md-8">
+                            <span class="label text- label-@TicketService.GetTicketTypeColor(Domain.TicketTypeEnum.SR)">
+                                @Domain.TicketTypeEnum.SR.EnumDisplayName()
+                            </span>
+                        </div>
+                        <div class="col-md-4 text-right">
+                            @Model.Where(w => w.RequestType.TicketType == Domain.TicketTypeEnum.SR).Count()
+                        </div>
+                        <div class="col-md-8">
+                            <span class="label text- label-@TicketService.GetTicketTypeColor(Domain.TicketTypeEnum.IN)">
+                                @Domain.TicketTypeEnum.IN.EnumDisplayName()
+                            </span>
+                        </div>
+                        <div class="col-md-4 text-right">
+                            @Model.Where(w => w.RequestType.TicketType == Domain.TicketTypeEnum.IN).Count()
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+    </div>
+
+}
+
+
+@section scripts {
+    <script src="~/Scripts/jquery.validate.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.js"></script>
+    @*<script src="~/Scripts/custom_functions.js"></script>*@
+
+    <script type="text/javascript">
+
+
+        $(document).ready(function () {
+
+            $('#dataTable').DataTable({
+                "paging": false,
+                "lengthChange": true,
+                "searching": true,
+                "ordering": true,
+                "info": true,
+                "autoWidth": true
+            });
+
+        });
+
+
+             $(document).ready(function () {
+
+             loadTeams();
+                 loadTicketTypes();
+                 loadCategory();
+                 loadCompanies();
+        });
+
+        $("select#TeamId").change(function (evt) {
+            loadUsers();
+
+        });
+
+        function loadTeams() {
+
+            $.getJSON("@Url.Action("GetTeamListJsonResult", "Team")", function (data) {
+                var dropDown = $("#TeamId");
+
+                dropDown.empty();
+                dropDown.append("<option value='0'>-- All --</option>");
+
+                $.each(JSON.parse(data), function (index, optionaldata) {
+                    dropDown.append($('<option />', { value: optionaldata.TeamId }).html(optionaldata.TeamName));
+                });
+
+                if ('@ViewBag.TeamId') {
+                      $('#TeamId').val(@ViewBag.TeamId).attr("selected", "selected");
+                 }
+
+                loadUsers();
+            });
+
+        }
+
+         function loadUsers() {
+             var _teamId = $('#TeamId').val();
+
+            $.getJSON("@Url.Action("GetUsersByTeamIdJsonResult", "User")",
+              {
+                  teamId: _teamId
+              }, function (data) {
+                  var dropDown = $("#UserEmpNo");
+
+                  dropDown.empty();
+                  dropDown.append("<option value='0'>-- All --</option>");
+
+                  $.each(JSON.parse(data), function (index, optionaldata) {
+                      dropDown.append($('<option/>', { value: optionaldata.EmpNo }).html(optionaldata.EmpNo + ' - ' +optionaldata.FullName + ' (' + optionaldata.DesignationName + ')' ));
+                  });
+
+                   if ('@ViewBag.UserEmpNo') {
+                       $('#UserEmpNo').val(@ViewBag.UserEmpNo).attr("selected", "selected");
+                 }
+
+              });
+        }
+
+         function loadTicketTypes() {
+
+            $.getJSON("@Url.Action("GetTicketTypesJsonResult", "RequestType")", function (data) {
+                var dropDown = $("#TicketTypeId");
+
+                dropDown.empty();
+                dropDown.append("<option value='0'>-- All --</option>");
+
+                $.each(JSON.parse(data), function (index, optionaldata) {
+                    dropDown.append($('<option />', { value: optionaldata.Id }).html(optionaldata.Name));
+                });
+
+                if ('@ViewBag.TicketTypeId') {
+                    $('#TicketTypeId').val(@ViewBag.TicketTypeId).attr("selected", "selected");
+                 }
+            });
+
+        }
+
+
+
+          function loadCategory() {
+
+            $.getJSON("@Url.Action("GetCategoryListJsonResult", "Category")",function(data) {
+                    var dropDown = $("#CategoryId");
+                dropDown.empty();
+                dropDown.append("<option value='0'>-- All --</option>");
+                $.each(JSON.parse(data), function (index, optionaldata) {
+                    dropDown.append($('<option />', { value: optionaldata.CategoryId }).html(optionaldata.CategoryName));
+                });
+
+                 if ('@ViewBag.CategoryId') {
+                     $('#CategoryId').val('@ViewBag.CategoryId').attr("selected", "selected");
+                }
+                @*else {
+                     $('#CategoryId').val('@categoryId').attr("selected", "selected");
+                }*@
+
+                });
+
+
+        }
+
+
+         function loadCompanies() {
+
+            $.getJSON("@Url.Action("GetCompanyListJsonResult", "Company")", function (data) {
+                var companyDropDown = $("#CompanyId");
+
+                companyDropDown.empty();
+                companyDropDown.append("<option value='0'>-- All --</option>");
+
+                $.each(JSON.parse(data), function (index, optionaldata) {
+                    companyDropDown.append($('<option/>', { value: optionaldata.CompanyId }).html(optionaldata.CompanyName));
+                });
+
+                if ('@ViewBag.CompanyId') {
+                    $('#CompanyId').val('@ViewBag.CompanyId').attr("selected", "selected");
+                }
+            });
+
+        }
+
+
+
+    </script>
+}
+
+
+
+
+
+
+

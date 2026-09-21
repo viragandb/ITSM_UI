@@ -1,0 +1,352 @@
+﻿@using Service
+@model IEnumerable<Domain.SubCategory>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="card">
+
+            <div class="card-header d-flex justify-content-between align-items-center">
+
+                <h5 class="card-title mb-0">
+                    <i class="align-middle me-2" data-lucide="layers"></i>
+                    Subcategories
+                </h5>
+
+                <a href="@Url.Action("Create", "SubCategory")"
+                   class="btn btn-sm btn-primary">
+
+                    <i class="align-middle me-1" data-lucide="plus"></i>
+                    Add New
+
+                </a>
+
+            </div>
+
+            <div class="card-body">
+
+                <div class="table-responsive">
+
+                    <table id="dataTable"
+                           class="table table-striped table-hover align-middle w-100">
+
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Icon</th>
+                                <th>Color</th>
+                                <th>Updated By</th>
+                                <th>Updated Date</th>
+                                <th class="text-end">Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+
+                                    <td>
+                                        @item.SubCategoryName
+                                    </td>
+
+                                    <td>
+                                        <i class="subcategory-icon"
+                                           data-icon="@item.Icon"></i>
+                                    </td>
+
+                                    <td>
+                                        <span class="badge bg-@item.Color">
+                                            @item.Color
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        @item.UpdatedBy
+                                    </td>
+
+                                    <td>
+                                        @item.UpdatedDate
+                                    </td>
+
+                                    <td class="text-end">
+
+                                        <div class="btn-group btn-group-sm">
+
+                                            <a href="@Url.Action("Edit", "SubCategory", new { id = item.SubCategoryId })"
+                                               class="btn btn-primary"
+                                               title="Edit">
+
+                                                <i class="align-middle"
+                                                   data-lucide="pencil"></i>
+
+                                            </a>
+
+                                            <button type="button"
+                                                    class="btn btn-danger"
+                                                    title="Delete"
+                                                    onclick="deleteItem('@item.SubCategoryId')">
+
+                                                <i class="align-middle"
+                                                   data-lucide="trash-2"></i>
+
+                                            </button>
+
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+@section scripts {
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $("#dataTable").DataTable({
+                paging: true,
+                lengthChange: true,
+                searching: true,
+                ordering: true,
+                info: true,
+                responsive: true,
+                autoWidth: false
+            });
+
+            renderSubCategoryIcons();
+
+        });
+
+
+        function getLucideIcon(icon) {
+
+            if (!icon) {
+                return "layers";
+            }
+
+            var value = icon.toString().toLowerCase()
+                .replace("fas ", "")
+                .replace("far ", "")
+                .replace("fab ", "")
+                .replace("fa ", "")
+                .replace("fa-", "")
+                .trim();
+
+
+            var iconMap = {
+
+                "plus": "plus",
+                "edit": "pencil",
+                "pencil": "pencil",
+                "pencil-alt": "pencil",
+
+                "trash": "trash-2",
+                "trash-alt": "trash-2",
+
+                "user": "user",
+                "users": "users",
+                "user-circle": "circle-user",
+
+                "briefcase": "briefcase",
+                "phone": "phone",
+                "envelope": "mail",
+                "mail": "mail",
+
+                "calendar": "calendar",
+                "clock": "clock",
+
+                "info": "info",
+                "info-circle": "info",
+
+                "check": "check",
+                "check-circle": "check-circle",
+                "check-square": "square-check",
+
+                "thumbs-up": "thumbs-up",
+                "thumbs-down": "thumbs-down",
+
+                "folder": "folder",
+                "file": "file",
+                "file-alt": "file-text",
+
+                "save": "save",
+                "search": "search",
+
+                "cog": "settings",
+                "gear": "settings",
+
+                "wrench": "wrench",
+                "key": "key",
+                "lock": "lock",
+                "unlock": "unlock",
+
+                "shield": "shield",
+                "bell": "bell",
+
+                "comment": "message-square",
+                "comments": "messages-square",
+
+                "list": "list",
+                "bars": "menu",
+
+                "home": "house",
+                "building": "building",
+
+                "database": "database",
+                "server": "server",
+
+                "desktop": "monitor",
+                "laptop": "laptop",
+
+                "mobile": "smartphone",
+                "mobile-alt": "smartphone",
+
+                "plug": "plug",
+
+                "link": "link",
+                "unlink": "unlink",
+
+                "exchange-alt": "arrow-right-left",
+                "sync": "refresh-cw",
+
+                "redo": "redo-2",
+                "undo": "undo-2",
+
+                "exclamation": "triangle-alert",
+                "exclamation-triangle": "triangle-alert",
+
+                "times": "x",
+                "times-circle": "circle-x",
+
+                "hourglass": "hourglass",
+                "hourglass-end": "hourglass",
+
+                "tasks": "clipboard-check",
+                "layer-group": "layers"
+            };
+
+            return iconMap[value] || "layers";
+        }
+
+
+        function renderSubCategoryIcons() {
+
+            $(".subcategory-icon").each(function () {
+
+                var iconValue = $(this).data("icon");
+                var lucideIcon = getLucideIcon(iconValue);
+
+                $(this).attr("data-lucide", lucideIcon);
+
+            });
+
+            if (window.lucide) {
+                lucide.createIcons();
+            }
+
+        }
+
+
+        function deleteItem(itemId) {
+
+            Swal.fire({
+                title: "Are you sure?",
+                text: "Do you want to delete?",
+                icon: "warning",
+                confirmButtonText: "Yes",
+                cancelButtonText: "No",
+                showCancelButton: true,
+                reverseButtons: true
+            }).then(function (result) {
+
+                if (result.isConfirmed || result.value) {
+
+                    $.ajax({
+
+                        url: '@Url.Action("Delete", "SubCategory")',
+
+                        type: "GET",
+
+                        dataType: "json",
+
+                        data: {
+                            id: itemId
+                        },
+
+                        success: function (data) {
+
+                            if (data == "1" || data == 1) {
+
+                                Swal.fire(
+                                    "Deleted!",
+                                    "Record has been deleted",
+                                    "success"
+                                );
+
+                                setTimeout(function () {
+                                    window.location.reload();
+                                }, 1000);
+
+                            }
+                            else if (data == "2" || data == 2) {
+
+                                Swal.fire(
+                                    "Data in use!",
+                                    "Data is currently in use and cannot be deleted",
+                                    "error"
+                                );
+
+                            }
+                            else {
+
+                                Swal.fire(
+                                    "Something went wrong!",
+                                    "Data is not deleted, Please try again",
+                                    "error"
+                                );
+
+                            }
+
+                        },
+
+                        error: function () {
+
+                            Swal.fire(
+                                "Something went wrong!",
+                                "Data is not deleted, Please try again",
+                                "error"
+                            );
+
+                        }
+
+                    });
+
+                }
+
+            });
+
+        }
+
+    </script>
+}
